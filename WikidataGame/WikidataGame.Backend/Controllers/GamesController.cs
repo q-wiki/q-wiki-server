@@ -53,6 +53,7 @@ namespace WikidataGame.Backend.Controllers
             if(string.IsNullOrWhiteSpace(deviceId))
                 return BadRequest(new { message = "DeviceId needs to be supplied" });
 
+            //create or update user
             var user = _userRepo.Get(deviceId);
             if (user == null)
             {
@@ -69,21 +70,7 @@ namespace WikidataGame.Backend.Controllers
             }
             _dataContext.SaveChanges();
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, deviceId)
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
-
-            Response.Headers.Add("WWW-Authenticate", $"Bearer {tokenString}");
+            Response.Headers.Add("WWW-Authenticate", $"Bearer {JwtTokenHelper.CreateJwtToken(deviceId, _appSettings)}");
             return Ok (new GameInfo
             {
                 GameId = Guid.NewGuid().ToString(),

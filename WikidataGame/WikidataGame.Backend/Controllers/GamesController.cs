@@ -37,8 +37,15 @@ namespace WikidataGame.Backend.Controllers
             _appSettings = appSettings.Value;
         }
 
+        /// <summary>
+        /// Creates a new game and matches the player with an opponent
+        /// </summary>
+        /// <param name="deviceId">device identifier</param>
+        /// <param name="pushUrl">push notification channel url</param>
+        /// <returns>Info about the newly created game</returns>
         [AllowAnonymous]
         [HttpPost]
+        [ProducesResponseType(typeof(GameInfo), StatusCodes.Status200OK)]
         public IActionResult CreateNewGame(
             [FromHeader(Name = "X-Device-ID")] string deviceId,
             [FromHeader(Name = "X-Push-URL")] string pushUrl)
@@ -83,6 +90,37 @@ namespace WikidataGame.Backend.Controllers
                 IsAwaitingOpponentToJoin = true,
                 Message = "Hello World!"
             });
+        }
+
+        /// <summary>
+        /// Retrieves information on the specified game
+        /// </summary>
+        /// <param name="gameId">game identifier</param>
+        /// <returns>Info about the specified game</returns>
+        [HttpGet("{gameId}")]
+        [ProducesResponseType(typeof(Game), StatusCodes.Status200OK)]
+        public IActionResult RetrieveGameState(string gameId)
+        {
+            //check if game exists
+
+            return Ok(new Game
+            {
+                Id = gameId
+            });
+        }
+
+        /// <summary>
+        /// Stops/deletes the specified game
+        /// </summary>
+        /// <param name="gameId">game identifier</param>
+        /// <returns>204 status code</returns>
+        [HttpDelete("{gameId}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public IActionResult DeleteGame(string gameId)
+        {
+            //check if game exists
+
+            return NoContent();
         }
     }
 }

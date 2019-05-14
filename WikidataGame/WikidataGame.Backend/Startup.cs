@@ -46,6 +46,9 @@ namespace WikidataGame.Backend
             {
                 c.SwaggerDoc("v1", new Info { Title = "Wikidata Game API", Version = "v1" });
 
+                var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                c.IncludeXmlComments(System.IO.Path.Combine(AppContext.BaseDirectory, xmlFile));
+
                 c.AddSecurityDefinition("oauth2", new ApiKeyScheme
                 {
                     Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",

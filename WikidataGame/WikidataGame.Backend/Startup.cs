@@ -19,6 +19,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Models;
 using WikidataGame.Backend.Repos;
+using WikidataGame.Backend.Services;
 
 namespace WikidataGame.Backend
 {
@@ -33,6 +34,10 @@ namespace WikidataGame.Backend
                 .AddEnvironmentVariables();
 
             Configuration = builder.Build();
+
+            // TODO: Remove this again
+            var tiles = MapGeneratorService.GenerateMap();
+            MapGeneratorService.Debug(tiles);
         }
 
         public IConfiguration Configuration { get; }

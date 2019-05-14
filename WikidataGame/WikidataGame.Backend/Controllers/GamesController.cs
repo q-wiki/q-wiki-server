@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using WikidataGame.Backend.Dto;
 using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Models;
@@ -21,19 +20,16 @@ namespace WikidataGame.Backend.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class GamesController : ControllerBase
+    public class GamesController : CustomControllerBase
     {
-        private readonly IRepository<User,string> _userRepo;
         private readonly AppSettings _appSettings;
-        private readonly DataContext _dataContext;
 
         public GamesController(
             DataContext dataContext,
             IRepository<User, string> userRepo,
-            IOptions<AppSettings> appSettings)
+            IOptions<AppSettings> appSettings) : base(dataContext, userRepo)
         {
-            _dataContext = dataContext;
-            _userRepo = userRepo;
+            
             _appSettings = appSettings.Value;
         }
 
@@ -88,7 +84,8 @@ namespace WikidataGame.Backend.Controllers
         [ProducesResponseType(typeof(Game), StatusCodes.Status200OK)]
         public IActionResult RetrieveGameState(string gameId)
         {
-            //check if game exists
+            //check if game exists for user
+            var user = GetCurrentUser();
 
             return Ok(new Game
             {

@@ -6,14 +6,24 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WikidataGame.Backend.Dto;
+using WikidataGame.Backend.Helpers;
+using WikidataGame.Backend.Models;
+using WikidataGame.Backend.Repos;
 
 namespace WikidataGame.Backend.Controllers
 {
     [Route("api/games/{gameId}/minigames")]
     [Authorize]
     [ApiController]
-    public class MinigamesController : ControllerBase
+    public class MinigamesController : CustomControllerBase
     {
+        public MinigamesController(
+            DataContext dataContext,
+            IRepository<User, string> userRepo) : base(dataContext, userRepo)
+        {
+
+        }
+
         /// <summary>
         /// Initializes a new minigame
         /// </summary>

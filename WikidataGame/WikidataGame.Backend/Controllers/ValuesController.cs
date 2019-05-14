@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WikidataGame.Backend.Controllers
@@ -11,9 +12,11 @@ namespace WikidataGame.Backend.Controllers
     public class ValuesController : ControllerBase
     {
         // GET api/values
+        [Authorize]
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
+            var user = User;
             return new string[] { "value1", "value2", "value3" };
         }
 

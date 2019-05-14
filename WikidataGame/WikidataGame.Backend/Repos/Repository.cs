@@ -10,7 +10,6 @@ namespace WikidataGame.Backend.Repos
     public class Repository<TEntity, TIdEntity> : IRepository<TEntity, TIdEntity> where TEntity : class where TIdEntity : class
     {
         protected readonly DbContext Context;
-        //protected DbSet<TEntity> Entities;
         private string _primaryKeyPropertyName;
 
         public Repository(DataContext context)

@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WikidataGame.Backend.Dto;
 using WikidataGame.Backend.Helpers;
-using WikidataGame.Backend.Models;
 using WikidataGame.Backend.Repos;
 
 namespace WikidataGame.Backend.Controllers
@@ -19,7 +18,7 @@ namespace WikidataGame.Backend.Controllers
     {
         public MinigamesController(
             DataContext dataContext,
-            IRepository<User, string> userRepo) : base(dataContext, userRepo)
+            IRepository<Models.User, string> userRepo) : base(dataContext, userRepo)
         {
 
         }

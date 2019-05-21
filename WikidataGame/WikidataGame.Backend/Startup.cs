@@ -34,10 +34,6 @@ namespace WikidataGame.Backend
                 .AddEnvironmentVariables();
 
             Configuration = builder.Build();
-
-            // TODO: Remove this again
-            var tiles = MapGeneratorService.GenerateMap();
-            MapGeneratorService.Debug(tiles);
         }
 
         public IConfiguration Configuration { get; }

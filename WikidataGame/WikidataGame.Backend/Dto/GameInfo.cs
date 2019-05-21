@@ -14,6 +14,9 @@ namespace WikidataGame.Backend.Dto
 
         public static GameInfo FromGame(Models.Game game)
         {
+            if (game == null)
+                return null;
+
             return new GameInfo
             {
                 GameId = game.Id,

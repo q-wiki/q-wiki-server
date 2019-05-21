@@ -29,7 +29,7 @@ namespace WikidataGame.Backend.Controllers
             DataContext dataContext,
             IUserRepository userRepo,
             IGameRepository gameRepo,
-            IOptions<AppSettings> appSettings) : base(dataContext, userRepo)
+            IOptions<AppSettings> appSettings) : base(dataContext, userRepo, gameRepo)
         {
             _gameRepo = gameRepo;
             _appSettings = appSettings.Value;
@@ -84,13 +84,11 @@ namespace WikidataGame.Backend.Controllers
         [ProducesResponseType(typeof(Game), StatusCodes.Status200OK)]
         public IActionResult RetrieveGameState(string gameId)
         {
-            //check if game exists for user
-            var user = GetCurrentUser();
+            if (!IsUserGameParticipant(gameId))
+                Forbid();
+            var game = _gameRepo.Get(gameId);
 
-            return Ok(new Game
-            {
-                Id = gameId
-            });
+            return Ok(Game.FromModel(game, GetCurrentUser().DeviceId));
         }
 
         /// <summary>
@@ -102,7 +100,12 @@ namespace WikidataGame.Backend.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IActionResult DeleteGame(string gameId)
         {
-            //check if game exists
+            if (!IsUserGameParticipant(gameId))
+                Forbid();
+
+            //TODO: notify opponent
+            var game = _gameRepo.Get(gameId);
+            _gameRepo.Remove(game);
 
             return NoContent();
         }

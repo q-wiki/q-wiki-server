@@ -17,5 +17,20 @@ namespace WikidataGame.Backend.Dto
         public int Difficulty { get; set; }
 
         public string OwnerId { get; set; }
+
+        public static Tile FromModel(Models.Tile tile)
+        {
+            if (tile == null)
+                return null;
+
+            return new Tile
+            {
+                Id = tile.Id,
+                ChosenCategoryId = tile.ChosenCategoryId,
+                AvailableCategories = tile.AvailableCategories.Select(c => Category.FromModel(c)).AsEnumerable(),
+                Difficulty = tile.Difficulty,
+                OwnerId = tile.OwnerId
+            };
+        }
     }
 }

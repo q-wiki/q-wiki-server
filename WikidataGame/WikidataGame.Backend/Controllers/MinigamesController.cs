@@ -18,7 +18,8 @@ namespace WikidataGame.Backend.Controllers
     {
         public MinigamesController(
             DataContext dataContext,
-            IRepository<Models.User, string> userRepo) : base(dataContext, userRepo)
+            IUserRepository userRepo,
+            IGameRepository gameRepo) : base(dataContext, userRepo, gameRepo)
         {
 
         }

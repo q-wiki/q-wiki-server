@@ -6,13 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CXuesong.MW.WikiClientLibrary.Wikibase" Version="0.6.0" />
     <PackageReference Include="dotNetRDF" Version="2.2.0" />
-    <PackageReference Include="dotNetRDF.Data.Sql" Version="0.7.0" />
-    <PackageReference Include="dotNetRDF.Data.Virtuoso" Version="2.2.0" />
-    <PackageReference Include="dotNetRDF.Web" Version="2.2.0" />
-    <PackageReference Include="DynamicSPARQL" Version="1.0.2.2" />
-    <PackageReference Include="DynamicSPARQL.dotNetRDF" Version="1.0.0.3" />
     <PackageReference Include="VDS.Common" Version="1.10.0" />
   </ItemGroup>
 

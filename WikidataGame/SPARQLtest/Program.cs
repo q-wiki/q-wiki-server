@@ -75,35 +75,22 @@ namespace SPARQLtest
             SparqlResultSet results2 = endpoint.QueryWithResultSet(queryString.CommandText);
             var random = new Random();
             results2.OrderBy(item => random.Next());
-
+            System.Collections.Generic.List<SparqlResult> test = results2.ToList();
+            test.OrderBy(item => random.Next());
             foreach (SparqlResult result in results2)
             {
                 Console.WriteLine(result.ToString());
-                
+                //With method
+                INode value = result.Value("?president");
+                Console.WriteLine(value);
+
             }
 
-            Console.WriteLine();
-            //********* 3rd try **********/
-            Console.WriteLine("Test3");
+            foreach (SparqlResult result in test)
+            {
+                Console.WriteLine(result.ToString());
 
-            TripleStore store = new TripleStore();
-            SparqlQueryParser sparqlparser = new SparqlQueryParser();
-            SparqlQuery query3 = sparqlparser.ParseFromString("CONSTRUCT { ?s ?p ?o } WHERE { { ?s ?p ?o } UNION { GRAPH ?g { ?s ?p ?o } } }");
-            Object results3 = store.ExecuteQuery(query3);
-            if (results is IGraph)
-            {
-                //Print out the Results
-                IGraph g = (IGraph)results;
-                foreach (Triple t in g.Triples)
-                {
-                    Console.WriteLine(t.ToString());
-                }
-                Console.WriteLine("Query took " + query.QueryExecutionTime.ToString());
-            } else
-            {
-                Console.WriteLine("No graph.");
             }
-
 
             Console.WriteLine();
             //********* 4th try **********/

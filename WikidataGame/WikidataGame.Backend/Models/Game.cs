@@ -12,12 +12,16 @@ namespace WikidataGame.Backend.Models
         [Key]
         public string Id { get; set; }
 
-        public ICollection<Tile> Tiles { get; set; }
+        public virtual ICollection<Tile> Tiles { get; set; }
 
-        public ICollection<User> Players { get; set; }
+        public virtual ICollection<User> Players { get; set; }
 
         [ForeignKey(nameof(User))]
         public string NextMovePlayerId { get; set; }
         public virtual User NextMovePlayer { get; set; }
+
+        [ForeignKey(nameof(User))]
+        public string WinningPlayerId { get; set; }
+        public virtual User WinningPlayer { get; set; }
     }
 }

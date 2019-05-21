@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using WikidataGame.Backend.Dto;
 using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Repos;
+using WikidataGame.Backend.Services;
 
 namespace WikidataGame.Backend.Controllers
 {
@@ -22,13 +23,15 @@ namespace WikidataGame.Backend.Controllers
     public class GamesController : CustomControllerBase
     {
         private readonly AppSettings _appSettings;
+        private readonly IGameRepository _gameRepo;
 
         public GamesController(
             DataContext dataContext,
-            IRepository<Models.User, string> userRepo,
+            IUserRepository userRepo,
+            IGameRepository gameRepo,
             IOptions<AppSettings> appSettings) : base(dataContext, userRepo)
         {
-            
+            _gameRepo = gameRepo;
             _appSettings = appSettings.Value;
         }
 
@@ -48,30 +51,28 @@ namespace WikidataGame.Backend.Controllers
             if(string.IsNullOrWhiteSpace(deviceId))
                 return BadRequest(new { message = "DeviceId needs to be supplied" });
 
-            //create or update user
-            var user = _userRepo.Get(deviceId);
-            if (user == null)
-            {
-                _userRepo.Add(new Models.User
-                {
-                    DeviceId = deviceId,
-                    PushChannelUrl = pushUrl
-                });
-            }
-            else
-            {
-                user.PushChannelUrl = pushUrl;
-                _userRepo.Update(user);
-            }
+            var user = _userRepo.CreateOrUpdateUser(deviceId, pushUrl);
             _dataContext.SaveChanges();
 
             Response.Headers.Add("WWW-Authenticate", $"Bearer {JwtTokenHelper.CreateJwtToken(deviceId, _appSettings)}");
-            return Ok (new GameInfo
+
+            var game = _gameRepo.RunningGameForPlayer(user);
+            if (game == default(Models.Game))
             {
-                GameId = Guid.NewGuid().ToString(),
-                IsAwaitingOpponentToJoin = true,
-                Message = "Hello World!"
-            });
+                game = _gameRepo.GetOpenGame();
+                if (game == default(Models.Game))
+                {
+                    game = _gameRepo.CreateNewGame(user);
+                }
+                else
+                {
+                    _gameRepo.JoinGame(game, user);
+                }
+
+                _dataContext.SaveChanges();
+            }
+
+            return Ok(GameInfo.FromGame(game));
         }
 
         /// <summary>

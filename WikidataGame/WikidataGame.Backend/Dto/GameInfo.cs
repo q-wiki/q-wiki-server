@@ -10,5 +10,16 @@ namespace WikidataGame.Backend.Dto
         public string GameId { get; set; }
         public bool IsAwaitingOpponentToJoin { get; set; }
         public string Message { get; set; }
+
+
+        public static GameInfo FromGame(Models.Game game)
+        {
+            return new GameInfo
+            {
+                GameId = game.Id,
+                IsAwaitingOpponentToJoin = game.Players.Count < 2,
+                Message = game.Players.Count < 2 ? "Waiting for opponent to join." : "You matched with someone else!"
+            };
+        }
     }
 }

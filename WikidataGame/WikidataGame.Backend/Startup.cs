@@ -81,7 +81,7 @@ namespace WikidataGame.Backend
                 {
                     OnTokenValidated = context =>
                     {
-                        var userRepo = context.HttpContext.RequestServices.GetRequiredService<IRepository<User,string>>();
+                        var userRepo = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
                         var user = userRepo.Get(context.Principal.Identity.Name);
                         if (user == null)
                         {
@@ -102,7 +102,8 @@ namespace WikidataGame.Backend
                 };
             });
 
-            services.AddScoped<IRepository<User, string>, Repository<User, string>>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IGameRepository, GameRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

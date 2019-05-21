@@ -36,7 +36,7 @@ namespace WikidataGame.Backend.Repos
         /// </summary>
         /// <param name="predicate">filter to apply</param>
         /// <returns>An enumerable of entites</returns>
-        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate) => Context.Set<TEntity>().Where(predicate);
+        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate) => Context.Set<TEntity>().Where(predicate).ToList();
 
         /// <summary>
         /// Returns a single entity thats matches the supplied filter or default(Entity) if there is no matching element
@@ -80,5 +80,6 @@ namespace WikidataGame.Backend.Repos
         /// </summary>
         /// <param name="entities">Enumerable of entities to update</param>
         public void UpdateRange(IEnumerable<TEntity> entities) => Context.Set<TEntity>().UpdateRange(entities);
+
     }
 }

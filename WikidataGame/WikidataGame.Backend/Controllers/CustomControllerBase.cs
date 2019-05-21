@@ -11,12 +11,12 @@ namespace WikidataGame.Backend.Controllers
 {
     public class CustomControllerBase : ControllerBase
     {
-        protected readonly IRepository<User, string> _userRepo;
+        protected readonly IUserRepository _userRepo;
         protected readonly DataContext _dataContext;
 
         public CustomControllerBase(
             DataContext dataContext,
-            IRepository<User, string> userRepo)
+            IUserRepository userRepo)
         {
             _dataContext = dataContext;
             _userRepo = userRepo;

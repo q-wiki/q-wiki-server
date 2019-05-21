@@ -13,7 +13,7 @@ namespace WikidataGame.Backend.Models
         public string ChosenCategoryId { get; set; }
         public virtual Category ChosenCategory { get; set; }
 
-        public ICollection<Category> AvailableCategories { get; set; }
+        public virtual ICollection<Category> AvailableCategories { get; set; }
 
         public int Difficulty { get; set; }
 

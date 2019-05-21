@@ -22,13 +22,10 @@ namespace WikidataGame.Backend.Services
 
             // TODO: This could probably be a lot prettier
             var noiseField = new Double[mapSize];
-
             for (int i = 0; i < mapSize; i++)
             {
-                System.Console.WriteLine($"width {width}, height {height}");
                 var x = i % width;
                 var y = i / width; // integer division floors
-                System.Console.WriteLine($"x {x}, y {y}");
 
                 noiseField[i] = Perlin.OctavePerlin((x + xOffset) * xProgress, (y + yOffset) * yProgress, 1, 1, 1);
             }

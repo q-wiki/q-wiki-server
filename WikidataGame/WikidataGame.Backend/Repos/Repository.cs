@@ -26,40 +26,10 @@ namespace WikidataGame.Backend.Repos
         public TEntity Get(TIdEntity id) => Context.Set<TEntity>().Find(id);
 
         /// <summary>
-        /// Retrieves the entity (including the supplied navigationProperties) with the supplied id/primary key 
-        /// </summary>
-        /// <typeparam name="TProperty"></typeparam>
-        /// <param name="id">Id/primary key</param>
-        /// <param name="navigationPropertyPaths">Navigation properties to include</param>
-        /// <returns>The entity</returns>
-        public TEntity GetWith<TProperty>(TIdEntity id, params Expression<Func<TEntity, TProperty>>[] navigationPropertyPaths)
-        {
-            var result = navigationPropertyPaths.Aggregate(GetAll().AsQueryable(), (current, include) =>
-            {
-                return current.Include(include);
-            });
-            return result.FirstOrDefault(e => ((TIdEntity)typeof(TEntity).GetProperty(_primaryKeyPropertyName).GetValue(e)).Equals(id));
-        }
-
-        /// <summary>
         /// Retrieves all entities
         /// </summary>
         /// <returns>An enumerable of entites</returns>
         public IEnumerable<TEntity> GetAll() => Context.Set<TEntity>().ToList();
-
-        /// <summary>
-        /// Retrieves all entities (including the supplied navigationProperties)
-        /// </summary>
-        /// <typeparam name="TProperty"></typeparam>
-        /// <param name="navigationPropertyPaths">Navigation properties to include</param>
-        /// <returns>An enumerable of entites</returns>
-        public IEnumerable<TEntity> GetAllWith<TProperty>(params Expression<Func<TEntity, TProperty>>[] navigationPropertyPaths)
-        {
-            return navigationPropertyPaths.Aggregate(GetAll().AsQueryable(), (current, include) =>
-            {
-                return current.Include(include);
-            }).ToList();
-        }
 
         /// <summary>
         /// Retrieves all entities that match the given filter

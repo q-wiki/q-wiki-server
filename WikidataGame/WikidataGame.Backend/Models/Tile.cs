@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WikidataGame.Backend.Models
 {
@@ -7,14 +9,17 @@ namespace WikidataGame.Backend.Models
         [Key]
         public string Id { get; set; }
 
-        public virtual Category ChosenCategory { get; set; }
+        [ForeignKey(nameof(Category))]
         public string ChosenCategoryId { get; set; }
-        public virtual Category[] AvailableCategories { get; set; }
+        public virtual Category ChosenCategory { get; set; }
+
+        public ICollection<Category> AvailableCategories { get; set; }
 
         public int Difficulty { get; set; }
 
-        public virtual User Owner { get; set; }
+        [ForeignKey(nameof(User))]
         public string OwnerId { get; set; }
+        public virtual User Owner { get; set; }
 
         public bool IsAccessible { get; set; }
 

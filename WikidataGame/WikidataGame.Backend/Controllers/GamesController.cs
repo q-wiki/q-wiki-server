@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using WikidataGame.Backend.Dto;
 using WikidataGame.Backend.Helpers;
-using WikidataGame.Backend.Models;
 using WikidataGame.Backend.Repos;
 
 namespace WikidataGame.Backend.Controllers
@@ -26,7 +25,7 @@ namespace WikidataGame.Backend.Controllers
 
         public GamesController(
             DataContext dataContext,
-            IRepository<User, string> userRepo,
+            IRepository<Models.User, string> userRepo,
             IOptions<AppSettings> appSettings) : base(dataContext, userRepo)
         {
             
@@ -53,7 +52,7 @@ namespace WikidataGame.Backend.Controllers
             var user = _userRepo.Get(deviceId);
             if (user == null)
             {
-                _userRepo.Add(new User
+                _userRepo.Add(new Models.User
                 {
                     DeviceId = deviceId,
                     PushChannelUrl = pushUrl

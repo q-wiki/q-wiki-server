@@ -42,12 +42,13 @@ namespace WikidataGame.Backend.Services
             var threshold = 0.1;
             var previousThreshold = 0.0;
             var stepSize = 0.1;
+            int aboveThreshold;
 
             // this infinite loop will look at the noiseField and search for a
             // threshold value that will give us the exact amount of accessible
             // tiles we want
-            while (true) {
-                var aboveThreshold = noiseField.Count(n => n > threshold);
+            do {
+                aboveThreshold = noiseField.Count(n => n > threshold);
                 if (aboveThreshold > accesibleTiles) {
                     // if we have too many accessible fields, we increase our threshold
                     if (previousThreshold > threshold) {
@@ -68,11 +69,7 @@ namespace WikidataGame.Backend.Services
                     previousThreshold = threshold;
                     threshold -= stepSize;
                 }
-                else {
-                    // we found a value that fits!
-                    break;
-                }
-            }
+            } while (accesibleTiles != aboveThreshold);
 
             return noiseField.Select(n => new Tile {
                 IsAccessible = n > threshold

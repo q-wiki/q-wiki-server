@@ -7,12 +7,13 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using WikidataGame.Backend.Dto;
 
 namespace WikidataGame.Backend.Helpers
 {
     public class JwtTokenHelper
     {
-        public static string CreateJwtToken(string deviceId, AppSettings appSettings)
+        public static AuthInfo CreateJwtToken(string deviceId, AppSettings appSettings)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
@@ -26,7 +27,10 @@ namespace WikidataGame.Backend.Helpers
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            return new AuthInfo {
+                Bearer = tokenHandler.WriteToken(token),
+                Expires = tokenDescriptor.Expires.Value
+            };
         }
     }
 }

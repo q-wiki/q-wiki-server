@@ -34,7 +34,7 @@ namespace WikidataGame.Backend.Controllers
         {
             var user = GetCurrentUser();
             var game = _gameRepo.Get(gameId);
-            return game.Players.Contains(user);
+            return game != null && game.Players.Contains(user);
         }
     }
 }

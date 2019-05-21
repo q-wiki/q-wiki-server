@@ -22,40 +22,21 @@ namespace WikidataGame.Backend.Controllers
     [Authorize]
     public class GamesController : CustomControllerBase
     {
-        private readonly AppSettings _appSettings;
-        private readonly IGameRepository _gameRepo;
 
         public GamesController(
             DataContext dataContext,
             IUserRepository userRepo,
-            IGameRepository gameRepo,
-            IOptions<AppSettings> appSettings) : base(dataContext, userRepo, gameRepo)
-        {
-            _gameRepo = gameRepo;
-            _appSettings = appSettings.Value;
-        }
+            IGameRepository gameRepo) : base(dataContext, userRepo, gameRepo) {}
 
         /// <summary>
         /// Creates a new game and matches the player with an opponent
         /// </summary>
-        /// <param name="deviceId">device identifier</param>
-        /// <param name="pushUrl">push notification channel url</param>
         /// <returns>Info about the newly created game</returns>
-        [AllowAnonymous]
         [HttpPost]
         [ProducesResponseType(typeof(GameInfo), StatusCodes.Status200OK)]
-        public IActionResult CreateNewGame(
-            [FromHeader(Name = "X-Device-ID")] string deviceId,
-            [FromHeader(Name = "X-Push-URL")] string pushUrl)
+        public IActionResult CreateNewGame()
         {
-            if(string.IsNullOrWhiteSpace(deviceId))
-                return BadRequest(new { message = "DeviceId needs to be supplied" });
-
-            var user = _userRepo.CreateOrUpdateUser(deviceId, pushUrl);
-            _dataContext.SaveChanges();
-
-            Response.Headers.Add("WWW-Authenticate", $"Bearer {JwtTokenHelper.CreateJwtToken(deviceId, _appSettings)}");
-
+            var user = GetCurrentUser();            
             var game = _gameRepo.RunningGameForPlayer(user);
             if (game == default(Models.Game))
             {
@@ -85,7 +66,7 @@ namespace WikidataGame.Backend.Controllers
         public IActionResult RetrieveGameState(string gameId)
         {
             if (!IsUserGameParticipant(gameId))
-                Forbid();
+                return Forbid();
             var game = _gameRepo.Get(gameId);
 
             return Ok(Game.FromModel(game, GetCurrentUser().DeviceId));
@@ -101,7 +82,7 @@ namespace WikidataGame.Backend.Controllers
         public IActionResult DeleteGame(string gameId)
         {
             if (!IsUserGameParticipant(gameId))
-                Forbid();
+                return Forbid();
 
             //TODO: notify opponent
             var game = _gameRepo.Get(gameId);

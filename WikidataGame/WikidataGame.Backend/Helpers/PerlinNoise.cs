@@ -47,7 +47,7 @@ namespace WikidataGame.Backend.Helpers
             }
         }
 
-        public static double perlin(double x, double y, double z)
+        private static double perlin(double x, double y, double z)
         {
             // if(repeat > 0) {									// If we have any repeat on, change the coordinates to their "local" repetitions
             //   x = x%repeat;
@@ -58,12 +58,12 @@ namespace WikidataGame.Backend.Helpers
             int xi = (int)x & 255;								// Calculate the "unit cube" that the point asked will be located in
             int yi = (int)y & 255;								// The left bound is ( |_x_|,|_y_|,|_z_| ) and the right bound is that
             int zi = (int)z & 255;								// plus 1.  Next we calculate the location (from 0.0 to 1.0) in that cube.
-            double xf = x - (int)x;								// We also fade the location to smooth the result.
+            double xf = x - (int)x;								// We also Fade the location to smooth the result.
             double yf = y - (int)y;
             double zf = z - (int)z;
-            double u = fade(xf);
-            double v = fade(yf);
-            double w = fade(zf);
+            double u = Fade(xf);
+            double v = Fade(yf);
+            double w = Fade(zf);
 
             int a = p[xi] + yi;								// This here is Perlin's hash function.  We take our x value (remember,
             int aa = p[a] + zi;								// between 0 and 255) and get a random value (from our p[] array above) between
@@ -75,26 +75,26 @@ namespace WikidataGame.Backend.Helpers
                                                   // These are all interpolated together using u, v, and w below.
 
             double x1, x2, y1, y2;
-            x1 = lerp(grad(p[aa], xf, yf, zf),			// This is where the "magic" happens.  We calculate a new set of p[] values and use that to get
-                  grad(p[ba], xf - 1, yf, zf),			// our final gradient values.  Then, we interpolate between those gradients with the u value to get
+            x1 = Lerp(Grad(p[aa], xf, yf, zf),			// This is where the "magic" happens.  We calculate a new set of p[] values and use that to get
+                  Grad(p[ba], xf - 1, yf, zf),			// our final gradient values.  Then, we interpolate between those gradients with the u value to get
                   u);										// 4 x-values.  Next, we interpolate between the 4 x-values with v to get 2 y-values.  Finally,
-            x2 = lerp(grad(p[ab], xf, yf - 1, zf),			// we interpolate between the y-values to get a z-value.
-                  grad(p[bb], xf - 1, yf - 1, zf),
+            x2 = Lerp(Grad(p[ab], xf, yf - 1, zf),			// we interpolate between the y-values to get a z-value.
+                  Grad(p[bb], xf - 1, yf - 1, zf),
                   u);										// When calculating the p[] values, remember that above, p[a+1] expands to p[xi]+yi+1 -- so you are
-            y1 = lerp(x1, x2, v);               // essentially adding 1 to yi.  Likewise, p[ab+1] expands to p[p[xi]+yi+1]+zi+1] -- so you are adding
-                                                // to zi.  The other 3 parameters are your possible return values (see grad()), which are actually
-            x1 = lerp(grad(p[aa + 1], xf, yf, zf - 1),		// the vectors from the edges of the unit cube to the point in the unit cube itself.
-                  grad(p[ba + 1], xf - 1, yf, zf - 1),
+            y1 = Lerp(x1, x2, v);               // essentially adding 1 to yi.  Likewise, p[ab+1] expands to p[p[xi]+yi+1]+zi+1] -- so you are adding
+                                                // to zi.  The other 3 parameters are your possible return values (see Grad()), which are actually
+            x1 = Lerp(Grad(p[aa + 1], xf, yf, zf - 1),		// the vectors from the edges of the unit cube to the point in the unit cube itself.
+                  Grad(p[ba + 1], xf - 1, yf, zf - 1),
                   u);
-            x2 = lerp(grad(p[ab + 1], xf, yf - 1, zf - 1),
-                        grad(p[bb + 1], xf - 1, yf - 1, zf - 1),
+            x2 = Lerp(Grad(p[ab + 1], xf, yf - 1, zf - 1),
+                        Grad(p[bb + 1], xf - 1, yf - 1, zf - 1),
                         u);
-            y2 = lerp(x1, x2, v);
+            y2 = Lerp(x1, x2, v);
 
-            return (lerp(y1, y2, w) + 1) / 2;						// For convenience we bound it to 0 - 1 (theoretical min/max before is -1 - 1)
+            return (Lerp(y1, y2, w) + 1) / 2;						// For convenience we bound it to 0 - 1 (theoretical min/max before is -1 - 1)
         }
 
-        public static double grad(int hash, double x, double y, double z)
+        private static double Grad(int hash, double x, double y, double z)
         {
             int h = hash & 15;									// Take the hashed value and take the first 4 bits of it (15 == 0b1111)
             double u = h < 8 /* 0b1000 */ ? x : y;        // If the most signifigant bit (MSB) of the hash is 0 then set u = x.  Otherwise y.
@@ -112,7 +112,7 @@ namespace WikidataGame.Backend.Helpers
             return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v); // Use the last 2 bits to decide if u and v are positive or negative.  Then return their addition.
         }
 
-        public static double fade(double t)
+        private static double Fade(double t)
         {
             // Fade function as defined by Ken Perlin.  This eases coordinate values
             // so that they will "ease" towards integral values.  This ends up smoothing
@@ -120,7 +120,7 @@ namespace WikidataGame.Backend.Helpers
             return t * t * t * (t * (t * 6 - 15) + 10);			// 6t^5 - 15t^4 + 10t^3
         }
 
-        public static double lerp(double a, double b, double x)
+        private static double Lerp(double a, double b, double x)
         {
             return a + x * (b - a);
         }

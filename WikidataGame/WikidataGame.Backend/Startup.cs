@@ -19,6 +19,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Models;
 using WikidataGame.Backend.Repos;
+using WikidataGame.Backend.Services;
 
 namespace WikidataGame.Backend
 {

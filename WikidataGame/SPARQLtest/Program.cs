@@ -13,8 +13,8 @@ namespace SPARQLtest
             // guide: https://github.com/dotnetrdf/dotnetrdf/wiki/UserGuide-Querying-With-SPARQL
 
 
-            Console.WriteLine("Test1");
-            //****** 1st try ****************/
+            /*Console.WriteLine("Test1");
+            //--------------- 1st try -------------/
             //Create a Parameterized String
             SparqlParameterizedString queryString = new SparqlParameterizedString();
 
@@ -65,35 +65,38 @@ namespace SPARQLtest
                 {
                     Console.WriteLine(result.ToString());
                 }
-            }
+            }*/
 
             Console.WriteLine();
-            //********* 2nd try **********/
+            //------------ 2nd try ------------/
             Console.WriteLine("Test2");
 
+            //String querytext = queryString.CommandText;
+            String querytext = "SELECT ?president ?president_name ?signature WHERE { ?president wdt:P39 wd:Q11696. ";
+            querytext += "?president wdt:P109 ?signature. ";
+            querytext += "OPTIONAL {?president rdfs:label ?president_name ";
+            querytext += "filter(lang(?president_name) = 'en').}}";
+            querytext += " ORDER BY RAND() LIMIT 4";
+
             SparqlRemoteEndpoint endpoint = new SparqlRemoteEndpoint(new Uri(("https://query.wikidata.org/bigdata/namespace/wdq/sparql")));
-            SparqlResultSet results2 = endpoint.QueryWithResultSet(queryString.CommandText);
-            var random = new Random();
-            results2.OrderBy(item => random.Next());
-            System.Collections.Generic.List<SparqlResult> test = results2.ToList();
-            test.OrderBy(item => random.Next());
+            SparqlResultSet results2 = endpoint.QueryWithResultSet(querytext);
+
             foreach (SparqlResult result in results2)
             {
-                Console.WriteLine(result.ToString());
-                //With method
-                INode value = result.Value("?president");
-                Console.WriteLine(value);
+                //Console.WriteLine(result.ToString());
+                // get dedicated values
+                INode value1 = result.Value("president");
+                // with indexing
+                INode value2 = result[1];
+                //With Named Indexing
+                INode value3 = result["signature"];
+                Console.WriteLine(value1 + " " + value2 + " " + value3);
 
             }
 
-            foreach (SparqlResult result in test)
-            {
-                Console.WriteLine(result.ToString());
 
-            }
-
-            Console.WriteLine();
-            //********* 4th try **********/
+            /*Console.WriteLine();
+            //---------- 4th try -------/
             Console.WriteLine("Test4");
             //Create a Parameterized String
             SparqlParameterizedString queryString4 = new SparqlParameterizedString();

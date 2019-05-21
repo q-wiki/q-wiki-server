@@ -81,6 +81,55 @@ namespace SPARQLtest
                 Console.WriteLine(result.ToString());
                 
             }
+
+            Console.WriteLine();
+            //********* 3rd try **********/
+            Console.WriteLine("Test3");
+
+            TripleStore store = new TripleStore();
+            SparqlQueryParser sparqlparser = new SparqlQueryParser();
+            SparqlQuery query3 = sparqlparser.ParseFromString("CONSTRUCT { ?s ?p ?o } WHERE { { ?s ?p ?o } UNION { GRAPH ?g { ?s ?p ?o } } }");
+            Object results3 = store.ExecuteQuery(query3);
+            if (results is IGraph)
+            {
+                //Print out the Results
+                IGraph g = (IGraph)results;
+                foreach (Triple t in g.Triples)
+                {
+                    Console.WriteLine(t.ToString());
+                }
+                Console.WriteLine("Query took " + query.QueryExecutionTime.ToString());
+            } else
+            {
+                Console.WriteLine("No graph.");
+            }
+
+
+            Console.WriteLine();
+            //********* 4th try **********/
+            Console.WriteLine("Test4");
+            //Create a Parameterized String
+            SparqlParameterizedString queryString4 = new SparqlParameterizedString();
+
+            //Add a namespace declaration
+            queryString4.Namespaces.AddNamespace("ex", new Uri("http://example.org/ns#"));
+
+            //Set the SPARQL command
+            //For more complex queries we can do this in multiple lines by using += on the
+            //CommandText property
+            //Note we can use @name style parameters here
+            queryString4.CommandText = "SELECT * WHERE { ?s ex:property @value }";
+
+            //Inject a Value for the parameter
+            queryString4.SetUri("value", new Uri("http://example.org/value"));
+
+            //When we call ToString() we get the full command text with namespaces appended as PREFIX
+            //declarations and any parameters replaced with their declared values
+            Console.WriteLine(queryString4.ToString());
+
+            //We can turn this into a query by parsing it as in our previous example
+            SparqlQueryParser parser4 = new SparqlQueryParser();
+            SparqlQuery query4 = parser4.ParseFromString(queryString4);
         }
     }
 }

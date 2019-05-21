@@ -67,7 +67,7 @@ namespace SPARQLtest
                 }
             }*/
 
-            Console.WriteLine();
+            /*Console.WriteLine();
             //------------ 2nd try ------------/
             Console.WriteLine("Test2");
 
@@ -92,7 +92,7 @@ namespace SPARQLtest
                 INode value3 = result["signature"];
                 Console.WriteLine(value1 + " " + value2 + " " + value3);
 
-            }
+            }*/
 
 
             /*Console.WriteLine();
@@ -119,7 +119,49 @@ namespace SPARQLtest
 
             //We can turn this into a query by parsing it as in our previous example
             SparqlQueryParser parser4 = new SparqlQueryParser();
-            SparqlQuery query4 = parser4.ParseFromString(queryString4);
+            SparqlQuery query4 = parser4.ParseFromString(queryString4);*/
+
+            Console.WriteLine();
+            //---------- 5th try -------/
+            Console.WriteLine("Test5");
+
+            String querytext5 = "SELECT ?capital ?country WHERE {  ?item wdt:P31 wd:Q5119. ?item wdt:P1376 ?land. ?land wdt:P31 wd:Q6256. OPTIONAL { ?item rdfs:label ?capital; filter(lang(?capital) = 'en') ?land rdfs:label ?country; filter(lang(?country) = 'en').} }  ORDER BY RAND() LIMIT 4";
+            SparqlRemoteEndpoint endpoint5 = new SparqlRemoteEndpoint(new Uri(("https://query.wikidata.org/bigdata/namespace/wdq/sparql")));
+            SparqlResultSet results5 = endpoint5.QueryWithResultSet(querytext5);
+
+            String question = "Was ist die Hauptstadt von " + results5[0]["country"] + "?";
+            String possAns = "";
+            foreach (SparqlResult result in results5)
+            {
+                possAns += result["capital"] + ", ";
+            }
+
+                Console.WriteLine("Question: " + question);
+            Console.WriteLine("Possible answers: " + possAns);
+
+            Console.WriteLine("Correct Answer: " + results5[0]["capital"]);
+
+            Console.WriteLine();
+            //---------- 6th try -------/
+            Console.WriteLine("Test6 (more generic than 5)");
+
+            String querytext6 = "SELECT ?answer ?question WHERE {  ?item wdt:P31 wd:Q5119. ?item wdt:P1376 ?land. ?land wdt:P31 wd:Q6256. OPTIONAL { ?item rdfs:label ?answer; filter(lang(?answer) = 'en') ?land rdfs:label ?question; filter(lang(?question) = 'en').} }  ORDER BY RAND() LIMIT 4";
+            SparqlRemoteEndpoint endpoint6 = new SparqlRemoteEndpoint(new Uri(("https://query.wikidata.org/bigdata/namespace/wdq/sparql")));
+            SparqlResultSet results6 = endpoint6.QueryWithResultSet(querytext6);
+
+            String quest = "Was ist die Hauptstadt von " + results6[0]["question"] + "?";
+            String possAns6 = "";
+            foreach (SparqlResult result in results6)
+            {
+                possAns6 += result["answer"] + ", ";
+            }
+
+            Console.WriteLine("Question: " + quest);
+            Console.WriteLine("Possible answers: " + possAns6);
+
+            Console.WriteLine("Correct Answer: " + results6[0]["answer"]);
+
         }
+
     }
 }

@@ -104,7 +104,7 @@ namespace WikidataGame.Backend.Services
         {
             // TODO: Implement this correctly; for now we just pick different positions randomly
             IEnumerable<Tile> accessibleTiles = tiles.Where(t => t.IsAccessible);
-            IEnumerable<Tile> startTiles = null;
+            IEnumerable<Tile> startTiles = new LinkedList<Tile>();
             Random rnd = new Random();
 
             while (startTiles.Distinct().Count() < players.Count())

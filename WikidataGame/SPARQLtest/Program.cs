@@ -4,6 +4,7 @@ using VDS.RDF.Query;
 using System.Linq;
 using VDS.RDF;
 using System.Collections.Generic;
+using VDS.RDF.Nodes;
 
 namespace SPARQLtest
 {
@@ -22,6 +23,8 @@ namespace SPARQLtest
             Dictionary<string, string> quests = new Dictionary<string, string>();
             quests.Add("What is the capital of {0}?", "SELECT ?answer ?question WHERE { ?item wdt:P31 wd:Q5119. ?item wdt:P1376 ?land. ?land wdt:P31 wd:Q6256. OPTIONAL { ?item rdfs:label ?answer; filter(lang(?answer) = 'en') ?land rdfs:label ?question; filter(lang(?question) = 'en').} }  ORDER BY RAND() LIMIT 4");
             quests.Add("Which continent has {0} countries?", "SELECT ?answer (COUNT(?item) AS ?question) WHERE { ?item wdt:P31 wd:Q6256. ?item wdt:P30 ?continent. ?continent wdt:P31 wd:Q5107. OPTIONAL { ?continent rdfs:label ?answer; filter(lang(?answer) = 'en') }} GROUP BY ?continent ?answer ORDER BY RAND() LIMIT 4");
+            quests.Add("Which U.S. president's signature is this: {0}?", "SELECT ?answer ?question WHERE { ?president wdt:P39 wd:Q11696. ?president wdt:P109 ?question. OPTIONAL { ?president rdfs:label ?answer; filter(lang(?answer) = 'en'). }} ORDER BY RAND() LIMIT 4");
+
 
             foreach (var q in quests)
             {
@@ -32,12 +35,12 @@ namespace SPARQLtest
                 String possAns = "";
                 foreach (SparqlResult result in results)
                 {
-                    possAns += result["answer"] + ", ";
+                    possAns += result["answer"].AsValuedNode().AsString() + ", ";
                 }
-                
+
                 // as described above: Platzhalter of question and answer
-                string qpart = results[0]["question"].ToString();
-                string ans = results[0]["answer"].ToString();
+                string qpart = results[0]["question"].AsValuedNode().AsString();
+                string ans = results[0]["answer"].AsValuedNode().AsString();
 
                 // Output
                 Console.WriteLine("Question: " + q.Key, qpart);

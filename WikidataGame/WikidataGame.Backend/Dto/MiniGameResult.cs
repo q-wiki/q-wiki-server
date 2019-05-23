@@ -14,5 +14,16 @@ namespace WikidataGame.Backend.Dto
         public IEnumerable<Tile> Tiles { get; set; }
 
         public string NextMovePlayerId { get; set; }
+
+        public static MiniGameResult FromModel(Models.MiniGame miniGame, Models.Game game)
+        {
+            return new MiniGameResult
+            {
+                IsWin = miniGame.IsWin,
+                CorrectAnswer = miniGame.CorrectAnswer,
+                Tiles = game.Tiles.Select(t => Tile.FromModel(t)).AsEnumerable(),
+                NextMovePlayerId = game.NextMovePlayerId
+            };
+        }
     }
 }

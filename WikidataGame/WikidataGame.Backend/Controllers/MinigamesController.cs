@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using WikidataGame.Backend.Dto;
 using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Repos;
+using WikidataGame.Backend.Services;
 
 namespace WikidataGame.Backend.Controllers
 {
@@ -34,8 +36,16 @@ namespace WikidataGame.Backend.Controllers
         [ProducesResponseType(typeof(MiniGame), StatusCodes.Status200OK)]
         public IActionResult InitalizeMinigame(string gameId, MiniGameInit minigameParams)
         {
+            var user = GetCurrentUser();
             //TODO: check if game exists
             //TODO: check if category allowed
+
+            var minigameServices = ControllerContext.HttpContext.RequestServices.GetServices<IMinigameService>();
+            var random = new Random();
+            var randomService = minigameServices.ElementAt(random.Next(0, minigameServices.Count() - 1));
+
+            //TODO: Implement minigames first!
+            //var minigame = randomService.GenerateMiniGame(gameId, user.DeviceId);
 
             return Ok(new MiniGame {
                 Id = Guid.NewGuid().ToString(),

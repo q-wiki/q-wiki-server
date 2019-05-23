@@ -104,6 +104,11 @@ namespace WikidataGame.Backend
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IGameRepository, GameRepository>();
+            services.AddScoped<IMinigameRepository, MinigameRepository>();
+            services.AddScoped<IQuestionRepository, QuestionRepository>();
+            services.AddScoped<IMinigameService, MultipleChoiceMinigameService>();
+            services.AddScoped<IMinigameService, SortingMinigameService>();
+            services.AddScoped<IMinigameService, BlurryImageMinigameService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

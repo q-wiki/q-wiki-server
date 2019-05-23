@@ -16,6 +16,7 @@ namespace WikidataGame.Backend.Helpers
         public DbSet<MiniGame> MiniGames { get; set; }
         public DbSet<Tile> Tiles { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Question> Questions { get; set; }
 
     }
 }

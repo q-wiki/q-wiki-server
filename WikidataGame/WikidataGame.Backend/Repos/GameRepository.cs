@@ -39,7 +39,7 @@ namespace WikidataGame.Backend.Repos
         {
             game.Players.Add(player);
             game.NextMovePlayer = player;
-            game.Tiles = MapGeneratorService.SetStartPostion(game.Players, game.Tiles).ToList();
+            game.Tiles = MapGeneratorService.SetStartPostions(game.Tiles, game.Players).ToList();
             return game;
         }
 

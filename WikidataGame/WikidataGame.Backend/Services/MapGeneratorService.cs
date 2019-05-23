@@ -93,14 +93,39 @@ namespace WikidataGame.Backend.Services
         /// <param name="mapHeight"></param>
         /// <param name="accessibleTiles"></param>
         /// <returns></returns>
-        public static IEnumerable<Tile> GenerateMap(int mapWidth, int mapHeight, int accessibleTiles) {
-            // TODO: Generate start positions
+        public static IEnumerable<Tile> GenerateMap(int mapWidth, int mapHeight, int accessibleTiles)
+        {
+            // TODO: Check for islands
             var candidate = GenerateMapCandidate(mapWidth, mapHeight, accessibleTiles);
             return candidate;
         }
 
-        public static IEnumerable<Tile> setStartPostion (IEnumerable<User> players, IEnumerable<Tile> tiles) {
-            // TODO: Check for islands
+        public static IEnumerable<Tile> SetStartPostions (IEnumerable<Tile> tiles, IEnumerable<User> players)
+        {
+            // TODO: Implement this correctly; for now we just pick different positions randomly
+            IEnumerable<Tile> accessibleTiles = tiles.Where(t => t.IsAccessible);
+            IEnumerable<Tile> startTiles = null;
+            Random rnd = new Random();
+
+            while (startTiles.Distinct().Count() < players.Count())
+            {
+                startTiles = players.Select(_ =>
+                    accessibleTiles.ElementAt(rnd.Next(accessibleTiles.Count()))
+                );
+            }
+
+            // NOTE: This is a bit inefficient (O(N²))
+            // This shouldn't be a problem at them moment though because the
+            // map is about 100 tiles large and we only have two players.
+            foreach (var tile in tiles) {
+                for (var idx = 0; idx < startTiles.Count(); idx++)
+                {
+                    if (tile == startTiles.ElementAt(idx)) {
+                        tile.Owner = players.ElementAt(idx);
+                    }
+                }
+            }
+
             return tiles;
         }
 

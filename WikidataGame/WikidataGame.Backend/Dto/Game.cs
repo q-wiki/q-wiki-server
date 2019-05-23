@@ -10,7 +10,7 @@ namespace WikidataGame.Backend.Dto
     {
         public string Id { get; set; }
 
-        public Tile[,] Tiles { get; set; }
+        public IEnumerable<IEnumerable<Tile>> Tiles { get; set; }
 
         public Player Me { get; set; }
 
@@ -26,18 +26,17 @@ namespace WikidataGame.Backend.Dto
                 return null;
 
             // convert tiles to two-dimensional array
-            // TODO: This could probably be more idiomatic
-            var tiles = game.Tiles.Select(t => Tile.FromModel(t)).AsEnumerable();
-            var tileArray = new Tile[GameConstants.MAP_WIDTH, GameConstants.MAP_HEIGHT];
-            for (var idx = 0; idx < tiles.Count(); idx++) {
-                var x = idx % GameConstants.MAP_WIDTH;
-                var y = idx - x / GameConstants.MAP_WIDTH;
-                tileArray[x,y] = tiles.ElementAt(idx);
-            }
+            var tiles = Enumerable.Range(0, GameConstants.MAP_HEIGHT)
+                .Select(yCoord =>
+                    game.Tiles.Skip(yCoord * GameConstants.MAP_WIDTH)
+                        .Take(GameConstants.MAP_WIDTH)
+                        // inaccessible tiles are represented as `null`
+                        .Select(t => t.IsAccessible ? Tile.FromModel(t) : null)
+                );
 
             return new Game {
                 Id = game.Id,
-                Tiles = tileArray,
+                Tiles = tiles,
                 AwaitingOpponentToJoin = game.Players.Count < 2,
                 NextMovePlayerId = game.NextMovePlayerId,
                 Me = Player.FromModel(game.Players.SingleOrDefault(p => p.DeviceId == currentUserId)),

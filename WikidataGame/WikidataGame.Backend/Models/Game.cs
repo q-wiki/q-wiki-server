@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace WikidataGame.Backend.Models
+
 {
     public class Game
     {

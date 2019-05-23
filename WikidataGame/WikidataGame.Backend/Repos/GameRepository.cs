@@ -12,17 +12,13 @@ namespace WikidataGame.Backend.Repos
     {
         public GameRepository(DataContext context) : base(context) { }
 
-        public const int MAP_WIDTH = 10;
-        public const int MAP_HEIGHT = 10;
-        public const int ACCESSIBLE_TILES = 10;
-
         public Game CreateNewGame(User player)
         {
             var game = new Game
             {
                 Id = Guid.NewGuid().ToString(),
                 Players = new List<User> { player },
-                Tiles = MapGeneratorService.GenerateMap(MAP_WIDTH, MAP_HEIGHT, ACCESSIBLE_TILES).ToList()
+                Tiles = MapGeneratorService.GenerateMap(GameConstants.MAP_WIDTH, GameConstants.MAP_HEIGHT, GameConstants.ACCESSIBLE_TILES).ToList()
             };
             Add(game);
             return Get(game.Id);

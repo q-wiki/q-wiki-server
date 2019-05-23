@@ -117,10 +117,12 @@ namespace WikidataGame.Backend.Services
             // NOTE: This is a bit inefficient (O(N²))
             // This shouldn't be a problem at them moment though because the
             // map is about 100 tiles large and we only have two players.
-            foreach (var tile in tiles) {
+            foreach (var tile in tiles)
+            {
                 for (var idx = 0; idx < startTiles.Count(); idx++)
                 {
-                    if (tile == startTiles.ElementAt(idx)) {
+                    if (tile == startTiles.ElementAt(idx))
+                    {
                         tile.Owner = players.ElementAt(idx);
                     }
                 }

@@ -17,7 +17,7 @@ namespace WikidataGame.Backend.Services
         /// <param name="mapHeight">Maximum tiles in y direction</param>
         /// <param name="accessibleTiles">How many tiles should be accessible</param>
         /// <returns>An IEnumerable of map tiles</returns>
-        public static IEnumerable<Tile> GenerateMap(int mapWidth, int mapHeight, int accesibleTiles)
+        public static IEnumerable<Tile> GenerateMap(int mapWidth, int mapHeight, int accessibleTiles)
         {
             var mapSize = mapWidth * mapHeight;
 
@@ -52,7 +52,7 @@ namespace WikidataGame.Backend.Services
             do
             {
                 aboveThreshold = noiseField.Count(n => n > threshold);
-                if (aboveThreshold > accesibleTiles)
+                if (aboveThreshold > accessibleTiles)
                 {
                     // if we have too many accessible fields, we increase our threshold
                     if (previousThreshold > threshold) 
@@ -65,7 +65,7 @@ namespace WikidataGame.Backend.Services
                     previousThreshold = threshold;
                     threshold += stepSize;
                 }
-                else if (aboveThreshold < accesibleTiles)
+                else if (aboveThreshold < accessibleTiles)
                 {
                     // same as above but the other way around
                     if (previousThreshold < threshold)
@@ -76,7 +76,7 @@ namespace WikidataGame.Backend.Services
                     previousThreshold = threshold;
                     threshold -= stepSize;
                 }
-            } while (accesibleTiles != aboveThreshold);
+            } while (accessibleTiles != aboveThreshold);
 
             return noiseField.Select(n => new Tile {
                 IsAccessible = n > threshold

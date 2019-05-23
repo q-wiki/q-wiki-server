@@ -12,13 +12,17 @@ namespace WikidataGame.Backend.Repos
     {
         public GameRepository(DataContext context) : base(context) { }
 
+        public const int MAP_WIDTH = 10;
+        public const int MAP_HEIGHT = 10;
+        public const int ACCESSIBLE_TILES = 10;
+
         public Game CreateNewGame(User player)
         {
             var game = new Game
             {
                 Id = Guid.NewGuid().ToString(),
                 Players = new List<User> { player },
-                Tiles = MapGeneratorService.GenerateMap(5, 5, 21).ToList()
+                Tiles = MapGeneratorService.GenerateMap(MAP_WIDTH, MAP_HEIGHT, ACCESSIBLE_TILES).ToList()
             };
             Add(game);
             return Get(game.Id);
@@ -35,6 +39,7 @@ namespace WikidataGame.Backend.Repos
         {
             game.Players.Add(player);
             game.NextMovePlayer = player;
+            game.Tiles = MapGeneratorService.SetStartPostion(game.Players, game.Tiles).ToList();
             return game;
         }
 

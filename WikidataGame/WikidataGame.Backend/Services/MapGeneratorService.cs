@@ -17,7 +17,7 @@ namespace WikidataGame.Backend.Services
         /// <param name="mapHeight">Maximum tiles in y direction</param>
         /// <param name="accessibleTiles">How many tiles should be accessible</param>
         /// <returns>An IEnumerable of map tiles</returns>
-        public static IEnumerable<Tile> GenerateMap(int mapWidth, int mapHeight, int accessibleTiles)
+        public static IEnumerable<Tile> GenerateMapCandidate(int mapWidth, int mapHeight, int accessibleTiles)
         {
             var mapSize = mapWidth * mapHeight;
 
@@ -83,6 +83,27 @@ namespace WikidataGame.Backend.Services
             });
         }
 
+
+        /// <summary>
+        /// Generates map candidates until we have one without islands.
+        /// Once a suitable map candidate is found, the two players will
+        /// be placed on it as far away as possible.
+        /// </summary>
+        /// <param name="mapWidth"></param>
+        /// <param name="mapHeight"></param>
+        /// <param name="accessibleTiles"></param>
+        /// <returns></returns>
+        public static IEnumerable<Tile> GenerateMap(int mapWidth, int mapHeight, int accessibleTiles) {
+            // TODO: Generate start positions
+            var candidate = GenerateMapCandidate(mapWidth, mapHeight, accessibleTiles);
+            return candidate;
+        }
+
+        public static IEnumerable<Tile> setStartPostion (IEnumerable<User> players, IEnumerable<Tile> tiles) {
+            // TODO: Check for islands
+            return tiles;
+        }
+
         public static void Debug (int mapWidth, IEnumerable<Tile> tiles)
         {
             for (int i = 0; i < tiles.Count(); i++)
@@ -94,5 +115,5 @@ namespace WikidataGame.Backend.Services
             System.Console.WriteLine($"Accessible tiles: {tiles.Count(x => x.IsAccessible)}");
             System.Console.WriteLine();
         }
-    } 
+    }
 }

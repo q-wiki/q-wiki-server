@@ -114,18 +114,9 @@ namespace WikidataGame.Backend.Services
                 }
             }
 
-            // NOTE: This is a bit inefficient (O(N²))
-            // This shouldn't be a problem at them moment though because the
-            // map is about 100 tiles large and we only have two players.
-            foreach (var tile in tiles)
+            foreach (var entry in startTiles)
             {
-                foreach (var p in players)
-                {
-                    if (tile.Id == startTiles[p].Id)
-                    {
-                        tile.Owner = p;
-                    }
-                }
+                entry.Value.Owner = entry.Key;
             }
 
             return tiles;

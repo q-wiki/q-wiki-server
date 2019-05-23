@@ -26,10 +26,10 @@ namespace WikidataGame.Backend.Dto
                 return null;
 
             // convert tiles to two-dimensional array
-            var tiles = Enumerable.Range(0, GameConstants.MAP_HEIGHT)
+            var tiles = Enumerable.Range(0, GameConstants.MapHeight)
                 .Select(yCoord =>
-                    game.Tiles.Skip(yCoord * GameConstants.MAP_WIDTH)
-                        .Take(GameConstants.MAP_WIDTH)
+                    game.Tiles.Skip(yCoord * GameConstants.MapWidth)
+                        .Take(GameConstants.MapWidth)
                         // inaccessible tiles are represented as `null`
                         .Select(t => t.IsAccessible ? Tile.FromModel(t) : null)
                 );

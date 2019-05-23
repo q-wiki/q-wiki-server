@@ -100,18 +100,18 @@ namespace WikidataGame.Backend.Services
             return candidate;
         }
 
-        public static IEnumerable<Tile> SetStartPostions (IEnumerable<Tile> tiles, IEnumerable<User> players)
+        public static IEnumerable<Tile> SetStartPositions (IEnumerable<Tile> tiles, IEnumerable<User> players)
         {
             // TODO: Implement this correctly; for now we just pick different positions randomly
-            IEnumerable<Tile> accessibleTiles = tiles.Where(t => t.IsAccessible);
-            IEnumerable<Tile> startTiles = new LinkedList<Tile>();
-            Random rnd = new Random();
+            var accessibleTiles = tiles.Where(t => t.IsAccessible);
+            var startTiles = new Dictionary<User, Tile>();
+            var rnd = new Random();
 
-            while (startTiles.Distinct().Count() < players.Count())
+            while (startTiles.Values.Distinct().Count() < players.Count())
             {
-                startTiles = players.Select(_ =>
-                    accessibleTiles.ElementAt(rnd.Next(accessibleTiles.Count()))
-                );
+                foreach (var p in players) {
+                    startTiles[p] = accessibleTiles.ElementAt(rnd.Next(accessibleTiles.Count()));
+                }
             }
 
             // NOTE: This is a bit inefficient (O(N²))
@@ -119,11 +119,11 @@ namespace WikidataGame.Backend.Services
             // map is about 100 tiles large and we only have two players.
             foreach (var tile in tiles)
             {
-                for (var idx = 0; idx < startTiles.Count(); idx++)
+                foreach (var p in players)
                 {
-                    if (tile == startTiles.ElementAt(idx))
+                    if (tile.Id == startTiles[p].Id)
                     {
-                        tile.Owner = players.ElementAt(idx);
+                        tile.Owner = p;
                     }
                 }
             }

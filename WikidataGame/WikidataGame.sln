@@ -5,11 +5,13 @@ VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikidataGame.Backend", "WikidataGame.Backend\WikidataGame.Backend.csproj", "{08B97C7A-2E3D-4F87-B922-2D016B87449C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WikidataGame.ApiClient", "WikidataGame.ApiClient\WikidataGame.ApiClient.csproj", "{18721432-242F-4FA5-BFB9-170A37BF86F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikidataGame.ApiClient", "WikidataGame.ApiClient\WikidataGame.ApiClient.csproj", "{18721432-242F-4FA5-BFB9-170A37BF86F0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiClient", "ApiClient", "{98C7F354-FB28-404A-B861-CD7741ED3A93}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WikidataGame.ApiClient.Sample", "WikidataGame.ApiClient.Sample\WikidataGame.ApiClient.Sample.csproj", "{F0DC3362-69AF-4132-A675-E160B0F72356}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikidataGame.ApiClient.Sample", "WikidataGame.ApiClient.Sample\WikidataGame.ApiClient.Sample.csproj", "{F0DC3362-69AF-4132-A675-E160B0F72356}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WikidataGame.Backend.Tests", "WikidataGame.Backend.Tests\WikidataGame.Backend.Tests.csproj", "{509DE7AA-0A44-46EB-8A5D-C12D79D583F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +31,10 @@ Global
 		{F0DC3362-69AF-4132-A675-E160B0F72356}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0DC3362-69AF-4132-A675-E160B0F72356}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0DC3362-69AF-4132-A675-E160B0F72356}.Release|Any CPU.Build.0 = Release|Any CPU
+		{509DE7AA-0A44-46EB-8A5D-C12D79D583F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{509DE7AA-0A44-46EB-8A5D-C12D79D583F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{509DE7AA-0A44-46EB-8A5D-C12D79D583F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{509DE7AA-0A44-46EB-8A5D-C12D79D583F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

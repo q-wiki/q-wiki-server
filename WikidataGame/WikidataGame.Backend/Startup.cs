@@ -60,9 +60,11 @@ namespace WikidataGame.Backend
 
                 c.OperationFilter<SecurityRequirementsOperationFilter>();
             });
-
+#if DEBUG
             services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("TestDb").UseLazyLoadingProxies());
-
+#else
+            services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("SQL")).UseLazyLoadingProxies());
+#endif
             // configure strongly typed settings objects
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);

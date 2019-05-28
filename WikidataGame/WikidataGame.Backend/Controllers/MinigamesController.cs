@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using WikidataGame.Backend.Dto;
 using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Repos;
+using WikidataGame.Backend.Services;
 
 namespace WikidataGame.Backend.Controllers
 {
@@ -16,12 +18,15 @@ namespace WikidataGame.Backend.Controllers
     [ApiController]
     public class MinigamesController : CustomControllerBase
     {
+        private readonly IMinigameRepository _minigameRepo;
+
         public MinigamesController(
             DataContext dataContext,
             IUserRepository userRepo,
-            IGameRepository gameRepo) : base(dataContext, userRepo, gameRepo)
+            IGameRepository gameRepo,
+            IMinigameRepository minigameRepo) : base(dataContext, userRepo, gameRepo)
         {
-
+            _minigameRepo = minigameRepo;
         }
 
         /// <summary>
@@ -34,8 +39,16 @@ namespace WikidataGame.Backend.Controllers
         [ProducesResponseType(typeof(MiniGame), StatusCodes.Status200OK)]
         public IActionResult InitalizeMinigame(string gameId, MiniGameInit minigameParams)
         {
-            //TODO: check if game exists
+            if (!IsUserGameParticipant(gameId))
+                return Forbid();
             //TODO: check if category allowed
+
+            var minigameServices = ControllerContext.HttpContext.RequestServices.GetServices<IMinigameService>();
+            var random = new Random();
+            var randomService = minigameServices.ElementAt(random.Next(0, minigameServices.Count() - 1));
+
+            //TODO: Implement minigames first!
+            //var minigame = randomService.GenerateMiniGame(gameId, user.Id);
 
             return Ok(new MiniGame {
                 Id = Guid.NewGuid().ToString(),
@@ -55,11 +68,14 @@ namespace WikidataGame.Backend.Controllers
         [ProducesResponseType(typeof(MiniGame), StatusCodes.Status200OK)]
         public IActionResult RetrieveMinigameInfo(string gameId, string minigameId)
         {
+            if (!IsUserGameParticipant(gameId) || !IsUserMinigamePlayer(gameId, minigameId))
+                return Forbid();
+
             //TODO: check if game exists
             return Ok(new MiniGame
             {
                 Id = Guid.NewGuid().ToString(),
-                Type = MiniGameType.BlurryImage,
+                Type = MiniGameType.MultipleChoice,
                 AnswerOptions = new List<string> { "Elephant", "Zebra", "Tiger", "Dog" },
                 TaskDescription = "Guess as fast as you can what is shown on the image. The image is blurred and will get sharper from time to time."
             });
@@ -76,15 +92,21 @@ namespace WikidataGame.Backend.Controllers
         [ProducesResponseType(typeof(MiniGameResult), StatusCodes.Status200OK)]
         public IActionResult AnswerMinigame(string gameId, string minigameId, IEnumerable<string> answers)
         {
-            //TODO: check if game exists
-            //TODO: check if allowed to answer
+            if (!IsUserGameParticipant(gameId) || !IsUserMinigamePlayer(gameId, minigameId))
+                return Forbid();
 
             return Ok(new MiniGameResult
             {
                 IsWin = answers != null && answers.Count() > 0 && answers.First() == "Elephant",
-                CorrectAnswer = new List<string> { "Elephant" },
-                Tiles = new List<Tile>()
+                CorrectAnswer = new List<string> { "Elephant" }
             });
+        }
+
+        private bool IsUserMinigamePlayer(string gameId, string minigameId)
+        {
+            var user = GetCurrentUser();
+            var minigame = _minigameRepo.Get(minigameId);
+            return minigame != null && minigame.GameId == gameId && minigame.Player == user;
         }
     }
 }

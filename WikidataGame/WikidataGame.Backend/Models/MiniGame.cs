@@ -13,6 +13,10 @@ namespace WikidataGame.Backend.Models
         [Key]
         public string Id { get; set; }
 
+        [ForeignKey(nameof(Game))]
+        public string GameId { get; set; }
+        public virtual Game Game { get; set; }
+
         public MiniGameType Type { get; set; }
 
         public string TaskDescription { get; set; }

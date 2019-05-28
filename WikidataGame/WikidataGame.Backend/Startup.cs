@@ -106,6 +106,7 @@ namespace WikidataGame.Backend
             services.AddScoped<IGameRepository, GameRepository>();
             services.AddScoped<IMinigameRepository, MinigameRepository>();
             services.AddScoped<IQuestionRepository, QuestionRepository>();
+            services.AddSingleton<IRepository<Category, string>, Repository<Category, string>>();
             services.AddScoped<IMinigameService, MultipleChoiceMinigameService>();
             services.AddScoped<IMinigameService, SortingMinigameService>();
             services.AddScoped<IMinigameService, BlurryImageMinigameService>();

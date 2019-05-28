@@ -13,7 +13,7 @@
             return new Category
             {
                 Id = category.Id,
-                Title = category.Id
+                Title = category.Title
             };
         }
     }

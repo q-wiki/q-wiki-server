@@ -30,8 +30,8 @@ namespace WikidataGame.Backend.Dto
                 Tiles = TileHelper.TileEnumerableModel2Dto(game.Tiles),
                 AwaitingOpponentToJoin = game.Players.Count < 2,
                 NextMovePlayerId = game.NextMovePlayerId,
-                Me = Player.FromModel(game.Players.SingleOrDefault(p => p.DeviceId == currentUserId)),
-                Opponent = Player.FromModel(game.Players.SingleOrDefault(p => p.DeviceId != currentUserId))
+                Me = Player.FromModel(game.Players.SingleOrDefault(p => p.Id == currentUserId)),
+                Opponent = Player.FromModel(game.Players.SingleOrDefault(p => p.Id != currentUserId))
             };
         }
     }

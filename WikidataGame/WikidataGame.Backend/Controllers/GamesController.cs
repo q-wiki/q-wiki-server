@@ -69,7 +69,7 @@ namespace WikidataGame.Backend.Controllers
                 return Forbid();
             var game = _gameRepo.Get(gameId);
 
-            return Ok(Game.FromModel(game, GetCurrentUser().DeviceId));
+            return Ok(Game.FromModel(game, GetCurrentUser().Id));
         }
 
         /// <summary>
@@ -87,6 +87,7 @@ namespace WikidataGame.Backend.Controllers
             //TODO: notify opponent
             var game = _gameRepo.Get(gameId);
             _gameRepo.Remove(game);
+            _dataContext.SaveChanges();
 
             return NoContent();
         }

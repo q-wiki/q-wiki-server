@@ -61,7 +61,15 @@ namespace WikidataGame.Backend
                 c.OperationFilter<SecurityRequirementsOperationFilter>();
             });
 
-            services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("TestDb").UseLazyLoadingProxies());
+            if (!string.IsNullOrWhiteSpace(Configuration.GetConnectionString("SQL")))
+            {
+                services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("SQL"))
+                    .UseLazyLoadingProxies());
+            }
+            else
+            {
+                services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("TestDb").UseLazyLoadingProxies());
+            }
 
             // configure strongly typed settings objects
             var appSettingsSection = Configuration.GetSection("AppSettings");
@@ -106,6 +114,7 @@ namespace WikidataGame.Backend
             services.AddScoped<IGameRepository, GameRepository>();
             services.AddScoped<IMinigameRepository, MinigameRepository>();
             services.AddScoped<IQuestionRepository, QuestionRepository>();
+            services.AddSingleton<IRepository<Category, string>, Repository<Category, string>>();
             services.AddScoped<IMinigameService, MultipleChoiceMinigameService>();
             services.AddScoped<IMinigameService, SortingMinigameService>();
             services.AddScoped<IMinigameService, BlurryImageMinigameService>();
@@ -132,6 +141,8 @@ namespace WikidataGame.Backend
             });
 
             app.Run(async (context) => await Task.Run(() => context.Response.Redirect("/swagger")));
+
+            app.ApplicationServices.GetService<DataContext>().Database.EnsureCreated();
         }
     }
 }

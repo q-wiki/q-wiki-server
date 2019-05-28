@@ -20,8 +20,8 @@ namespace WikidataGame.Backend.Dto
             return new GameInfo
             {
                 GameId = game.Id,
-                IsAwaitingOpponentToJoin = game.Players.Count < 2,
-                Message = game.Players.Count < 2 ? "Waiting for opponent to join." : "You matched with someone else!"
+                IsAwaitingOpponentToJoin = game.Players.Count() < 2,
+                Message = game.Players.Count() < 2 ? "Waiting for opponent to join." : "You matched with someone else!"
             };
         }
     }

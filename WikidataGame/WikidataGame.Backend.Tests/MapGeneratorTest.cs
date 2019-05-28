@@ -16,13 +16,14 @@ namespace WikidataGame.Backend.Tests
             var mapCandidate = Services.MapGeneratorService.GenerateMapCandidate(
                 10, 10, 5
             );
-            Assert.Equal(Enumerable.Count(mapCandidate), 10 * 10);
-            Assert.Equal(Enumerable.Count(mapCandidate.Where(t => t.IsAccessible)), 5);
+            Assert.Equal(mapCandidate.ToList().Count(), 10 * 10);
+            Assert.Equal(mapCandidate.Where(t => t.IsAccessible).Count(), 5);
         }
 
         [Fact]
         public void PlayerJoinTest()
         {
+            // no tiles should have an owner before two players joined
             var finalMapCandidate = Services.MapGeneratorService.GenerateMap(10, 10, 5);
             Assert.All(finalMapCandidate, tile => Assert.Null(tile.Owner));
             

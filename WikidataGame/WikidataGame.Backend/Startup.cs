@@ -82,7 +82,7 @@ namespace WikidataGame.Backend
                     OnTokenValidated = context =>
                     {
                         var userRepo = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
-                        var user = userRepo.Get(context.Principal.Identity.Name);
+                        var user = userRepo.SingleOrDefault(u => u.DeviceId == context.Principal.Identity.Name);
                         if (user == null)
                         {
                             // return unauthorized if user no longer exists

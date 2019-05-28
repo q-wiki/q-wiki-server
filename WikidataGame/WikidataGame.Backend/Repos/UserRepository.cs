@@ -13,11 +13,12 @@ namespace WikidataGame.Backend.Repos
 
         public User CreateOrUpdateUser(string deviceId, string pushUrl)
         {
-            var user = Get(deviceId);
+            User user = SingleOrDefault(u => u.DeviceId == deviceId);
             if (user == null)
             {
-                user = new Models.User
+                user = new User
                 {
+                    Id = Guid.NewGuid().ToString(),
                     DeviceId = deviceId,
                     PushChannelUrl = pushUrl
                 };

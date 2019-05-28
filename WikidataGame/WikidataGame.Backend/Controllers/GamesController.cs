@@ -69,7 +69,7 @@ namespace WikidataGame.Backend.Controllers
                 return Forbid();
             var game = _gameRepo.Get(gameId);
 
-            return Ok(Game.FromModel(game, GetCurrentUser().DeviceId));
+            return Ok(Game.FromModel(game, GetCurrentUser().Id));
         }
 
         /// <summary>

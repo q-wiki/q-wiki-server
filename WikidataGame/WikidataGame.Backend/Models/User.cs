@@ -9,6 +9,7 @@ namespace WikidataGame.Backend.Models
     public class User
     {
         [Key]
+        public string Id { get; set; }
         public string DeviceId { get; set; }
         public GamePlatform Platform { get; set; } = GamePlatform.Android;
 

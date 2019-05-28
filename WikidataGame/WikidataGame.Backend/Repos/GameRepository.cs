@@ -18,7 +18,7 @@ namespace WikidataGame.Backend.Repos
             {
                 Id = Guid.NewGuid().ToString(),
                 Players = new List<User> { player },
-                Tiles = MapGeneratorService.GenerateMap(5, 5, 21).ToList()
+                Tiles = MapGeneratorService.GenerateMap(GameConstants.MapWidth, GameConstants.MapHeight, GameConstants.AccessibleTiles).ToList()
             };
             Add(game);
             return Get(game.Id);
@@ -35,6 +35,7 @@ namespace WikidataGame.Backend.Repos
         {
             game.Players.Add(player);
             game.NextMovePlayer = player;
+            game.Tiles = MapGeneratorService.SetStartPositions(game.Tiles, game.Players).ToList();
             return game;
         }
 

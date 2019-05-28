@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WikidataGame.Backend.Helpers;
 
 namespace WikidataGame.Backend.Dto
 {
@@ -9,7 +10,7 @@ namespace WikidataGame.Backend.Dto
     {
         public string Id { get; set; }
 
-        public IEnumerable<Tile> Tiles { get; set; }
+        public IEnumerable<IEnumerable<Tile>> Tiles { get; set; }
 
         public Player Me { get; set; }
 
@@ -24,10 +25,18 @@ namespace WikidataGame.Backend.Dto
             if (game == null)
                 return null;
 
-            return new Game
-            {
+            // convert tiles to two-dimensional array
+            var tiles = Enumerable.Range(0, GameConstants.MapHeight)
+                .Select(yCoord =>
+                    game.Tiles.Skip(yCoord * GameConstants.MapWidth)
+                        .Take(GameConstants.MapWidth)
+                        // inaccessible tiles are represented as `null`
+                        .Select(t => t.IsAccessible ? Tile.FromModel(t) : null)
+                );
+
+            return new Game {
                 Id = game.Id,
-                Tiles = game.Tiles.Select(t => Tile.FromModel(t)).AsEnumerable(),
+                Tiles = tiles,
                 AwaitingOpponentToJoin = game.Players.Count < 2,
                 NextMovePlayerId = game.NextMovePlayerId,
                 Me = Player.FromModel(game.Players.SingleOrDefault(p => p.DeviceId == currentUserId)),

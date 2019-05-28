@@ -41,7 +41,6 @@ namespace WikidataGame.Backend.Controllers
         {
             if (!IsUserGameParticipant(gameId))
                 return Forbid();
-            //TODO: check if game exists
             //TODO: check if category allowed
 
             var minigameServices = ControllerContext.HttpContext.RequestServices.GetServices<IMinigameService>();
@@ -49,7 +48,7 @@ namespace WikidataGame.Backend.Controllers
             var randomService = minigameServices.ElementAt(random.Next(0, minigameServices.Count() - 1));
 
             //TODO: Implement minigames first!
-            //var minigame = randomService.GenerateMiniGame(gameId, user.DeviceId);
+            //var minigame = randomService.GenerateMiniGame(gameId, user.Id);
 
             return Ok(new MiniGame {
                 Id = Guid.NewGuid().ToString(),
@@ -69,11 +68,14 @@ namespace WikidataGame.Backend.Controllers
         [ProducesResponseType(typeof(MiniGame), StatusCodes.Status200OK)]
         public IActionResult RetrieveMinigameInfo(string gameId, string minigameId)
         {
+            if (!IsUserGameParticipant(gameId) || !IsUserMinigamePlayer(gameId, minigameId))
+                return Forbid();
+
             //TODO: check if game exists
             return Ok(new MiniGame
             {
                 Id = Guid.NewGuid().ToString(),
-                Type = MiniGameType.BlurryImage,
+                Type = MiniGameType.MultipleChoice,
                 AnswerOptions = new List<string> { "Elephant", "Zebra", "Tiger", "Dog" },
                 TaskDescription = "Guess as fast as you can what is shown on the image. The image is blurred and will get sharper from time to time."
             });
@@ -90,8 +92,8 @@ namespace WikidataGame.Backend.Controllers
         [ProducesResponseType(typeof(MiniGameResult), StatusCodes.Status200OK)]
         public IActionResult AnswerMinigame(string gameId, string minigameId, IEnumerable<string> answers)
         {
-            //TODO: check if game exists
-            //TODO: check if allowed to answer
+            if (!IsUserGameParticipant(gameId) || !IsUserMinigamePlayer(gameId, minigameId))
+                return Forbid();
 
             return Ok(new MiniGameResult
             {

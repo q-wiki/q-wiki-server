@@ -65,8 +65,8 @@ namespace WikidataGame.Backend.Tests
         [Fact]
         public void DifferentTilesCategoryTest()
         {
-            var tileOne = new Models.Tile { Id = Guid.NewGuid().ToString() };
-            var tileTwo = new Models.Tile { Id = Guid.NewGuid().ToString() };
+            var tileOne = new Models.Tile { Id = "b32b5e31-20f7-4c5d-971b-c7b558049e03" };
+            var tileTwo = new Models.Tile { Id = "d3d4e3eb-a90c-4dde-96c9-870f19547529" };
             var categoryRepo = new CategoryRepositoryMock();
 
             var categoriesForFirstDraw = Helpers.TileHelper.GetCategoriesForTile(categoryRepo, tileOne);

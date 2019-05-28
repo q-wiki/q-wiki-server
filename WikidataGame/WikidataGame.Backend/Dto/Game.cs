@@ -25,18 +25,9 @@ namespace WikidataGame.Backend.Dto
             if (game == null)
                 return null;
 
-            // convert tiles to two-dimensional array
-            var tiles = Enumerable.Range(0, GameConstants.MapHeight)
-                .Select(yCoord =>
-                    game.Tiles.Skip(yCoord * GameConstants.MapWidth)
-                        .Take(GameConstants.MapWidth)
-                        // inaccessible tiles are represented as `null`
-                        .Select(t => t.IsAccessible ? Tile.FromModel(t) : null)
-                );
-
             return new Game {
                 Id = game.Id,
-                Tiles = tiles,
+                Tiles = TileHelper.TileEnumerableModel2Dto(game.Tiles),
                 AwaitingOpponentToJoin = game.Players.Count < 2,
                 NextMovePlayerId = game.NextMovePlayerId,
                 Me = Player.FromModel(game.Players.SingleOrDefault(p => p.DeviceId == currentUserId)),

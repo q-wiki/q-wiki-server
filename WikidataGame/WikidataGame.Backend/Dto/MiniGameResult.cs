@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WikidataGame.Backend.Helpers;
 
 namespace WikidataGame.Backend.Dto
 {
@@ -11,7 +12,7 @@ namespace WikidataGame.Backend.Dto
 
         public IEnumerable<string> CorrectAnswer { get; set; }
 
-        public IEnumerable<Tile> Tiles { get; set; }
+        public IEnumerable<IEnumerable<Tile>> Tiles { get; set; }
 
         public string NextMovePlayerId { get; set; }
 
@@ -21,7 +22,7 @@ namespace WikidataGame.Backend.Dto
             {
                 IsWin = miniGame.IsWin,
                 CorrectAnswer = miniGame.CorrectAnswer,
-                Tiles = game.Tiles.Select(t => Tile.FromModel(t)).AsEnumerable(),
+                Tiles = TileHelper.TileEnumerableModel2Dto(game.Tiles),
                 NextMovePlayerId = game.NextMovePlayerId
             };
         }

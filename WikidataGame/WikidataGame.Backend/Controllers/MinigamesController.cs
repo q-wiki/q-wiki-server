@@ -18,12 +18,15 @@ namespace WikidataGame.Backend.Controllers
     [ApiController]
     public class MinigamesController : CustomControllerBase
     {
+        private readonly IMinigameRepository _minigameRepo;
+
         public MinigamesController(
             DataContext dataContext,
             IUserRepository userRepo,
-            IGameRepository gameRepo) : base(dataContext, userRepo, gameRepo)
+            IGameRepository gameRepo,
+            IMinigameRepository minigameRepo) : base(dataContext, userRepo, gameRepo)
         {
-
+            _minigameRepo = minigameRepo;
         }
 
         /// <summary>
@@ -36,7 +39,8 @@ namespace WikidataGame.Backend.Controllers
         [ProducesResponseType(typeof(MiniGame), StatusCodes.Status200OK)]
         public IActionResult InitalizeMinigame(string gameId, MiniGameInit minigameParams)
         {
-            var user = GetCurrentUser();
+            if (!IsUserGameParticipant(gameId))
+                return Forbid();
             //TODO: check if game exists
             //TODO: check if category allowed
 
@@ -92,9 +96,15 @@ namespace WikidataGame.Backend.Controllers
             return Ok(new MiniGameResult
             {
                 IsWin = answers != null && answers.Count() > 0 && answers.First() == "Elephant",
-                CorrectAnswer = new List<string> { "Elephant" },
-                Tiles = new List<Tile>()
+                CorrectAnswer = new List<string> { "Elephant" }
             });
+        }
+
+        private bool IsUserMinigamePlayer(string gameId, string minigameId)
+        {
+            var user = GetCurrentUser();
+            var minigame = _minigameRepo.Get(minigameId);
+            return minigame != null && minigame.GameId == gameId && minigame.Player == user;
         }
     }
 }

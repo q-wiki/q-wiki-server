@@ -19,7 +19,7 @@ namespace WikidataGame.Backend.Services
 
         public Models.MiniGameType MiniGameType => Models.MiniGameType.BlurryImage;
 
-        public Dto.MiniGame GenerateMiniGame(string gameId, string playerId)
+        public Dto.MiniGame GenerateMiniGame(string gameId, string playerId, string categoryId)
         {
             throw new NotImplementedException();
         }

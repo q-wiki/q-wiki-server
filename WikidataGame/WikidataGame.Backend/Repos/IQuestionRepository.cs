@@ -8,6 +8,6 @@ namespace WikidataGame.Backend.Repos
 {
     public interface IQuestionRepository : IRepository<Question, string>
     {
-        Question GetRandomQuestionForMinigameType(MiniGameType type);
+        Question GetRandomQuestionForMinigameType(MiniGameType type, string categoryId);
     }
 }

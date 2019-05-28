@@ -87,6 +87,7 @@ namespace WikidataGame.Backend.Controllers
             //TODO: notify opponent
             var game = _gameRepo.Get(gameId);
             _gameRepo.Remove(game);
+            _dataContext.SaveChanges();
 
             return NoContent();
         }

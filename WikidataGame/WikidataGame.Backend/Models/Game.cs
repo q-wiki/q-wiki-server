@@ -19,7 +19,7 @@ namespace WikidataGame.Backend.Models
         public virtual ICollection<GameUser> GameUsers { get; set; } = new List<GameUser>();
 
         [NotMapped]
-        public virtual IEnumerable<User> Players
+        public IEnumerable<User> Players
         {
             get
             {

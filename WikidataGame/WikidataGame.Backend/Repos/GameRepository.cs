@@ -32,7 +32,7 @@ namespace WikidataGame.Backend.Repos
 
         public Game GetOpenGame()
         {
-            var games = Find(g => g.Players.Count() < 2);
+            var games = Find(g => g.GameUsers.Count() < 2);
             if (games.Count() < 1) return null;
             return games.First();
         }
@@ -45,13 +45,13 @@ namespace WikidataGame.Backend.Repos
                 UserId = player.Id
             });
             game.NextMovePlayer = player;
-            game.Tiles = MapGeneratorService.SetStartPositions(game.Tiles, game.Players).ToList();
+            game.Tiles = MapGeneratorService.SetStartPositions(game.Tiles, game.GameUsers.Select(gu => gu.User)).ToList();
             return game;
         }
 
         public Game RunningGameForPlayer(User player)
         {
-            return SingleOrDefault(g => g.Players.Contains(player) && string.IsNullOrEmpty(g.WinningPlayerId));
+            return SingleOrDefault(g => g.GameUsers.Select(gu => gu.UserId).Contains(player.Id) && string.IsNullOrEmpty(g.WinningPlayerId));
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WikidataGame.Backend.Helpers;
+using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Dto
 {
@@ -28,10 +29,10 @@ namespace WikidataGame.Backend.Dto
             return new Game {
                 Id = game.Id,
                 Tiles = TileHelper.TileEnumerableModel2Dto(game.Tiles),
-                AwaitingOpponentToJoin = game.Players.Count() < 2,
+                AwaitingOpponentToJoin = game.GameUsers.Count() < 2,
                 NextMovePlayerId = game.NextMovePlayerId,
-                Me = Player.FromModel(game.Players.SingleOrDefault(p => p.Id == currentUserId)),
-                Opponent = Player.FromModel(game.Players.SingleOrDefault(p => p.Id != currentUserId))
+                Me = Player.FromModel(game.GameUsers.SingleOrDefault(gu => gu.UserId == currentUserId)?.User),
+                Opponent = Player.FromModel(game.GameUsers.SingleOrDefault(gu => gu.UserId != currentUserId)?.User)
             };
         }
     }

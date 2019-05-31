@@ -18,15 +18,6 @@ namespace WikidataGame.Backend.Models
 
         public virtual ICollection<GameUser> GameUsers { get; set; } = new List<GameUser>();
 
-        [NotMapped]
-        public IEnumerable<User> Players
-        {
-            get
-            {
-                return GameUsers.Select(gu => gu.User);
-            }
-        }
-
         [ForeignKey(nameof(User))]
         [StringLength(36)]
         public string NextMovePlayerId { get; set; }

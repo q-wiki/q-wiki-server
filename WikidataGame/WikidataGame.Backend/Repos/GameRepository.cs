@@ -33,7 +33,7 @@ namespace WikidataGame.Backend.Repos
         public Game GetOpenGame()
         {
             var games = Find(g => g.Players.Count() < 2);
-            if (games.Count() < 1) return default;
+            if (games.Count() < 1) return null;
             return games.First();
         }
 

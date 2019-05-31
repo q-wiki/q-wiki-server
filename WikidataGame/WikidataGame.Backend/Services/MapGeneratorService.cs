@@ -100,23 +100,23 @@ namespace WikidataGame.Backend.Services
             return candidate;
         }
 
-        public static IEnumerable<Tile> SetStartPositions (IEnumerable<Tile> tiles, IEnumerable<User> players)
+        public static IEnumerable<Tile> SetStartPositions (IEnumerable<Tile> tiles, IEnumerable<string> userIds)
         {
             // TODO: Implement this correctly; for now we just pick different positions randomly
             var accessibleTiles = tiles.Where(t => t.IsAccessible);
-            var startTiles = new Dictionary<User, Tile>();
+            var startTiles = new Dictionary<string, Tile>();
             var rnd = new Random();
 
-            while (startTiles.Values.Distinct().Count() < players.Count())
+            while (startTiles.Values.Distinct().Count() < userIds.Count())
             {
-                foreach (var p in players) {
-                    startTiles[p] = accessibleTiles.ElementAt(rnd.Next(accessibleTiles.Count()));
+                foreach (var userId in userIds) {
+                    startTiles[userId] = accessibleTiles.ElementAt(rnd.Next(accessibleTiles.Count()));
                 }
             }
 
             foreach (var entry in startTiles)
             {
-                entry.Value.Owner = entry.Key;
+                entry.Value.OwnerId = entry.Key;
             }
 
             return tiles;
@@ -126,12 +126,12 @@ namespace WikidataGame.Backend.Services
         {
             for (int i = 0; i < tiles.Count(); i++)
             {
-                System.Console.Write(tiles.ElementAt(i));
+                Console.Write(tiles.ElementAt(i));
                 if (i % mapWidth == 0) System.Console.WriteLine();
             }
-            System.Console.WriteLine();
-            System.Console.WriteLine($"Accessible tiles: {tiles.Count(x => x.IsAccessible)}");
-            System.Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine($"Accessible tiles: {tiles.Count(x => x.IsAccessible)}");
+            Console.WriteLine();
         }
     }
 }

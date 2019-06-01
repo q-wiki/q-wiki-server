@@ -22,10 +22,9 @@ namespace WikidataGame.Models
         /// <summary>
         /// Initializes a new instance of the Player class.
         /// </summary>
-        public Player(string id = default(string), string deviceId = default(string), string name = default(string))
+        public Player(string id = default(string), string name = default(string))
         {
             Id = id;
-            DeviceId = deviceId;
             Name = name;
             CustomInit();
         }
@@ -39,11 +38,6 @@ namespace WikidataGame.Models
         /// </summary>
         [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }
-
-        /// <summary>
-        /// </summary>
-        [JsonProperty(PropertyName = "deviceId")]
-        public string DeviceId { get; set; }
 
         /// <summary>
         /// </summary>

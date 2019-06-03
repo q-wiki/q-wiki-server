@@ -81,7 +81,7 @@ namespace WikidataGame.Backend.Helpers
             .Where(coordinate => -1 < coordinate.Item1 && coordinate.Item1 < width && -1 < coordinate.Item2 && coordinate.Item2 < width)
             .ToDictionary(
                 coordinate => coordinate,
-                coordinate => tiles.ElementAt(x + y * width)
+                coordinate => tiles.ElementAt(coordinate.Item1 + coordinate.Item2 * width)
             );
     }
   }

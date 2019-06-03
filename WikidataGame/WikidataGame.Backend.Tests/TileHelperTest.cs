@@ -81,7 +81,7 @@ namespace WikidataGame.Backend.Tests
             var width = 10;
             var height = 10;
             var tiles = Services.MapGeneratorService.GenerateMapCandidate(
-                width, height, 5
+                width, height, 50
             );
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 0, 0, width, height);
             var expectedCoordinates = new HashSet<Tuple<int, int>> {
@@ -92,6 +92,8 @@ namespace WikidataGame.Backend.Tests
             Assert.Equal(neighbors.Count(), expectedCoordinates.Count());
             Assert.Equal(neighbors.Keys, expectedCoordinates);
 
+            Assert.Equal(tiles.ElementAt(1), neighbors[Tuple.Create(1, 0)]);
+            Assert.Equal(tiles.ElementAt(width), neighbors[Tuple.Create(0, 1)]);
         }
 
         [Fact]
@@ -100,7 +102,7 @@ namespace WikidataGame.Backend.Tests
             var width = 10;
             var height = 10;
             var tiles = Services.MapGeneratorService.GenerateMapCandidate(
-                width, height, 5
+                width, height, 50
             );
 
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 1, 0, width, height);
@@ -128,7 +130,7 @@ namespace WikidataGame.Backend.Tests
             var width = 10;
             var height = 10;
             var tiles = Services.MapGeneratorService.GenerateMapCandidate(
-                width, height, 5
+                width, height, 50
             );
 
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 2, 0, width, height);
@@ -152,7 +154,7 @@ namespace WikidataGame.Backend.Tests
             var width = 10;
             var height = 10;
             var tiles = Services.MapGeneratorService.GenerateMapCandidate(
-                width, height, 5
+                width, height, 50
             );
 
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 9, 0, width, height);

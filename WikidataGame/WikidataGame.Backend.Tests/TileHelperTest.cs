@@ -76,9 +76,82 @@ namespace WikidataGame.Backend.Tests
         }
 
         [Fact]
-        public void NeighborTest()
+        public void TopLeftNeighborTest()
         {
-           // TODO: Check if neighbors are correctly found for all tiles
+            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+                10, 10, 5
+            );
+            var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 0, 0);
+            var expectedCoordinates = new HashSet<Tuple<int, int>> {
+                Tuple.Create(0, 1),
+                Tuple.Create(1, 0)
+            };
+
+            Assert.Equal(neighbors.Count(), expectedCoordinates.Count());
+            Assert.Equal(neighbors.Keys, expectedCoordinates);
+
+            // TODO: Check if the tile at the coordinate is the one we expected
+        }
+
+        [Fact]
+        public void TopRowOddXNeighborTest()
+        {
+            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+                10, 10, 5
+            );
+
+            var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 1, 0);
+            var expectedCoordinates = new HashSet<Tuple<int, int>> {
+                Tuple.Create(0, 0),
+                Tuple.Create(2, 0),
+                Tuple.Create(1, 0),
+                Tuple.Create(1, 1),
+                Tuple.Create(2, 1)
+            };
+
+            Assert.Equal(neighbors.Count(), expectedCoordinates.Count());
+            Assert.Equal(neighbors.Keys, expectedCoordinates);
+
+            // TODO: Check if the tile at the coordinate is the one we expected
+        }
+
+        public void TopRowEvenXNeighborTest()
+        {
+            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+                10, 10, 5
+            );
+
+            var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 2, 0);
+            var expectedCoordinates = new HashSet<Tuple<int, int>> {
+                Tuple.Create(1, 0),
+                Tuple.Create(3, 0),
+                Tuple.Create(2, 1)
+            };
+
+            Assert.Equal(neighbors.Count(), expectedCoordinates.Count());
+            Assert.Equal(neighbors.Keys, expectedCoordinates);
+
+            // TODO: Check if the tile at the coordinate is the one we expected
+        }
+
+        [Fact]
+        public void TopRightNeighborTest()
+        {
+            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+                10, 10, 5
+            );
+
+            var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 2, 0);
+            var expectedCoordinates = new HashSet<Tuple<int, int>> {
+                Tuple.Create(1, 0),
+                Tuple.Create(3, 0),
+                Tuple.Create(2, 1)
+            };
+
+            Assert.Equal(neighbors.Count(), expectedCoordinates.Count());
+            Assert.Equal(neighbors.Keys, expectedCoordinates);
+
+            // TODO: Check if the tile at the coordinate is the one we expected
         }
     }
 }

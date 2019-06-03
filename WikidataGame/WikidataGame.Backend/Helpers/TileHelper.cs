@@ -43,5 +43,10 @@ namespace WikidataGame.Backend.Helpers
 
             return draws;
         }
+
+
+    public static Dictionary<Tuple<int, int>, Models.Tile> GetNeighbors(IEnumerable<Models.Tile> tiles, int x, int y) {
+        return new Dictionary<Tuple<int, int>, Models.Tile>();
     }
+  }
 }

@@ -15,7 +15,7 @@ namespace WikidataGame.Backend.Tests
               Id = Guid.NewGuid().ToString(),
               Title = $"Category number {i}"
             })
-            .AsEnumerable();
+            .ToList();
 
         public IEnumerable<Models.Category> GetAll()
         {

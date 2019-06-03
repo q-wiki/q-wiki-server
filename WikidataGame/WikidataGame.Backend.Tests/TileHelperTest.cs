@@ -171,5 +171,78 @@ namespace WikidataGame.Backend.Tests
             Assert.Equal(tiles.ElementAt(8 + width), neighbors[Tuple.Create(8, 1)]);
             Assert.Equal(tiles.ElementAt(9 + width), neighbors[Tuple.Create(8, 1)]);
         }
+
+        [Fact]
+        public void LeftEdgeNeighborTest () {
+            var width = 19;
+            var height = 19;
+            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+                width, height, 200
+            );
+
+            var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 0, 9, width, height);
+            var expectedCoordinates = new HashSet<Tuple<int, int>> {
+                Tuple.Create(0, 8),
+                Tuple.Create(1, 8),
+                Tuple.Create(1, 9),
+                Tuple.Create(0, 10)
+            };
+
+            Assert.Equal(expectedCoordinates.Count(), neighbors.Count());
+            Assert.Equal(expectedCoordinates, neighbors.Keys);
+
+            Assert.Equal(tiles.ElementAt(8 * width), neighbors[Tuple.Create(0, 8)]);
+            Assert.Equal(tiles.ElementAt(1 + 8 * width), neighbors[Tuple.Create(1, 8)]);
+            Assert.Equal(tiles.ElementAt(1 + 9 * width), neighbors[Tuple.Create(1, 9)]);
+            Assert.Equal(tiles.ElementAt(10 * width), neighbors[Tuple.Create(0, 10)]);
+        }
+
+        [Fact]
+        public void RightEdgeNeighborTest () {
+            var width = 20;
+            var height = 20;
+            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+                width, height, 200
+            );
+
+            var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 19, 9, width, height);
+            var expectedCoordinates = new HashSet<Tuple<int, int>> {
+                Tuple.Create(19, 8),
+                Tuple.Create(18, 9),
+                Tuple.Create(18, 10),
+                Tuple.Create(19, 10)
+            };
+
+            Assert.Equal(expectedCoordinates.Count(), neighbors.Count());
+            Assert.Equal(expectedCoordinates, neighbors.Keys);
+
+            Assert.Equal(tiles.ElementAt(19 + 8 * width), neighbors[Tuple.Create(19, 8)]);
+            Assert.Equal(tiles.ElementAt(18 + 9 * width), neighbors[Tuple.Create(18, 9)]);
+            Assert.Equal(tiles.ElementAt(18 + 10 * width), neighbors[Tuple.Create(18, 10)]);
+            Assert.Equal(tiles.ElementAt(19 + 10 * width), neighbors[Tuple.Create(19, 10)]);
+        }
+
+        [Fact]
+        public void BottomLeftNeighborTest()
+        {
+            var width = 4;
+            var height = 4;
+            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+                width, height, 9
+            );
+            var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 0, 3, width, height);
+            var expectedCoordinates = new HashSet<Tuple<int, int>> {
+                Tuple.Create(0, 2),
+                Tuple.Create(1, 2),
+                Tuple.Create(1, 3)
+            };
+
+            Assert.Equal(neighbors.Count(), expectedCoordinates.Count());
+            Assert.Equal(neighbors.Keys, expectedCoordinates);
+
+            Assert.Equal(tiles.ElementAt(2 * width), neighbors[Tuple.Create(0, 2)]);
+            Assert.Equal(tiles.ElementAt(1 + 2 * width), neighbors[Tuple.Create(1, 2)]);
+            Assert.Equal(tiles.ElementAt(1 + 3 * width), neighbors[Tuple.Create(1, 3)]);
+        }
     }
 }

@@ -50,7 +50,7 @@ namespace WikidataGame.Backend.Tests
     public class TileHelperTest
     {
         [Fact]
-        public void TileCategoryTest()
+        public void StableTileCategoryTest()
         {
             // we should get stable categories for a tile
             var tile = new Models.Tile { Id = Guid.NewGuid().ToString() };
@@ -81,10 +81,10 @@ namespace WikidataGame.Backend.Tests
             var tiles = Services.MapGeneratorService.GenerateMapCandidate(
                 10, 10, 5
             );
-            var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 0, 0);
+            var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 0, 0, 10, 10);
             var expectedCoordinates = new HashSet<Tuple<int, int>> {
-                Tuple.Create(0, 1),
-                Tuple.Create(1, 0)
+                Tuple.Create(1, 0),
+                Tuple.Create(0, 1)
             };
 
             Assert.Equal(neighbors.Count(), expectedCoordinates.Count());
@@ -100,17 +100,17 @@ namespace WikidataGame.Backend.Tests
                 10, 10, 5
             );
 
-            var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 1, 0);
+            var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 1, 0, 10, 10);
             var expectedCoordinates = new HashSet<Tuple<int, int>> {
                 Tuple.Create(0, 0),
                 Tuple.Create(2, 0),
-                Tuple.Create(1, 0),
+                Tuple.Create(0, 1),
                 Tuple.Create(1, 1),
                 Tuple.Create(2, 1)
             };
 
-            Assert.Equal(neighbors.Count(), expectedCoordinates.Count());
-            Assert.Equal(neighbors.Keys, expectedCoordinates);
+            Assert.Equal(expectedCoordinates.Count(), neighbors.Count());
+            Assert.Equal(expectedCoordinates, neighbors.Keys);
 
             // TODO: Check if the tile at the coordinate is the one we expected
         }
@@ -121,15 +121,15 @@ namespace WikidataGame.Backend.Tests
                 10, 10, 5
             );
 
-            var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 2, 0);
+            var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 2, 0, 10, 10);
             var expectedCoordinates = new HashSet<Tuple<int, int>> {
                 Tuple.Create(1, 0),
                 Tuple.Create(3, 0),
                 Tuple.Create(2, 1)
             };
 
-            Assert.Equal(neighbors.Count(), expectedCoordinates.Count());
-            Assert.Equal(neighbors.Keys, expectedCoordinates);
+            Assert.Equal(expectedCoordinates.Count(), neighbors.Count());
+            Assert.Equal(expectedCoordinates, neighbors.Keys);
 
             // TODO: Check if the tile at the coordinate is the one we expected
         }
@@ -141,15 +141,15 @@ namespace WikidataGame.Backend.Tests
                 10, 10, 5
             );
 
-            var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 2, 0);
+            var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 9, 0, 10, 10);
             var expectedCoordinates = new HashSet<Tuple<int, int>> {
-                Tuple.Create(1, 0),
-                Tuple.Create(3, 0),
-                Tuple.Create(2, 1)
+                Tuple.Create(8, 0),
+                Tuple.Create(8, 1),
+                Tuple.Create(9, 1)
             };
 
-            Assert.Equal(neighbors.Count(), expectedCoordinates.Count());
-            Assert.Equal(neighbors.Keys, expectedCoordinates);
+            Assert.Equal(expectedCoordinates.Count(), neighbors.Count());
+            Assert.Equal(expectedCoordinates, neighbors.Keys);
 
             // TODO: Check if the tile at the coordinate is the one we expected
         }

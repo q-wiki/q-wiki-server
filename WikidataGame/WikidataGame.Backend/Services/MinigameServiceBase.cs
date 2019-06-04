@@ -56,9 +56,11 @@ namespace WikidataGame.Backend.Services
         }
 
 
-        public bool IsMiniGameAnswerCorrect(Models.MiniGame miniGame, IEnumerable<string> answers)
+        public static bool IsMiniGameAnswerCorrect(Models.MiniGame miniGame, IEnumerable<string> answers)
         {
-            return answers.SequenceEqual(miniGame.CorrectAnswer);
+            if (answers != null && answers.Count() > 0) 
+                return answers.SequenceEqual(miniGame.CorrectAnswer);
+            return false;
         }
     }
 }

@@ -47,15 +47,11 @@ namespace WikidataGame.Backend.Controllers
             var random = new Random();
             var randomService = minigameServices.ElementAt(random.Next(0, minigameServices.Count() - 1));
 
-            //TODO: Implement minigames first!
-            //var minigame = randomService.GenerateMiniGame(gameId, user.Id);
+            //TODO: Implement sorting and image minigames!
+            // TODO: remove hard-coded category id
+            var minigame = randomService.GenerateMiniGame(gameId, GetCurrentUser().Id, "cf3111af-8b18-4c6f-8ee6-115157d54b79");
 
-            return Ok(new MiniGame {
-                Id = Guid.NewGuid().ToString(),
-                Type = MiniGameType.BlurryImage,
-                AnswerOptions = new List<string> { "Elephant", "Zebra", "Tiger", "Dog" },
-                TaskDescription = "Guess as fast as you can what is shown on the image, which will get sharper from time to time"
-            });
+            return Ok(minigame);
         }
 
         /// <summary>
@@ -72,13 +68,9 @@ namespace WikidataGame.Backend.Controllers
                 return Forbid();
 
             //TODO: check if game exists
-            return Ok(new MiniGame
-            {
-                Id = Guid.NewGuid().ToString(),
-                Type = MiniGameType.MultipleChoice,
-                AnswerOptions = new List<string> { "Elephant", "Zebra", "Tiger", "Dog" },
-                TaskDescription = "Guess as fast as you can what is shown on the image. The image is blurred and will get sharper from time to time."
-            });
+            var minigame = _minigameRepo.Get(minigameId);
+
+            return Ok(MiniGame.FromModel(minigame));
         }
 
         /// <summary>
@@ -95,11 +87,15 @@ namespace WikidataGame.Backend.Controllers
             if (!IsUserGameParticipant(gameId) || !IsUserMinigamePlayer(gameId, minigameId))
                 return Forbid();
 
-            return Ok(new MiniGameResult
-            {
-                IsWin = answers != null && answers.Count() > 0 && answers.First() == "Elephant",
-                CorrectAnswer = new List<string> { "Elephant" }
-            });
+            var minigame = _minigameRepo.Get(minigameId);
+            minigame.IsWin = MinigameServiceBase.IsMiniGameAnswerCorrect(minigame, answers);
+            // TODO: adapt tiles to result
+
+            _dataContext.SaveChanges();
+
+            var game = _gameRepo.Get(gameId);
+
+            return Ok(MiniGameResult.FromModel(minigame, game));
         }
 
         private bool IsUserMinigamePlayer(string gameId, string minigameId)

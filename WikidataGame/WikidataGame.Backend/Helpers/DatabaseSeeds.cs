@@ -74,13 +74,13 @@ namespace WikidataGame.Backend.Helpers
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "What is the name of the capital of {0}?",
                     SparqlQuery = @"SELECT ?answer ?question WHERE {  
-                          ? item wdt:P31 wd:Q5119.
-                          ? item wdt:P1376 ? land.
-                          ? land wdt : P31 wd:Q6256.
+                          ?item wdt:P31 wd:Q5119.
+                          ?item wdt:P1376 ?land.
+                          ?land wdt:P31 wd:Q6256.
                           OPTIONAL { 
-                            ?item rdfs:label ? answer;
+                            ?item rdfs:label ?answer;
                                     filter(lang(?answer) = 'en')
-                              ? land rdfs:label? question;
+                              ?land rdfs:label ?question;
                                     filter(lang(?question) = 'en').
                           }
                             }
@@ -91,7 +91,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = "aca0f5f7-b000-42fb-b713-f5fe43748761",
                     CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                     MiniGameType = MiniGameType.MultipleChoice,
-                    TaskDescription = "How many countries are on the continent {0}?",
+                    TaskDescription = "Which continent has {0} countries?",
                     SparqlQuery = @"SELECT ?answer (COUNT(?item) AS ?question)
                         WHERE 
                         {

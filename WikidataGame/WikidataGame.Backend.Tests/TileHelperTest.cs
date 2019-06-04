@@ -50,7 +50,7 @@ namespace WikidataGame.Backend.Tests
     public class TileHelperTest
     {
         [Fact]
-        public void StableTileCategoryTest()
+        public void GetCategoriesForTile_SingleTile_GeneratesSameCategoriesWhenAskedRepeatedly()
         {
             // we should get stable categories for a tile
             var tile = new Models.Tile { Id = Guid.NewGuid().ToString() };
@@ -63,7 +63,7 @@ namespace WikidataGame.Backend.Tests
         }
 
         [Fact]
-        public void DifferentTilesCategoryTest()
+        public void GetCategoriesForTile_SingleTile_GeneratesDifferentCategoriesForDifferentTiles()
         {
             var tileOne = new Models.Tile { Id = "b32b5e31-20f7-4c5d-971b-c7b558049e03" };
             var tileTwo = new Models.Tile { Id = "d3d4e3eb-a90c-4dde-96c9-870f19547529" };
@@ -76,7 +76,7 @@ namespace WikidataGame.Backend.Tests
         }
 
         [Fact]
-        public void TopLeftNeighborTest()
+        public void GetNeighbors_TopLeftTile_GivesValidNeighbors ()
         {
             var width = 10;
             var height = 10;
@@ -97,7 +97,7 @@ namespace WikidataGame.Backend.Tests
         }
 
         [Fact]
-        public void TopRowOddXNeighborTest()
+        public void GetNeighbors_TopRowOddX_GivesValidNeighbors ()
         {
             var width = 10;
             var height = 10;
@@ -125,7 +125,7 @@ namespace WikidataGame.Backend.Tests
         }
 
         [Fact]
-        public void TopRowEvenXNeighborTest()
+        public void GetNeighbors_TopRowEvenX_GivesValidNeighbors ()
         {
             var width = 10;
             var height = 10;
@@ -173,7 +173,7 @@ namespace WikidataGame.Backend.Tests
         }
 
         [Fact]
-        public void LeftEdgeNeighborTest ()
+        public void GetNeighbors_LeftEdge_GivesValidNeighbors ()
         {
             var width = 19;
             var height = 19;
@@ -199,7 +199,7 @@ namespace WikidataGame.Backend.Tests
         }
 
         [Fact]
-        public void RightEdgeNeighborTest ()
+        public void GetNeighbors_RightEdge_GivesValidNeighbors ()
         {
             var width = 20;
             var height = 20;
@@ -225,7 +225,7 @@ namespace WikidataGame.Backend.Tests
         }
 
         [Fact]
-        public void BottomLeftNeighborTest()
+        public void GetNeighbors_BottomLeftCorner_GivesValidNeighbors ()
         {
             var width = 4;
             var height = 4;
@@ -248,7 +248,7 @@ namespace WikidataGame.Backend.Tests
         }
 
         [Fact]
-        public void FindsIslandTest ()
+        public void HasIslands_MapsWithIslands_IdentifiedCorrectly ()
         {
             // "x" represents and accessible tile, "o" and inaccessible one
             var horizontalIsland = new [] {
@@ -269,7 +269,7 @@ namespace WikidataGame.Backend.Tests
         }
 
         [Fact]
-        public void CorrectDontHaveIslandsTest ()
+        public void HasIslands_MapsWithOnlyContinuousTiles_IdentifiedCorrectly ()
         {
             var middleIsland = new [] {
                 "o", "o", "o", "o",

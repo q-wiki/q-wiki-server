@@ -11,7 +11,7 @@ namespace WikidataGame.Backend.Tests
         //Getting started: https://xunit.net/docs/getting-started/netcore/cmdline
 
         [Fact]
-        public void MapStructureTest()
+        public void GenerateMapCandidate_10x10Map_SizeAndAmountOfAccessibleTilesAreCorrect ()
         {
             var mapCandidate = Services.MapGeneratorService.GenerateMapCandidate(
                 10, 10, 5
@@ -21,7 +21,7 @@ namespace WikidataGame.Backend.Tests
         }
 
         [Fact]
-        public void PlayerJoinTest()
+        public void SetStartPositions_10x10Map_StartPositionsBeforeAndAfterJoiningAreCorrect ()
         {
             // no tiles should have an owner before two players joined
             var finalMapCandidate = Services.MapGeneratorService.GenerateMap(10, 10, 5);

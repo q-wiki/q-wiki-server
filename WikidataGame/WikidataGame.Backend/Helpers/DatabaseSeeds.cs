@@ -105,7 +105,67 @@ namespace WikidataGame.Backend.Helpers
                         GROUP BY ?continent ?answer
                         ORDER BY RAND()
                         LIMIT 4"
-                });
+                },
+                new Question
+                {
+                    Id = "9a70639b-3447-475a-905a-e866a0c98a1c",
+                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                    MiniGameType = MiniGameType.MultipleChoice,
+                    TaskDescription = "Which country is a part of continent {0}?",
+                    SparqlQuery = @"SELECT ?answer ?question
+                        WITH {
+                          SELECT DISTINCT ?state ?continent ?stateLabel ?continentLabel WHERE {
+                            ?state wdt:P31/wdt:P279* wd:Q3624078;
+                                 p:P463 ?memberOfStatement.
+                            ?memberOfStatement a wikibase:BestRank;
+                                               ps:P463 wd:Q1065.
+                            MINUS { ?memberOfStatement pq:P582 ?endTime. }
+                            MINUS { ?state wdt:P576|wdt:P582 ?end. }
+                            ?state p:P30 ?continentStatement.
+                          ?continentStatement a wikibase:BestRank;
+                                              ps:P30 ?continent.
+                            VALUES ?continent { wd:Q49 wd:Q48 wd:Q46 wd:Q18 wd:Q15 } # ohne Ozeanien
+                            MINUS { ?continentStatement pq:P582 ?endTime. }
+                          } ORDER BY RAND()
+                        } AS %states
+                        WITH {
+                          SELECT ?state ?continent WHERE {
+                            INCLUDE %states.
+                            {
+                              SELECT DISTINCT ?continent WHERE {
+                                VALUES ?continent { wd:Q49 wd:Q48 wd:Q46 wd:Q18 wd:Q15 } # ohne Ozeanien
+                              } order by rand() 
+                              LIMIT 1
+                            }
+                          }
+                        } AS %selectedContinent
+                        WITH {
+                          SELECT DISTINCT ?state ?continent WHERE {
+                            INCLUDE %selectedContinent.
+                          }
+                          LIMIT 1
+                        } AS %threeStates
+                        WITH {
+                          # dump continent for false answers (needed for sorting)
+                          SELECT ?state ?empty WHERE {
+                            INCLUDE %states.
+                            FILTER NOT EXISTS { INCLUDE %selectedContinent. }
+                          }
+                          LIMIT 3
+                        } AS %oneState
+                        WHERE {
+                            { INCLUDE %oneState. } UNION
+                            { INCLUDE %threeStates. }
+
+                          SERVICE wikibase:label { 
+                            bd:serviceParam wikibase:language 'en'.
+                            ?state  rdfs:label ?answer.
+                            ?continent rdfs:label ?question.
+                          }
+                        }
+                        ORDER BY DESC(?question)"
+                }
+                );
         }
     }
 }

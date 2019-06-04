@@ -48,7 +48,9 @@ namespace WikidataGame.Backend.Services
             // get possible answers
             foreach (SparqlResult result in res)
             {
-                results.Add(new Tuple<string, string>(result["question"].AsValuedNode().AsString(), result["answer"].AsValuedNode().AsString()));
+                string q = (result["question"] != null) ? result["question"].AsValuedNode().AsString() : "";
+                string a = (result["answer"] != null) ? result["answer"].AsValuedNode().AsString() : "";
+                results.Add(new Tuple<string, string>(q, a));
             }
 
             return results;

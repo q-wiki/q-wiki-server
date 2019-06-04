@@ -13,7 +13,8 @@ namespace SPARQLtest
         static void Main(string[] args)
         {
 
-            SparqlRemoteEndpoint endpoint = new SparqlRemoteEndpoint(new Uri(("https://query.wikidata.org/bigdata/namespace/wdq/sparql")));
+            var timestamp = DateTime.UtcNow.ToString();
+            SparqlRemoteEndpoint endpoint = new SparqlRemoteEndpoint(new Uri(($"https://query.wikidata.org/bigdata/namespace/wdq/sparql?foo={timestamp}")));
 
             // Dictionary with questions and queries
             // The queries should always yield exactly 4 result rows, where the first is the one with the correct answer

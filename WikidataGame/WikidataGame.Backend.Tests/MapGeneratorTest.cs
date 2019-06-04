@@ -34,8 +34,8 @@ namespace WikidataGame.Backend.Tests
             players.Add(p2);
             Services.MapGeneratorService.SetStartPositions(finalMapCandidate, players.Select(p => p.Id));
 
-            var tileForP1 = finalMapCandidate.Where(t => t.Owner == p1).First();            
-            var tileForP2 = finalMapCandidate.Where(t => t.Owner == p2).First();
+            var tileForP1 = finalMapCandidate.Where(t => t.OwnerId == p1.Id).First();            
+            var tileForP2 = finalMapCandidate.Where(t => t.OwnerId == p2.Id).First();
 
             Assert.NotNull(tileForP1);
             Assert.NotNull(tileForP2);

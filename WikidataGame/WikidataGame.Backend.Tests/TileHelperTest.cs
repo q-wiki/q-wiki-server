@@ -5,56 +5,30 @@ using System.Linq.Expressions;
 using System.Collections.Generic;
 using Xunit;
 using WikidataGame.Backend;
+using WikidataGame.Backend.Models;
+using WikidataGame.Backend.Repos;
+using Microsoft.EntityFrameworkCore;
 
 namespace WikidataGame.Backend.Tests
 {
-    public class CategoryRepositoryMock : Repos.IRepository<Models.Category, string>
-    {
-        private IEnumerable<Models.Category> _categories = Enumerable.Range(0, 10)
-            .Select(i => new Models.Category {
-              Id = Guid.NewGuid().ToString(),
-              Title = $"Category number {i}"
-            })
-            .ToList();
-
-        public IEnumerable<Models.Category> GetAll()
-        {
-            // we implement GetAll to return 10 randomly generated categories
-            return _categories;
-        }
-
-        // The methods below are all dummies
-        public Models.Category Get(string id)
-        {
-            return null;
-        }
-        public IEnumerable<Models.Category> Find(Expression<Func<Models.Category, bool>> predicate)
-        {
-            return null;
-        }
-        public Models.Category SingleOrDefault(Expression<Func<Models.Category, bool>> predicate)
-        {
-            return null;
-        }
-
-        public void Add(Models.Category entity) {}
-        public void AddRange(IEnumerable<Models.Category> entities) {}
-
-        public void Remove(Models.Category entity) {}
-        public void RemoveRange(IEnumerable<Models.Category> entities) {}
-
-        public void Update(Models.Category entity) {}
-        public void UpdateRange(IEnumerable<Models.Category> entities) {}
-    }
-
     public class TileHelperTest
     {
+
+        private IRepository<Category, string> CategoryRepo()
+        {
+            var Builderoptions = new DbContextOptionsBuilder<Helpers.DataContext>();
+            Builderoptions.UseLazyLoadingProxies().UseInMemoryDatabase(Guid.NewGuid().ToString());
+            var context = new Helpers.DataContext(Builderoptions.Options);
+            context.Database.EnsureCreated();
+            return new Repository<Category, string>(context);
+        }
+
         [Fact]
         public void GetCategoriesForTile_SingleTile_GeneratesSameCategoriesWhenAskedRepeatedly()
         {
             // we should get stable categories for a tile
             var tile = new Models.Tile { Id = Guid.NewGuid().ToString() };
-            var categoryRepo = new CategoryRepositoryMock();
+            var categoryRepo = CategoryRepo();
 
             var categoriesForFirstDraw = Helpers.TileHelper.GetCategoriesForTile(categoryRepo, tile);
             var categoriesForSecondDraw = Helpers.TileHelper.GetCategoriesForTile(categoryRepo, tile);
@@ -67,7 +41,7 @@ namespace WikidataGame.Backend.Tests
         {
             var tileOne = new Models.Tile { Id = "b32b5e31-20f7-4c5d-971b-c7b558049e03" };
             var tileTwo = new Models.Tile { Id = "d3d4e3eb-a90c-4dde-96c9-870f19547529" };
-            var categoryRepo = new CategoryRepositoryMock();
+            var categoryRepo = CategoryRepo();
 
             var categoriesForFirstDraw = Helpers.TileHelper.GetCategoriesForTile(categoryRepo, tileOne);
             var categoriesForSecondDraw = Helpers.TileHelper.GetCategoriesForTile(categoryRepo, tileTwo);
@@ -80,7 +54,7 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 10;
             var height = 10;
-            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+            var tiles = Services.MapGeneratorService.GenerateMap(
                 width, height, 50
             );
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 0, 0, width, height);
@@ -101,7 +75,7 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 10;
             var height = 10;
-            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+            var tiles = Services.MapGeneratorService.GenerateMap(
                 width, height, 50
             );
 
@@ -129,7 +103,7 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 10;
             var height = 10;
-            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+            var tiles = Services.MapGeneratorService.GenerateMap(
                 width, height, 50
             );
 
@@ -153,7 +127,7 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 10;
             var height = 10;
-            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+            var tiles = Services.MapGeneratorService.GenerateMap(
                 width, height, 50
             );
 
@@ -177,7 +151,7 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 19;
             var height = 19;
-            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+            var tiles = Services.MapGeneratorService.GenerateMap(
                 width, height, 200
             );
 
@@ -203,7 +177,7 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 20;
             var height = 20;
-            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+            var tiles = Services.MapGeneratorService.GenerateMap(
                 width, height, 200
             );
 
@@ -229,7 +203,7 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 4;
             var height = 4;
-            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+            var tiles = Services.MapGeneratorService.GenerateMap(
                 width, height, 9
             );
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 0, 3, width, height);

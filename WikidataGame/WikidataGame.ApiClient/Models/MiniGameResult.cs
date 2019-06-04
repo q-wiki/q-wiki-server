@@ -24,7 +24,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// Initializes a new instance of the MiniGameResult class.
         /// </summary>
-        public MiniGameResult(bool? isWin = default(bool?), IList<string> correctAnswer = default(IList<string>), IList<Tile> tiles = default(IList<Tile>), string nextMovePlayerId = default(string))
+        public MiniGameResult(bool? isWin = default(bool?), IList<string> correctAnswer = default(IList<string>), IList<IList<Tile>> tiles = default(IList<IList<Tile>>), string nextMovePlayerId = default(string))
         {
             IsWin = isWin;
             CorrectAnswer = correctAnswer;
@@ -51,7 +51,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "tiles")]
-        public IList<Tile> Tiles { get; set; }
+        public IList<IList<Tile>> Tiles { get; set; }
 
         /// <summary>
         /// </summary>

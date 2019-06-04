@@ -61,7 +61,15 @@ namespace WikidataGame.Backend
                 c.OperationFilter<SecurityRequirementsOperationFilter>();
             });
 
-            services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("TestDb").UseLazyLoadingProxies());
+            if (!string.IsNullOrWhiteSpace(Configuration.GetConnectionString("SQL")))
+            {
+                services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("SQL"))
+                    .UseLazyLoadingProxies());
+            }
+            else
+            {
+                services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("TestDb").UseLazyLoadingProxies());
+            }
 
             // configure strongly typed settings objects
             var appSettingsSection = Configuration.GetSection("AppSettings");
@@ -82,7 +90,7 @@ namespace WikidataGame.Backend
                     OnTokenValidated = context =>
                     {
                         var userRepo = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
-                        var user = userRepo.Get(context.Principal.Identity.Name);
+                        var user = userRepo.SingleOrDefault(u => u.DeviceId == context.Principal.Identity.Name);
                         if (user == null)
                         {
                             // return unauthorized if user no longer exists
@@ -104,6 +112,12 @@ namespace WikidataGame.Backend
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IGameRepository, GameRepository>();
+            services.AddScoped<IMinigameRepository, MinigameRepository>();
+            services.AddScoped<IQuestionRepository, QuestionRepository>();
+            services.AddSingleton<IRepository<Category, string>, Repository<Category, string>>();
+            services.AddScoped<IMinigameService, MultipleChoiceMinigameService>();
+            services.AddScoped<IMinigameService, SortingMinigameService>();
+            services.AddScoped<IMinigameService, BlurryImageMinigameService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -127,6 +141,8 @@ namespace WikidataGame.Backend
             });
 
             app.Run(async (context) => await Task.Run(() => context.Response.Redirect("/swagger")));
+
+            app.ApplicationServices.GetService<DataContext>().Database.EnsureCreated();
         }
     }
 }

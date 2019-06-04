@@ -10,12 +10,9 @@ namespace WikidataGame.Backend.Repos
     public class Repository<TEntity, TIdEntity> : IRepository<TEntity, TIdEntity> where TEntity : class where TIdEntity : class
     {
         protected readonly DbContext Context;
-        private string _primaryKeyPropertyName;
-
         public Repository(DataContext context)
         {
             Context = context;
-            _primaryKeyPropertyName = typeof(TEntity).GetProperties().SingleOrDefault(prop => Attribute.IsDefined(prop, typeof(System.ComponentModel.DataAnnotations.KeyAttribute))).Name;
         }
 
         /// <summary>

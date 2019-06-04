@@ -16,6 +16,18 @@ namespace WikidataGame.Backend.Helpers
         public DbSet<MiniGame> MiniGames { get; set; }
         public DbSet<Tile> Tiles { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Question> Questions { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<GameUser>().HasKey(table => new { table.GameId, table.UserId });
+
+            //Seed Database
+            DatabaseSeeds.SeedCategories(modelBuilder);
+            DatabaseSeeds.SeedQuestions(modelBuilder);
+        }
 
     }
 }

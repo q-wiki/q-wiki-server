@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Dto
 {
@@ -20,8 +21,8 @@ namespace WikidataGame.Backend.Dto
             return new GameInfo
             {
                 GameId = game.Id,
-                IsAwaitingOpponentToJoin = game.Players.Count < 2,
-                Message = game.Players.Count < 2 ? "Waiting for opponent to join." : "You matched with someone else!"
+                IsAwaitingOpponentToJoin = game.GameUsers.Count() < 2,
+                Message = game.GameUsers.Count() < 2 ? "Waiting for opponent to join." : "You matched with someone else!"
             };
         }
     }

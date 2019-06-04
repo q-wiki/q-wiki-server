@@ -27,12 +27,12 @@ namespace WikidataGame.Backend.Tests
             var finalMapCandidate = Services.MapGeneratorService.GenerateMap(10, 10, 5);
             Assert.All(finalMapCandidate, tile => Assert.Null(tile.Owner));
             
-            var p1 = new Models.User { DeviceId="device-a" };
-            var p2 = new Models.User { DeviceId="device-b" };
+            var p1 = new Models.User { Id="user-a" };
+            var p2 = new Models.User { Id="user-b" };
             var players = new List<Models.User>();
             players.Add(p1);
             players.Add(p2);
-            Services.MapGeneratorService.SetStartPositions(finalMapCandidate, players);
+            Services.MapGeneratorService.SetStartPositions(finalMapCandidate, players.Select(p => p.Id));
 
             var tileForP1 = finalMapCandidate.Where(t => t.Owner == p1).First();            
             var tileForP2 = finalMapCandidate.Where(t => t.Owner == p2).First();

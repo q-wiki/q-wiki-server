@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WikidataGame.Backend.Helpers;
+using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Dto
 {
@@ -25,22 +26,13 @@ namespace WikidataGame.Backend.Dto
             if (game == null)
                 return null;
 
-            // convert tiles to two-dimensional array
-            var tiles = Enumerable.Range(0, GameConstants.MapHeight)
-                .Select(yCoord =>
-                    game.Tiles.Skip(yCoord * GameConstants.MapWidth)
-                        .Take(GameConstants.MapWidth)
-                        // inaccessible tiles are represented as `null`
-                        .Select(t => t.IsAccessible ? Tile.FromModel(t) : null)
-                );
-
             return new Game {
                 Id = game.Id,
-                Tiles = tiles,
-                AwaitingOpponentToJoin = game.Players.Count < 2,
+                Tiles = TileHelper.TileEnumerableModel2Dto(game.Tiles),
+                AwaitingOpponentToJoin = game.GameUsers.Count() < 2,
                 NextMovePlayerId = game.NextMovePlayerId,
-                Me = Player.FromModel(game.Players.SingleOrDefault(p => p.DeviceId == currentUserId)),
-                Opponent = Player.FromModel(game.Players.SingleOrDefault(p => p.DeviceId != currentUserId))
+                Me = Player.FromModel(game.GameUsers.SingleOrDefault(gu => gu.UserId == currentUserId)?.User),
+                Opponent = Player.FromModel(game.GameUsers.SingleOrDefault(gu => gu.UserId != currentUserId)?.User)
             };
         }
     }

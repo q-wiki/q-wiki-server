@@ -84,16 +84,16 @@ namespace WikidataGame.Backend.Tests
                 width, height, 50
             );
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 0, 0, width, height);
-            var expectedCoordinates = new HashSet<Tuple<int, int>> {
-                Tuple.Create(1, 0),
-                Tuple.Create(0, 1)
+            var expectedCoordinates = new HashSet<(int, int)> {
+                (1, 0),
+                (0, 1)
             };
 
             Assert.Equal(neighbors.Count(), expectedCoordinates.Count());
             Assert.Equal(neighbors.Keys, expectedCoordinates);
 
-            Assert.Equal(tiles.ElementAt(1), neighbors[Tuple.Create(1, 0)]);
-            Assert.Equal(tiles.ElementAt(width), neighbors[Tuple.Create(0, 1)]);
+            Assert.Equal(tiles.ElementAt(1), neighbors[(1, 0)]);
+            Assert.Equal(tiles.ElementAt(width), neighbors[(0, 1)]);
         }
 
         [Fact]
@@ -106,22 +106,22 @@ namespace WikidataGame.Backend.Tests
             );
 
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 1, 0, width, height);
-            var expectedCoordinates = new HashSet<Tuple<int, int>> {
-                Tuple.Create(0, 0),
-                Tuple.Create(2, 0),
-                Tuple.Create(0, 1),
-                Tuple.Create(1, 1),
-                Tuple.Create(2, 1)
+            var expectedCoordinates = new HashSet<(int, int)> {
+                (0, 0),
+                (2, 0),
+                (0, 1),
+                (1, 1),
+                (2, 1)
             };
 
             Assert.Equal(expectedCoordinates.Count(), neighbors.Count());
             Assert.Equal(expectedCoordinates, neighbors.Keys);
 
-            Assert.Equal(tiles.ElementAt(0), neighbors[Tuple.Create(0, 0)]);
-            Assert.Equal(tiles.ElementAt(2), neighbors[Tuple.Create(2, 0)]);
-            Assert.Equal(tiles.ElementAt(width), neighbors[Tuple.Create(0, 1)]);
-            Assert.Equal(tiles.ElementAt(1 + width), neighbors[Tuple.Create(1, 1)]);
-            Assert.Equal(tiles.ElementAt(2 + width), neighbors[Tuple.Create(2, 1)]);
+            Assert.Equal(tiles.ElementAt(0), neighbors[(0, 0)]);
+            Assert.Equal(tiles.ElementAt(2), neighbors[(2, 0)]);
+            Assert.Equal(tiles.ElementAt(width), neighbors[(0, 1)]);
+            Assert.Equal(tiles.ElementAt(1 + width), neighbors[(1, 1)]);
+            Assert.Equal(tiles.ElementAt(2 + width), neighbors[(2, 1)]);
         }
 
         [Fact]
@@ -134,18 +134,18 @@ namespace WikidataGame.Backend.Tests
             );
 
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 2, 0, width, height);
-            var expectedCoordinates = new HashSet<Tuple<int, int>> {
-                Tuple.Create(1, 0),
-                Tuple.Create(3, 0),
-                Tuple.Create(2, 1)
+            var expectedCoordinates = new HashSet<(int, int)> {
+                (1, 0),
+                (3, 0),
+                (2, 1)
             };
 
             Assert.Equal(expectedCoordinates.Count(), neighbors.Count());
             Assert.Equal(expectedCoordinates, neighbors.Keys);
 
-            Assert.Equal(tiles.ElementAt(1), neighbors[Tuple.Create(1, 0)]);
-            Assert.Equal(tiles.ElementAt(3), neighbors[Tuple.Create(3, 0)]);
-            Assert.Equal(tiles.ElementAt(2 + width), neighbors[Tuple.Create(2, 1)]);
+            Assert.Equal(tiles.ElementAt(1), neighbors[(1, 0)]);
+            Assert.Equal(tiles.ElementAt(3), neighbors[(3, 0)]);
+            Assert.Equal(tiles.ElementAt(2 + width), neighbors[(2, 1)]);
         }
 
         [Fact]
@@ -158,22 +158,23 @@ namespace WikidataGame.Backend.Tests
             );
 
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 9, 0, width, height);
-            var expectedCoordinates = new HashSet<Tuple<int, int>> {
-                Tuple.Create(8, 0),
-                Tuple.Create(8, 1),
-                Tuple.Create(9, 1)
+            var expectedCoordinates = new HashSet<(int, int)> {
+                (8, 0),
+                (8, 1),
+                (9, 1)
             };
 
             Assert.Equal(expectedCoordinates.Count(), neighbors.Count());
             Assert.Equal(expectedCoordinates, neighbors.Keys);
 
-            Assert.Equal(tiles.ElementAt(8), neighbors[Tuple.Create(8, 0)]);
-            Assert.Equal(tiles.ElementAt(8 + width), neighbors[Tuple.Create(8, 1)]);
-            Assert.Equal(tiles.ElementAt(9 + width), neighbors[Tuple.Create(8, 1)]);
+            Assert.Equal(tiles.ElementAt(8), neighbors[(8, 0)]);
+            Assert.Equal(tiles.ElementAt(8 + width), neighbors[(8, 1)]);
+            Assert.Equal(tiles.ElementAt(9 + width), neighbors[(8, 1)]);
         }
 
         [Fact]
-        public void LeftEdgeNeighborTest () {
+        public void LeftEdgeNeighborTest ()
+        {
             var width = 19;
             var height = 19;
             var tiles = Services.MapGeneratorService.GenerateMapCandidate(
@@ -181,24 +182,25 @@ namespace WikidataGame.Backend.Tests
             );
 
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 0, 9, width, height);
-            var expectedCoordinates = new HashSet<Tuple<int, int>> {
-                Tuple.Create(0, 8),
-                Tuple.Create(1, 8),
-                Tuple.Create(1, 9),
-                Tuple.Create(0, 10)
+            var expectedCoordinates = new HashSet<(int, int)> {
+                (0, 8),
+                (1, 8),
+                (1, 9),
+                (0, 10)
             };
 
             Assert.Equal(expectedCoordinates.Count(), neighbors.Count());
             Assert.Equal(expectedCoordinates, neighbors.Keys);
 
-            Assert.Equal(tiles.ElementAt(8 * width), neighbors[Tuple.Create(0, 8)]);
-            Assert.Equal(tiles.ElementAt(1 + 8 * width), neighbors[Tuple.Create(1, 8)]);
-            Assert.Equal(tiles.ElementAt(1 + 9 * width), neighbors[Tuple.Create(1, 9)]);
-            Assert.Equal(tiles.ElementAt(10 * width), neighbors[Tuple.Create(0, 10)]);
+            Assert.Equal(tiles.ElementAt(8 * width), neighbors[(0, 8)]);
+            Assert.Equal(tiles.ElementAt(1 + 8 * width), neighbors[(1, 8)]);
+            Assert.Equal(tiles.ElementAt(1 + 9 * width), neighbors[(1, 9)]);
+            Assert.Equal(tiles.ElementAt(10 * width), neighbors[(0, 10)]);
         }
 
         [Fact]
-        public void RightEdgeNeighborTest () {
+        public void RightEdgeNeighborTest ()
+        {
             var width = 20;
             var height = 20;
             var tiles = Services.MapGeneratorService.GenerateMapCandidate(
@@ -206,20 +208,20 @@ namespace WikidataGame.Backend.Tests
             );
 
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 19, 9, width, height);
-            var expectedCoordinates = new HashSet<Tuple<int, int>> {
-                Tuple.Create(19, 8),
-                Tuple.Create(18, 9),
-                Tuple.Create(18, 10),
-                Tuple.Create(19, 10)
+            var expectedCoordinates = new HashSet<(int, int)> {
+                (19, 8),
+                (18, 9),
+                (18, 10),
+                (19, 10)
             };
 
             Assert.Equal(expectedCoordinates.Count(), neighbors.Count());
             Assert.Equal(expectedCoordinates, neighbors.Keys);
 
-            Assert.Equal(tiles.ElementAt(19 + 8 * width), neighbors[Tuple.Create(19, 8)]);
-            Assert.Equal(tiles.ElementAt(18 + 9 * width), neighbors[Tuple.Create(18, 9)]);
-            Assert.Equal(tiles.ElementAt(18 + 10 * width), neighbors[Tuple.Create(18, 10)]);
-            Assert.Equal(tiles.ElementAt(19 + 10 * width), neighbors[Tuple.Create(19, 10)]);
+            Assert.Equal(tiles.ElementAt(19 + 8 * width), neighbors[(19, 8)]);
+            Assert.Equal(tiles.ElementAt(18 + 9 * width), neighbors[(18, 9)]);
+            Assert.Equal(tiles.ElementAt(18 + 10 * width), neighbors[(18, 10)]);
+            Assert.Equal(tiles.ElementAt(19 + 10 * width), neighbors[(19, 10)]);
         }
 
         [Fact]
@@ -231,18 +233,84 @@ namespace WikidataGame.Backend.Tests
                 width, height, 9
             );
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 0, 3, width, height);
-            var expectedCoordinates = new HashSet<Tuple<int, int>> {
-                Tuple.Create(0, 2),
-                Tuple.Create(1, 2),
-                Tuple.Create(1, 3)
+            var expectedCoordinates = new HashSet<(int, int)> {
+                (0, 2),
+                (1, 2),
+                (1, 3)
             };
 
             Assert.Equal(neighbors.Count(), expectedCoordinates.Count());
             Assert.Equal(neighbors.Keys, expectedCoordinates);
 
-            Assert.Equal(tiles.ElementAt(2 * width), neighbors[Tuple.Create(0, 2)]);
-            Assert.Equal(tiles.ElementAt(1 + 2 * width), neighbors[Tuple.Create(1, 2)]);
-            Assert.Equal(tiles.ElementAt(1 + 3 * width), neighbors[Tuple.Create(1, 3)]);
+            Assert.Equal(tiles.ElementAt(2 * width), neighbors[(0, 2)]);
+            Assert.Equal(tiles.ElementAt(1 + 2 * width), neighbors[(1, 2)]);
+            Assert.Equal(tiles.ElementAt(1 + 3 * width), neighbors[(1, 3)]);
+        }
+
+        [Fact]
+        public void FindsIslandTest ()
+        {
+            // "x" represents and accessible tile, "o" and inaccessible one
+            var horizontalIsland = new [] {
+                "x", "x", "x", "x",
+                "o", "o", "o", "o",
+                "o", "o", "o", "o",
+                "x", "x", "x", "x"
+            }.Select(x => new Models.Tile { IsAccessible = x == "x" });
+
+            var verticalIsland = new [] {
+                "x", "o", "x",
+                "x", "o", "x",
+                "x", "o", "x"
+            }.Select(x => new Models.Tile { IsAccessible = x == "x" });
+
+            Assert.Equal(true, Helpers.TileHelper.HasIslands(horizontalIsland, 4, 4));
+            Assert.Equal(true, Helpers.TileHelper.HasIslands(verticalIsland, 3, 3));
+        }
+
+        [Fact]
+        public void CorrectDontHaveIslandsTest ()
+        {
+            var middleIsland = new [] {
+                "o", "o", "o", "o",
+                "o", "x", "x", "o",
+                "o", "o", "o", "o"
+            }.Select(x => new Models.Tile { IsAccessible = x == "x" });
+
+            var accessibleInUpperPart = new [] {
+                "x", "x", "x", "o",
+                "x", "x", "o", "o",
+                "x", "o", "o", "o"
+            }.Select(x => new Models.Tile { IsAccessible = x == "x" });
+
+            var accessibleInLowerPart = new [] {
+                "o", "o", "o",
+                "o", "o", "o",
+                "o", "x", "x"
+            }.Select(x => new Models.Tile { IsAccessible = x == "x" });
+
+            var withBridge = new [] {
+                "x", "x", "x",
+                "o", "x", "o",
+                "x", "x", "x"
+            }.Select(x => new Models.Tile { IsAccessible = x == "x" });
+
+            var completelyAccessible = Enumerable.Range(0, 9)
+                .Select(_ => new Models.Tile {
+                    IsAccessible = true
+                });
+
+            var completelyInaccessible = Enumerable.Range(0, 9)
+                .Select(_ => new Models.Tile {
+                    IsAccessible = false
+                });
+
+            Assert.Equal(false, Helpers.TileHelper.HasIslands(middleIsland, 4, 3));
+            Assert.Equal(false, Helpers.TileHelper.HasIslands(accessibleInUpperPart, 4, 3));
+            Assert.Equal(false, Helpers.TileHelper.HasIslands(accessibleInLowerPart, 3, 3));
+            Assert.Equal(false, Helpers.TileHelper.HasIslands(withBridge, 3, 3));
+            Assert.Equal(false, Helpers.TileHelper.HasIslands(completelyAccessible, 3, 3));
+            Assert.Equal(false, Helpers.TileHelper.HasIslands(completelyInaccessible, 3, 3));
         }
     }
 }

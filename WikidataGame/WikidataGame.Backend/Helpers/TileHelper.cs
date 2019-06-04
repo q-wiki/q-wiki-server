@@ -29,7 +29,7 @@ namespace WikidataGame.Backend.Helpers
         public static IEnumerable<Models.Category> GetCategoriesForTile(Repos.IRepository<Models.Category, string> categoryRepo, Models.Tile tile)
         {
             // we get all categories, draw 3 distinct random ints in
-            // [i, categories.Count()[ and return the categories for 
+            // [i, categories.Count()[ and return the categories for
             // these draws
             var rnd = new Random(tile.Id.GetHashCode());
             var categories = categoryRepo.GetAll();
@@ -56,33 +56,89 @@ namespace WikidataGame.Backend.Helpers
     /// <param name="width">Map width</param>
     /// <param name="height">Map height</param>
     /// <returns>A dict of neighbors that maps coordinates to tiles.</returns>
-    public static Dictionary<Tuple<int, int>, Models.Tile> GetNeighbors(IEnumerable<Models.Tile> tiles, int x, int y, int width, int height) {
+    public static Dictionary<(int, int), Models.Tile> GetNeighbors(IEnumerable<Models.Tile> tiles, int x, int y, int width, int height)
+    {
         // odd and even tiles behave differently in a hexagonal grid; in our
         // grid, the [0, 0] sits to the top left of [1, 0] and right above [0, 1]
         var coordinates = x % 2 == 0
-            ? new List<Tuple<int, int>> {
-                Tuple.Create(x - 1, y - 1),                
-                Tuple.Create(x, y - 1),                
-                Tuple.Create(x + 1, y - 1),                
-                Tuple.Create(x - 1, y),                
-                Tuple.Create(x + 1, y),                
-                Tuple.Create(x, y + 1)                
+            ? new List<(int, int)> {
+                (x - 1, y - 1),
+                (x, y - 1),
+                (x + 1, y - 1),
+                (x - 1, y),
+                (x + 1, y),
+                (x, y + 1)
             }
-            : new List<Tuple<int, int>> {
-                Tuple.Create(x, y - 1),
-                Tuple.Create(x - 1, y),
-                Tuple.Create(x + 1, y),
-                Tuple.Create(x - 1, y + 1),
-                Tuple.Create(x, y + 1),
-                Tuple.Create(x + 1, y + 1),
+            : new List<(int, int)> {
+                (x, y - 1),
+                (x - 1, y),
+                (x + 1, y),
+                (x - 1, y + 1),
+                (x, y + 1),
+                (x + 1, y + 1)
             };
-        
+
         return coordinates
-            .Where(coordinate => -1 < coordinate.Item1 && coordinate.Item1 < width && -1 < coordinate.Item2 && coordinate.Item2 < width)
+            .Where(((int x, int y) coord) => -1 < coord.x && coord.x < width && -1 < coord.y && coord.y < height)
             .ToDictionary(
                 coordinate => coordinate,
-                coordinate => tiles.ElementAt(coordinate.Item1 + coordinate.Item2 * width)
+                ((int x, int y) coord) => tiles.ElementAt(coord.x + coord.y * width)
             );
+    }
+
+    public static bool HasIslands (IEnumerable<Models.Tile> tiles, int width, int height) 
+    {
+        var colors = new Dictionary<(int, int), int>(); // maps a tuple of (x, y) to chosen colors
+        var color = -1;
+        var synonymousColors = new Dictionary<int, int>();
+
+        for (var x = 0; x < width; x++)
+        {
+            for (var y = 0; y < height; y++)
+            {
+                var tile = tiles.ElementAt(x + y * width);
+                if (tile.IsAccessible)
+                {
+                    var neighborCoords = GetNeighbors(tiles, x, y, width, height)
+                        .Keys
+                        .Where(((int x, int y) coord) => coord.x <= x && coord.y <= y)
+                        .ToList();
+
+                    // find a neighbor that has a color and use that
+                    neighborCoords
+                        .ForEach(coord => {
+                            if (colors.ContainsKey(coord)) {
+                                colors[(x, y)] = colors[coord];
+                            } else {
+                                color++;
+                                colors[(x, y)] = color;
+                            }
+                        });
+                    
+                    // if neighboring fields are colored in more than one way,
+                    // the colors are equivalent
+                    neighborCoords
+                        .Where(coord => colors.ContainsKey(coord))
+                        .Select(coord => colors[coord])
+                        .ToList()
+                        .ForEach(neighborsColor => synonymousColors[neighborsColor] = color);
+                }
+            }
+        }
+
+        // remove all ambiguity by giving synonmous colors the same color
+        while (synonymousColors.Count() > 0) 
+        {
+            (var fromColor, var toColor) = synonymousColors.First();
+            colors.Keys.ToList().ForEach(coord => {
+                if (colors[coord] == fromColor) {
+                    colors[coord] = toColor;
+                }
+            });
+            synonymousColors.Remove(fromColor);
+        }
+
+        return colors.Values.Distinct().Count() > 1;
     }
   }
 }

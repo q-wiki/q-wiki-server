@@ -14,11 +14,16 @@ namespace WikidataGame.Backend.Repos
 
         public Game CreateNewGame(User player)
         {
+            var mapCandidate = MapGeneratorService.GenerateMap(GameConstants.MapWidth, GameConstants.MapHeight, GameConstants.AccessibleTiles);
+            while (TileHelper.HasIslands(mapCandidate, GameConstants.MapWidth, GameConstants.MapHeight)) {
+                mapCandidate = MapGeneratorService.GenerateMap(GameConstants.MapWidth, GameConstants.MapHeight, GameConstants.AccessibleTiles);
+            }
+
             var game = new Game
             {
                 Id = Guid.NewGuid().ToString(),
                 Players = new List<User> { player },
-                Tiles = MapGeneratorService.GenerateMap(GameConstants.MapWidth, GameConstants.MapHeight, GameConstants.AccessibleTiles).ToList()
+                Tiles = mapCandidate.ToList()
             };
             Add(game);
             return Get(game.Id);

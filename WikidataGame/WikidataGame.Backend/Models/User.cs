@@ -9,7 +9,13 @@ namespace WikidataGame.Backend.Models
     public class User
     {
         [Key]
+        [StringLength(36)]
+        public string Id { get; set; }
+
+        [Required]
         public string DeviceId { get; set; }
+
+        [Required]
         public GamePlatform Platform { get; set; } = GamePlatform.Android;
 
         public string PushChannelUrl { get; set; }

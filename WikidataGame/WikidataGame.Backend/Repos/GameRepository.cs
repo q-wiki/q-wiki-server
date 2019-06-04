@@ -17,30 +17,41 @@ namespace WikidataGame.Backend.Repos
             var game = new Game
             {
                 Id = Guid.NewGuid().ToString(),
-                Players = new List<User> { player },
-                Tiles = MapGeneratorService.GenerateMap(5, 5, 21).ToList()
+                Tiles = MapGeneratorService.GenerateMap(GameConstants.MapWidth, GameConstants.MapHeight, GameConstants.AccessibleTiles).ToList()
             };
+            var gameUser = new GameUser
+            {
+                GameId = game.Id,
+                UserId = player.Id
+            };
+
+            game.GameUsers.Add(gameUser);
             Add(game);
             return Get(game.Id);
         }
 
         public Game GetOpenGame()
         {
-            var games = Find(g => g.Players.Count < 2);
-            if (games.Count() < 1) return default(Game);
+            var games = Find(g => g.GameUsers.Count() < 2);
+            if (games.Count() < 1) return null;
             return games.First();
         }
 
         public Game JoinGame(Game game, User player)
         {
-            game.Players.Add(player);
+            game.GameUsers.Add(new GameUser
+            {
+                GameId = game.Id,
+                UserId = player.Id
+            });
             game.NextMovePlayer = player;
+            game.Tiles = MapGeneratorService.SetStartPositions(game.Tiles, game.GameUsers.Select(gu => gu.UserId)).ToList();
             return game;
         }
 
         public Game RunningGameForPlayer(User player)
         {
-            return SingleOrDefault(g => g.Players.Contains(player) && string.IsNullOrEmpty(g.WinningPlayerId));
+            return SingleOrDefault(g => g.GameUsers.Select(gu => gu.UserId).Contains(player.Id) && string.IsNullOrEmpty(g.WinningPlayerId));
         }
     }
 }

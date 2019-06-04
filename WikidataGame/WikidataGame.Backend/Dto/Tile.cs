@@ -27,7 +27,7 @@ namespace WikidataGame.Backend.Dto
             {
                 Id = tile.Id,
                 ChosenCategoryId = tile.ChosenCategoryId,
-                AvailableCategories = tile.AvailableCategories.Select(c => Category.FromModel(c)).AsEnumerable(),
+                //AvailableCategories = ,
                 Difficulty = tile.Difficulty,
                 OwnerId = tile.OwnerId
             };

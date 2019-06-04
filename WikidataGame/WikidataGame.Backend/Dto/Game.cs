@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WikidataGame.Backend.Helpers;
+using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Dto
 {
@@ -9,7 +11,7 @@ namespace WikidataGame.Backend.Dto
     {
         public string Id { get; set; }
 
-        public IEnumerable<Tile> Tiles { get; set; }
+        public IEnumerable<IEnumerable<Tile>> Tiles { get; set; }
 
         public Player Me { get; set; }
 
@@ -24,14 +26,13 @@ namespace WikidataGame.Backend.Dto
             if (game == null)
                 return null;
 
-            return new Game
-            {
+            return new Game {
                 Id = game.Id,
-                Tiles = game.Tiles.Select(t => Tile.FromModel(t)).AsEnumerable(),
-                AwaitingOpponentToJoin = game.Players.Count < 2,
+                Tiles = TileHelper.TileEnumerableModel2Dto(game.Tiles),
+                AwaitingOpponentToJoin = game.GameUsers.Count() < 2,
                 NextMovePlayerId = game.NextMovePlayerId,
-                Me = Player.FromModel(game.Players.SingleOrDefault(p => p.DeviceId == currentUserId)),
-                Opponent = Player.FromModel(game.Players.SingleOrDefault(p => p.DeviceId != currentUserId))
+                Me = Player.FromModel(game.GameUsers.SingleOrDefault(gu => gu.UserId == currentUserId)?.User),
+                Opponent = Player.FromModel(game.GameUsers.SingleOrDefault(gu => gu.UserId != currentUserId)?.User)
             };
         }
     }

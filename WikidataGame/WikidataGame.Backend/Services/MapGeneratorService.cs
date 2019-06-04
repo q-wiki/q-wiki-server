@@ -17,7 +17,7 @@ namespace WikidataGame.Backend.Services
         /// <param name="mapHeight">Maximum tiles in y direction</param>
         /// <param name="accessibleTiles">How many tiles should be accessible</param>
         /// <returns>An IEnumerable of map tiles</returns>
-        public static IEnumerable<Tile> GenerateMap(int mapWidth, int mapHeight, int accessibleTiles)
+        public static IEnumerable<Tile> GenerateMapCandidate(int mapWidth, int mapHeight, int accessibleTiles)
         {
             var mapSize = mapWidth * mapHeight;
 
@@ -83,16 +83,55 @@ namespace WikidataGame.Backend.Services
             });
         }
 
+
+        /// <summary>
+        /// Generates map candidates until we have one without islands.
+        /// Once a suitable map candidate is found, the two players will
+        /// be placed on it as far away as possible.
+        /// </summary>
+        /// <param name="mapWidth"></param>
+        /// <param name="mapHeight"></param>
+        /// <param name="accessibleTiles"></param>
+        /// <returns></returns>
+        public static IEnumerable<Tile> GenerateMap(int mapWidth, int mapHeight, int accessibleTiles)
+        {
+            // TODO: Check for islands
+            var candidate = GenerateMapCandidate(mapWidth, mapHeight, accessibleTiles);
+            return candidate;
+        }
+
+        public static IEnumerable<Tile> SetStartPositions (IEnumerable<Tile> tiles, IEnumerable<string> userIds)
+        {
+            // TODO: Implement this correctly; for now we just pick different positions randomly
+            var accessibleTiles = tiles.Where(t => t.IsAccessible);
+            var startTiles = new Dictionary<string, Tile>();
+            var rnd = new Random();
+
+            while (startTiles.Values.Distinct().Count() < userIds.Count())
+            {
+                foreach (var userId in userIds) {
+                    startTiles[userId] = accessibleTiles.ElementAt(rnd.Next(accessibleTiles.Count()));
+                }
+            }
+
+            foreach (var entry in startTiles)
+            {
+                entry.Value.OwnerId = entry.Key;
+            }
+
+            return tiles;
+        }
+
         public static void Debug (int mapWidth, IEnumerable<Tile> tiles)
         {
             for (int i = 0; i < tiles.Count(); i++)
             {
-                System.Console.Write(tiles.ElementAt(i));
+                Console.Write(tiles.ElementAt(i));
                 if (i % mapWidth == 0) System.Console.WriteLine();
             }
-            System.Console.WriteLine();
-            System.Console.WriteLine($"Accessible tiles: {tiles.Count(x => x.IsAccessible)}");
-            System.Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine($"Accessible tiles: {tiles.Count(x => x.IsAccessible)}");
+            Console.WriteLine();
         }
-    } 
+    }
 }

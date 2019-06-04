@@ -27,14 +27,14 @@ namespace WikidataGame.Backend.Controllers
 
         protected User GetCurrentUser()
         {
-            return _userRepo.Get(User.Identity.Name);
+            return _userRepo.SingleOrDefault(u => u.DeviceId == User.Identity.Name);
         }
 
         protected bool IsUserGameParticipant(string gameId)
         {
             var user = GetCurrentUser();
             var game = _gameRepo.Get(gameId);
-            return game != null && game.Players.Contains(user);
+            return game != null && game.GameUsers.SingleOrDefault(gu => gu.UserId == user.Id) != null;
         }
     }
 }

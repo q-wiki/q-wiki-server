@@ -259,7 +259,6 @@ namespace WikidataGame.Backend.Helpers
                               VALUES ?region {wd:Q12585 wd:Q653884}.
                               FILTER NOT EXISTS {?country wdt:P31 wd:Q112099.}
                               FILTER NOT EXISTS {?country wdt:P31 wd:Q13107770.}
-                              #FILTER NOT EXISTS {?country wdt:P30 wd:Q46.}
                               FILTER NOT EXISTS {?country wdt:P361 wd:Q27611.}
                               FILTER NOT EXISTS {INCLUDE %basins.}
                           } order by rand()
@@ -275,6 +274,81 @@ namespace WikidataGame.Backend.Helpers
                           }
                         }
                         order by DESC(?noSea)"
+                },
+                new Question
+                {
+                    Id = "a6a470de-9efb-4fde-9388-6eb20f2ff1f4",
+                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                    MiniGameType = MiniGameType.MultipleChoice,
+                    TaskDescription = "Which country is no basin country of the {0}?",
+                    SparqlQuery = @"SELECT DISTINCT ?question ?answer
+                        WITH {
+                          SELECT DISTINCT (?state as ?country) WHERE {
+                            ?state wdt:P31/wdt:P279* wd:Q3624078;
+                                   p:P463 ?memberOfStatement.
+                            ?memberOfStatement a wikibase:BestRank;
+                                                 ps:P463 wd:Q1065.
+                            MINUS { ?memberOfStatement pq:P582 ?endTime. }
+                            MINUS { ?state wdt:P576|wdt:P582 ?end. }
+                          }
+                        } AS %states
+                        WITH { 
+                              SELECT DISTINCT ?country WHERE {
+                                  BIND(wd:Q4918 AS ?sea).
+                                  ?sea wdt:P205 ?country.
+                                } order by rand() LIMIT 3
+                            } as %threeBasins
+                        WITH {
+                          SELECT DISTINCT ?country ?noSea
+                            WHERE {
+                              BIND(wd:Q4918 AS ?noSea).
+                              INCLUDE %states.
+                              ?country wdt:P361 ?region.
+                              VALUES ?region { wd:Q7204 wd:Q984212 wd:Q27449 wd:Q263686 wd:Q50807777 wd:Q27468 wd:Q27381 }.
+                              FILTER NOT EXISTS {?country wdt:P31 wd:Q51576574.}
+                          } order by rand()
+                          LIMIT 1
+                        } AS %oneOther
+                        WHERE {
+                          { INCLUDE %oneOther. } UNION
+                          { INCLUDE %threeBasins. }
+                          SERVICE wikibase:label { 
+                            bd:serviceParam wikibase:language 'en'.
+                            ?country rdfs:label ?answer.
+                            ?noSea rdfs:label ?question.
+                          }
+                        }
+                        order by DESC(?noSea)"
+                },
+                new Question
+                {
+                    Id = "29fed1d0-d306-4946-8109-63b8aaf0262e",
+                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                    MiniGameType = MiniGameType.MultipleChoice,
+                    TaskDescription = "What is the longest river in {0}?",
+                    SparqlQuery = @"SELECT DISTINCT ?answer ?question WHERE {
+                        { SELECT DISTINCT ?river ?continent (avg(?length2) as ?length)
+                            WHERE
+                            {
+                              ?river wdt:P31/wdt:P279* wd:Q355304;
+                                 wdt:P2043 ?length2;
+                                 wdt:P30 ?continent.
+                              {
+                                SELECT DISTINCT ?continent WHERE {
+                                  VALUES ?continent { wd:Q49 wd:Q48 wd:Q46 wd:Q18 wd:Q15  } # ohne Ozeanien
+                                } order by rand() LIMIT 1
+                               } 
+                            }
+                            group by ?river ?continent
+                        }
+                        OPTIONAL {?continent rdfs:label ?question;
+                            filter(lang(?question) = 'en')
+                            ?river rdfs:label ?answer ;
+                            filter(lang(?answer) = 'en')
+                        }
+                    }
+                    order by desc(?length)
+                    limit 4"
                 }
                 );
         }

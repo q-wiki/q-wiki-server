@@ -212,6 +212,69 @@ namespace WikidataGame.Backend.Helpers
                           }
                         }
                         order by DESC(?question)"
+                },
+                new Question
+                {
+                    Id = "4f6c477e-7025-44b4-a3b0-f3ebd8902902",
+                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                    MiniGameType = MiniGameType.MultipleChoice,
+                    TaskDescription = "Which country is no basin country of the {0}?",
+                    SparqlQuery = @"SELECT DISTINCT ?question ?answer
+                        WITH {
+                          SELECT DISTINCT (?state as ?country) WHERE {
+                            ?state wdt:P31/wdt:P279* wd:Q3624078;
+                                   p:P463 ?memberOfStatement.
+                            ?memberOfStatement a wikibase:BestRank;
+                                                 ps:P463 wd:Q1065.
+                            MINUS { ?memberOfStatement pq:P582 ?endTime. }
+                            MINUS { ?state wdt:P576|wdt:P582 ?end. }
+                          }
+                        } AS %states
+                        WITH { 
+                              SELECT DISTINCT ?country ?sea WHERE {
+                                  BIND(wd:Q1247 AS ?sea).
+                                  {
+                                    ?sea wdt:P205 ?country.
+                                  }
+                                  UNION
+                                  {
+                                    INCLUDE %states.
+                                    ?country wdt:P361 ?region.
+                                    VALUES ?region {wd:Q664609 wd:Q166131 wd:Q778 wd:Q93259 wd:Q19386 wd:Q5317255}.
+                                  }
+                                } order by rand()
+                            } as %basins
+                        WITH { 
+                            SELECT DISTINCT ?country ?sea
+                            WHERE {
+                              INCLUDE %basins.
+                                } order by rand() LIMIT 3
+                            } as %threeBasins
+                        WITH {
+                          SELECT DISTINCT ?country ?noSea
+                            WHERE {
+                              INCLUDE %states.
+                              ?country wdt:P361 ?region.
+                              BIND(wd:Q1247 as ?noSea).
+                              VALUES ?region {wd:Q12585 wd:Q653884}.
+                              FILTER NOT EXISTS {?country wdt:P31 wd:Q112099.}
+                              FILTER NOT EXISTS {?country wdt:P31 wd:Q13107770.}
+                              #FILTER NOT EXISTS {?country wdt:P30 wd:Q46.}
+                              FILTER NOT EXISTS {?country wdt:P361 wd:Q27611.}
+                              FILTER NOT EXISTS {INCLUDE %basins.}
+                          } order by rand()
+                          LIMIT 1
+                        } AS %oneOther
+                        WHERE {
+                          { INCLUDE %oneOther. } UNION
+                          { INCLUDE %threeBasins. } 
+                          SERVICE wikibase:label { 
+                            bd:serviceParam wikibase:language 'en'.
+                            ?country rdfs:label ?answer.
+                            ?noSea rdfs:label ?question.
+                          }
+                        }
+                        order by DESC(?noSea)"
                 }
                 );
         }

@@ -30,11 +30,8 @@ namespace WikidataGame.Backend.Services
 
             minigame.TaskDescription = string.Format(question.TaskDescription, data[0].Item1); // placeholder and answer in first tuple!
             minigame.CorrectAnswer = new List<string> { data[0].Item2 }; // placeholder and answer in first tuple!
-            minigame.AnswerOptions = data.Select(item => item.Item2).ToList();
-
-            // shuffle answer options -> TODO: shuffle here or somewhere else?
-            var random = new Random();
-            minigame.AnswerOptions.OrderBy(item => random.Next());
+            var templist = data.Select(item => item.Item2).ToList();
+            minigame.AnswerOptions = templist.OrderBy(a => Guid.NewGuid()).ToList(); // shuffle answer options
 
             _dataContext.SaveChanges();
 

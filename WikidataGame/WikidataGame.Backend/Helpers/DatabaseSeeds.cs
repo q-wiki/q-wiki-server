@@ -164,6 +164,54 @@ namespace WikidataGame.Backend.Helpers
                           }
                         }
                         ORDER BY DESC(?question)"
+                },
+                new Question
+                {
+                    Id = "46679c4f-ef97-445d-9a70-d95a5337720f",
+                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                    MiniGameType = MiniGameType.MultipleChoice,
+                    TaskDescription = "Which country is no basin country of the Baltic Sea?",
+                    SparqlQuery = @"SELECT DISTINCT ?question ?answer
+                        WITH {
+                          SELECT DISTINCT (?state as ?country) WHERE {
+                            ?state wdt:P31/wdt:P279* wd:Q3624078;
+                                   p:P463 ?memberOfStatement.
+                            ?memberOfStatement a wikibase:BestRank;
+                                                 ps:P463 wd:Q1065.
+                            MINUS { ?memberOfStatement pq:P582 ?endTime. }
+                            MINUS { ?state wdt:P576|wdt:P582 ?end. }
+                          }
+                        } AS %states
+                        WITH { 
+                              SELECT DISTINCT ?country ?sea WHERE {
+                                  BIND(wd:Q545 AS ?sea).
+                                  ?sea wdt:P205 ?country.
+                                }
+                            } as %basins
+                        WITH { 
+                              SELECT DISTINCT ?country ?sea WHERE {
+                                  INCLUDE %basins.
+                                } ORDER BY RAND() LIMIT 3
+                            } as %threeBasins
+                        WITH {
+                          SELECT DISTINCT ?country ?sea ?noSea
+                            WHERE {
+                              INCLUDE %states.
+                              ?country wdt:P30 wd:Q46.
+                              BIND(wd:Q545 as ?noSea).
+                            FILTER NOT EXISTS { INCLUDE %basins.}
+                          } ORDER BY RAND()  LIMIT 1
+                        } AS %oneOther
+                        WHERE {
+                          { INCLUDE %oneOther. } UNION
+                          { INCLUDE %threeBasins. }
+                          SERVICE wikibase:label { 
+                            bd:serviceParam wikibase:language 'en'. 
+                            ?country rdfs:label ?answer.
+                            ?noSea rdfs:label ?question. 
+                          }
+                        }
+                        order by DESC(?question)"
                 }
                 );
         }

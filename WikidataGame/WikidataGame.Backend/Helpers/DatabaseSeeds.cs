@@ -349,6 +349,32 @@ namespace WikidataGame.Backend.Helpers
                     }
                     order by desc(?length)
                     limit 4"
+                },
+                new Question
+                {
+                    Id = "f88a4dc0-8187-43c4-8775-593822bf4af1",
+                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                    MiniGameType = MiniGameType.BlurryImage,
+                    TaskDescription = "Which famous monument is this: {0}?",
+                    SparqlQuery = @"SELECT ?question (CONCAT( ?ans, ' (', ?country, ')' ) as ?answer) WHERE {
+                      { SELECT DISTINCT (?answer as ?ans) (MAX(?image) as ?question) ?country WHERE { 
+                        ?landmark wdt:P31/wdt:P279* wd:Q2319498;
+                                 wikibase:sitelinks ?sitelinks;
+                                 wdt:P18 ?image;
+                                 wdt:P17 ?cntr.
+                        ?landmark wdt:P1435 ?type.
+                        FILTER(?sitelinks >= 10)
+
+                        SERVICE wikibase:label { 
+                            bd:serviceParam wikibase:language 'en'.
+                            ?cntr rdfs:label ?country.
+                            ?landmark rdfs:label ?answer.}
+                        }
+                        GROUP BY ?answer ?country
+                        ORDER BY RAND() 
+                        LIMIT 4 
+                      }
+                    }"
                 }
                 );
         }

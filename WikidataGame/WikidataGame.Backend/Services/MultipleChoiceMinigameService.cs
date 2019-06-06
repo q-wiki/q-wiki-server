@@ -19,7 +19,7 @@ namespace WikidataGame.Backend.Services
 
         public Models.MiniGameType MiniGameType => Models.MiniGameType.MultipleChoice;
 
-        public MiniGame GenerateMiniGame(string gameId, string playerId, string categoryId)
+        public Dto.MiniGame GenerateMiniGame(string gameId, string playerId, string categoryId)
         {
             var question = _questionRepo.GetRandomQuestionForMinigameType(MiniGameType, categoryId);
 

@@ -16,8 +16,34 @@ namespace WikidataGame.Backend.Tests
             var mapCandidate = Services.MapGeneratorService.GenerateMapCandidate(
                 10, 10, 5
             );
-            Assert.Equal(mapCandidate.ToList().Count(), 10 * 10);
-            Assert.Equal(mapCandidate.Where(t => t.IsAccessible).Count(), 5);
+            Assert.Equal(10 * 10, mapCandidate.ToList().Count());
+            Assert.Equal(5, mapCandidate.Where(t => t.IsAccessible).Count());
+        }
+
+        [Fact]
+        public void GenerateMapCandidate_Odd19x19Map_SizeAndAmountOfAccessibleTilesAreCorrect ()
+        {
+            var mapWidth = 19;
+            var mapHeight = 19;
+            var accessibleTiles = 5;
+            var mapCandidate = Services.MapGeneratorService.GenerateMapCandidate(
+                mapWidth, mapHeight, accessibleTiles
+            );
+            Assert.Equal(mapWidth * mapHeight, mapCandidate.ToList().Count());
+            Assert.Equal(accessibleTiles, mapCandidate.Where(t => t.IsAccessible).Count());
+        }
+
+        [Fact]
+        public void GenerateMapCandidate_NonSquare8x21Map_SizeAndAmountOfAccessibleTilesAreCorrect ()
+        {
+            var mapWidth = 8;
+            var mapHeight = 21;
+            var accessibleTiles = 101;
+            var mapCandidate = Services.MapGeneratorService.GenerateMapCandidate(
+                mapWidth, mapHeight, accessibleTiles
+            );
+            Assert.Equal(mapWidth * mapHeight, mapCandidate.ToList().Count());
+            Assert.Equal(accessibleTiles, mapCandidate.Where(t => t.IsAccessible).Count());
         }
 
         [Fact]

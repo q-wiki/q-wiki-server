@@ -50,15 +50,15 @@ namespace WikidataGame.Backend.Tests
         }
 
         [Fact]
-        public void GetNeighbors_TopLeftTile_GivesValidNeighbors ()
+        public void GetNeighbors_TopLeftCorner_GivesValidNeighbors ()
         {
             var width = 10;
             var height = 10;
-            var tiles = Services.MapGeneratorService.GenerateMap(
+            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
                 width, height, 50
             );
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 0, 0, width, height);
-            var expectedCoordinates = new HashSet<(int, int)> {
+            var expectedCoordinates = new List<(int, int)> {
                 (1, 0),
                 (0, 1)
             };
@@ -75,12 +75,12 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 10;
             var height = 10;
-            var tiles = Services.MapGeneratorService.GenerateMap(
+            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
                 width, height, 50
             );
 
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 1, 0, width, height);
-            var expectedCoordinates = new HashSet<(int, int)> {
+            var expectedCoordinates = new List<(int, int)> {
                 (0, 0),
                 (2, 0),
                 (0, 1),
@@ -103,12 +103,12 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 10;
             var height = 10;
-            var tiles = Services.MapGeneratorService.GenerateMap(
+            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
                 width, height, 50
             );
 
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 2, 0, width, height);
-            var expectedCoordinates = new HashSet<(int, int)> {
+            var expectedCoordinates = new List<(int, int)> {
                 (1, 0),
                 (3, 0),
                 (2, 1)
@@ -123,16 +123,16 @@ namespace WikidataGame.Backend.Tests
         }
 
         [Fact]
-        public void TopRightNeighborTest()
+        public void GetNeighbors_TopRightCorner_GivesValidNeighbors ()
         {
             var width = 10;
             var height = 10;
-            var tiles = Services.MapGeneratorService.GenerateMap(
+            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
                 width, height, 50
             );
 
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 9, 0, width, height);
-            var expectedCoordinates = new HashSet<(int, int)> {
+            var expectedCoordinates = new List<(int, int)> {
                 (8, 0),
                 (8, 1),
                 (9, 1)
@@ -143,7 +143,7 @@ namespace WikidataGame.Backend.Tests
 
             Assert.Equal(tiles.ElementAt(8), neighbors[(8, 0)]);
             Assert.Equal(tiles.ElementAt(8 + width), neighbors[(8, 1)]);
-            Assert.Equal(tiles.ElementAt(9 + width), neighbors[(8, 1)]);
+            Assert.Equal(tiles.ElementAt(9 + width), neighbors[(9, 1)]);
         }
 
         [Fact]
@@ -151,12 +151,12 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 19;
             var height = 19;
-            var tiles = Services.MapGeneratorService.GenerateMap(
+            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
                 width, height, 200
             );
 
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 0, 9, width, height);
-            var expectedCoordinates = new HashSet<(int, int)> {
+            var expectedCoordinates = new List<(int, int)> {
                 (0, 8),
                 (1, 8),
                 (1, 9),
@@ -177,12 +177,12 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 20;
             var height = 20;
-            var tiles = Services.MapGeneratorService.GenerateMap(
+            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
                 width, height, 200
             );
 
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 19, 9, width, height);
-            var expectedCoordinates = new HashSet<(int, int)> {
+            var expectedCoordinates = new List<(int, int)> {
                 (19, 8),
                 (18, 9),
                 (18, 10),
@@ -203,11 +203,11 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 4;
             var height = 4;
-            var tiles = Services.MapGeneratorService.GenerateMap(
+            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
                 width, height, 9
             );
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 0, 3, width, height);
-            var expectedCoordinates = new HashSet<(int, int)> {
+            var expectedCoordinates = new List<(int, int)> {
                 (0, 2),
                 (1, 2),
                 (1, 3)
@@ -219,6 +219,27 @@ namespace WikidataGame.Backend.Tests
             Assert.Equal(tiles.ElementAt(2 * width), neighbors[(0, 2)]);
             Assert.Equal(tiles.ElementAt(1 + 2 * width), neighbors[(1, 2)]);
             Assert.Equal(tiles.ElementAt(1 + 3 * width), neighbors[(1, 3)]);
+        }
+
+        [Fact]
+        public void GetNeighbors_BottomRightCorner_GivesValidNeighbors ()
+        {
+            var width = 4;
+            var height = 4;
+            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+                width, height, 6
+            );
+            var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 3, 3, width, height);
+            var expectedCoordinates = new List<(int, int)> {
+                (3, 2),
+                (2, 3)
+            };
+
+            Assert.Equal(neighbors.Count(), expectedCoordinates.Count());
+            Assert.Equal(neighbors.Keys, expectedCoordinates);
+
+            Assert.Equal(tiles.ElementAt(3 + 2 * width), neighbors[(3, 2)]);
+            Assert.Equal(tiles.ElementAt(2 + 3 * width), neighbors[(2, 3)]);
         }
 
         [Fact]
@@ -238,8 +259,8 @@ namespace WikidataGame.Backend.Tests
                 "x", "o", "x"
             }.Select(x => new Models.Tile { IsAccessible = x == "x" });
 
-            Assert.Equal(true, Helpers.TileHelper.HasIslands(horizontalIsland, 4, 4));
-            Assert.Equal(true, Helpers.TileHelper.HasIslands(verticalIsland, 3, 3));
+            Assert.True(Helpers.TileHelper.HasIslands(horizontalIsland, 4, 4));
+            Assert.True(Helpers.TileHelper.HasIslands(verticalIsland, 3, 3));
         }
 
         [Fact]
@@ -279,12 +300,12 @@ namespace WikidataGame.Backend.Tests
                     IsAccessible = false
                 });
 
-            Assert.Equal(false, Helpers.TileHelper.HasIslands(middleIsland, 4, 3));
-            Assert.Equal(false, Helpers.TileHelper.HasIslands(accessibleInUpperPart, 4, 3));
-            Assert.Equal(false, Helpers.TileHelper.HasIslands(accessibleInLowerPart, 3, 3));
-            Assert.Equal(false, Helpers.TileHelper.HasIslands(withBridge, 3, 3));
-            Assert.Equal(false, Helpers.TileHelper.HasIslands(completelyAccessible, 3, 3));
-            Assert.Equal(false, Helpers.TileHelper.HasIslands(completelyInaccessible, 3, 3));
+            Assert.False(Helpers.TileHelper.HasIslands(middleIsland, 4, 3));
+            Assert.False(Helpers.TileHelper.HasIslands(accessibleInUpperPart, 4, 3));
+            Assert.False(Helpers.TileHelper.HasIslands(accessibleInLowerPart, 3, 3));
+            Assert.False(Helpers.TileHelper.HasIslands(withBridge, 3, 3));
+            Assert.False(Helpers.TileHelper.HasIslands(completelyAccessible, 3, 3));
+            Assert.False(Helpers.TileHelper.HasIslands(completelyInaccessible, 3, 3));
         }
     }
 }

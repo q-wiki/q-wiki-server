@@ -29,7 +29,6 @@ namespace WikidataGame.Backend.Services
             var yProgress = 0.22;
             var yOffset = rand.Next(0, 10);
 
-            // TODO: This could probably be a lot prettier
             var noiseField = new Double[mapSize];
             for (int index = 0; index < mapSize; index++)
             {
@@ -81,7 +80,7 @@ namespace WikidataGame.Backend.Services
             return noiseField.Select(n => new Tile {
                 IsAccessible = n > threshold,
                 Id = Guid.NewGuid().ToString()
-            });
+            }).ToList();
         }
 
 
@@ -98,14 +97,13 @@ namespace WikidataGame.Backend.Services
         {
             var candidate = GenerateMapCandidate(mapWidth, mapHeight, accessibleTiles);
             while (TileHelper.HasIslands(candidate, mapWidth, mapHeight)) {
-                candidate = MapGeneratorService.GenerateMapCandidate(GameConstants.MapWidth, GameConstants.MapHeight, GameConstants.AccessibleTiles);
+                candidate = MapGeneratorService.GenerateMapCandidate(mapWidth, mapHeight, accessibleTiles);
             }
-            return candidate.ToList();
+            return candidate;
         }
 
         public static IEnumerable<Tile> SetStartPositions (IEnumerable<Tile> tiles, IEnumerable<string> userIds)
         {
-            // TODO: Implement this correctly; for now we just pick different positions randomly
             var accessibleTiles = tiles.Where(t => t.IsAccessible);
             var startTiles = new Dictionary<string, string>();
             var rnd = new Random();

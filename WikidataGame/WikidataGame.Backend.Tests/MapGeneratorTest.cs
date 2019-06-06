@@ -47,6 +47,19 @@ namespace WikidataGame.Backend.Tests
         }
 
         [Fact]
+        public void GenerateMap_10x10Map_ReturnsMapWithoutIslands ()
+        {
+            var mapWidth = 10;
+            var mapHeight = 10;
+            var accessibleTiles = 65;
+            var map = Services.MapGeneratorService.GenerateMap(
+                mapWidth, mapHeight, accessibleTiles
+            );
+
+            Assert.False(Helpers.TileHelper.HasIslands(map, mapWidth, mapHeight));
+        }
+
+        [Fact]
         public void SetStartPositions_10x10Map_StartPositionsBeforeAndAfterJoiningAreCorrect ()
         {
             // no tiles should have an owner before two players joined

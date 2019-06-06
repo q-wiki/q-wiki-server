@@ -38,14 +38,16 @@ namespace SPARQLtest
                 // query results...
                 SparqlResultSet results = endpoint.QueryWithResultSet(q.Value);
 
-                // get possible answers   ->TODO: needs to be shuffled!
+                // get possible answers
+                var ansList = results.Select(item => item["answer"].AsValuedNode().AsString()).ToList();
+                ansList = ansList.OrderBy(a => Guid.NewGuid()).ToList(); // shuffle answer options
                 String possAns = "";
-                foreach (SparqlResult result in results)
+                foreach (string result in ansList)
                 {
-                    possAns += result["answer"].AsValuedNode().AsString() + ", ";
+                    possAns += result + ", ";
                 }
 
-                // as described above: Platzhalter of question and answer
+                // as described above: placeholder of question and answer
                 string qpart = (results[0]["question"] != null) ? results[0]["question"].AsValuedNode().AsString() : "";
                 string ans = results[0]["answer"].AsValuedNode().AsString();
 

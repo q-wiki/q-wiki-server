@@ -84,7 +84,7 @@ namespace WikidataGame.Backend.Helpers
                                     filter(lang(?question) = 'en').
                           }
                             }
-                        ORDER BY RAND() LIMIT 4"
+                        ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) LIMIT 4"
                 },
                 new Question
                 {
@@ -103,7 +103,7 @@ namespace WikidataGame.Backend.Helpers
                                           }
                         }
                         GROUP BY ?continent ?answer
-                        ORDER BY RAND()
+                        ORDER BY MD5(CONCAT(STR(?answer), STR(NOW())))
                         LIMIT 4"
                 },
                 new Question
@@ -126,7 +126,7 @@ namespace WikidataGame.Backend.Helpers
                                               ps:P30 ?continent.
                             VALUES ?continent { wd:Q49 wd:Q48 wd:Q46 wd:Q18 wd:Q15 } # ohne Ozeanien
                             MINUS { ?continentStatement pq:P582 ?endTime. }
-                          } ORDER BY RAND()
+                          } ORDER BY MD5(CONCAT(STR(?state), STR(NOW())))
                         } AS %states
                         WITH {
                           SELECT ?state ?continent WHERE {
@@ -134,7 +134,7 @@ namespace WikidataGame.Backend.Helpers
                             {
                               SELECT DISTINCT ?continent WHERE {
                                 VALUES ?continent { wd:Q49 wd:Q48 wd:Q46 wd:Q18 wd:Q15 } # ohne Ozeanien
-                              } order by rand() 
+                              } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW())))
                               LIMIT 1
                             }
                           }
@@ -191,7 +191,7 @@ namespace WikidataGame.Backend.Helpers
                         WITH { 
                               SELECT DISTINCT ?country ?sea WHERE {
                                   INCLUDE %basins.
-                                } ORDER BY RAND() LIMIT 3
+                                } ORDER BY MD5(CONCAT(STR(?country), STR(NOW()))) LIMIT 3
                             } as %threeBasins
                         WITH {
                           SELECT DISTINCT ?country ?sea ?noSea
@@ -200,7 +200,7 @@ namespace WikidataGame.Backend.Helpers
                               ?country wdt:P30 wd:Q46.
                               BIND(wd:Q545 as ?noSea).
                             FILTER NOT EXISTS { INCLUDE %basins.}
-                          } ORDER BY RAND()  LIMIT 1
+                          } ORDER BY MD5(CONCAT(STR(?country), STR(NOW()))) LIMIT 1
                         } AS %oneOther
                         WHERE {
                           { INCLUDE %oneOther. } UNION
@@ -242,13 +242,13 @@ namespace WikidataGame.Backend.Helpers
                                     ?country wdt:P361 ?region.
                                     VALUES ?region {wd:Q664609 wd:Q166131 wd:Q778 wd:Q93259 wd:Q19386 wd:Q5317255}.
                                   }
-                                } order by rand()
+                                } ORDER BY MD5(CONCAT(STR(?country), STR(NOW())))
                             } as %basins
                         WITH { 
                             SELECT DISTINCT ?country ?sea
                             WHERE {
                               INCLUDE %basins.
-                                } order by rand() LIMIT 3
+                                } LIMIT 3
                             } as %threeBasins
                         WITH {
                           SELECT DISTINCT ?country ?noSea
@@ -261,7 +261,7 @@ namespace WikidataGame.Backend.Helpers
                               FILTER NOT EXISTS {?country wdt:P31 wd:Q13107770.}
                               FILTER NOT EXISTS {?country wdt:P361 wd:Q27611.}
                               FILTER NOT EXISTS {INCLUDE %basins.}
-                          } order by rand()
+                          } ORDER BY MD5(CONCAT(STR(?country), STR(NOW())))
                           LIMIT 1
                         } AS %oneOther
                         WHERE {
@@ -291,12 +291,13 @@ namespace WikidataGame.Backend.Helpers
                             MINUS { ?memberOfStatement pq:P582 ?endTime. }
                             MINUS { ?state wdt:P576|wdt:P582 ?end. }
                           }
+                          ORDER BY MD5(CONCAT(STR(?state), STR(NOW())))
                         } AS %states
                         WITH { 
                               SELECT DISTINCT ?country WHERE {
                                   BIND(wd:Q4918 AS ?sea).
                                   ?sea wdt:P205 ?country.
-                                } order by rand() LIMIT 3
+                                } LIMIT 3
                             } as %threeBasins
                         WITH {
                           SELECT DISTINCT ?country ?noSea
@@ -306,8 +307,7 @@ namespace WikidataGame.Backend.Helpers
                               ?country wdt:P361 ?region.
                               VALUES ?region { wd:Q7204 wd:Q984212 wd:Q27449 wd:Q263686 wd:Q50807777 wd:Q27468 wd:Q27381 }.
                               FILTER NOT EXISTS {?country wdt:P31 wd:Q51576574.}
-                          } order by rand()
-                          LIMIT 1
+                          } LIMIT 1
                         } AS %oneOther
                         WHERE {
                           { INCLUDE %oneOther. } UNION
@@ -336,7 +336,7 @@ namespace WikidataGame.Backend.Helpers
                               {
                                 SELECT DISTINCT ?continent WHERE {
                                   VALUES ?continent { wd:Q49 wd:Q48 wd:Q46 wd:Q18 wd:Q15  } # ohne Ozeanien
-                                } order by rand() LIMIT 1
+                                } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW()))) LIMIT 1
                                } 
                             }
                             group by ?river ?continent
@@ -371,7 +371,7 @@ namespace WikidataGame.Backend.Helpers
                             ?landmark rdfs:label ?answer.}
                         }
                         GROUP BY ?answer ?country
-                        ORDER BY RAND() 
+                        ORDER BY MD5(CONCAT(STR(?question), STR(NOW())))
                         LIMIT 4 
                       }
                     }"

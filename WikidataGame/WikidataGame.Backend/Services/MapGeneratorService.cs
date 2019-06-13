@@ -29,7 +29,6 @@ namespace WikidataGame.Backend.Services
             var yProgress = 0.22;
             var yOffset = rand.Next(0, 10);
 
-            // TODO: This could probably be a lot prettier
             var noiseField = new Double[mapSize];
             for (int index = 0; index < mapSize; index++)
             {
@@ -79,8 +78,9 @@ namespace WikidataGame.Backend.Services
             } while (accessibleTiles != aboveThreshold);
 
             return noiseField.Select(n => new Tile {
-                IsAccessible = n > threshold
-            });
+                IsAccessible = n > threshold,
+                Id = Guid.NewGuid().ToString()
+            }).ToList();
         }
 
 
@@ -95,28 +95,29 @@ namespace WikidataGame.Backend.Services
         /// <returns></returns>
         public static IEnumerable<Tile> GenerateMap(int mapWidth, int mapHeight, int accessibleTiles)
         {
-            // TODO: Check for islands
             var candidate = GenerateMapCandidate(mapWidth, mapHeight, accessibleTiles);
+            while (TileHelper.HasIslands(candidate, mapWidth, mapHeight)) {
+                candidate = MapGeneratorService.GenerateMapCandidate(mapWidth, mapHeight, accessibleTiles);
+            }
             return candidate;
         }
 
         public static IEnumerable<Tile> SetStartPositions (IEnumerable<Tile> tiles, IEnumerable<string> userIds)
         {
-            // TODO: Implement this correctly; for now we just pick different positions randomly
             var accessibleTiles = tiles.Where(t => t.IsAccessible);
-            var startTiles = new Dictionary<string, Tile>();
+            var startTiles = new Dictionary<string, string>();
             var rnd = new Random();
 
             while (startTiles.Values.Distinct().Count() < userIds.Count())
             {
                 foreach (var userId in userIds) {
-                    startTiles[userId] = accessibleTiles.ElementAt(rnd.Next(accessibleTiles.Count()));
+                    startTiles[userId] = accessibleTiles.ElementAt(rnd.Next(accessibleTiles.Count())).Id;
                 }
             }
 
-            foreach (var entry in startTiles)
+            foreach (var tile in startTiles)
             {
-                entry.Value.OwnerId = entry.Key;
+                tiles.SingleOrDefault(t => t.Id == tile.Value).OwnerId = tile.Key;
             }
 
             return tiles;

@@ -77,8 +77,15 @@ namespace WikidataGame.Backend.Services
                 }
             } while (accessibleTiles != aboveThreshold);
 
+            // used for difficulties; we basically partition the space we have
+            // into three equally sized bins and assign a difficulty based
+            // on that
+            var highestPoint = noiseField.Max();
+            var difficultyGap = (highestPoint - threshold) / 2;
+
             return noiseField.Select(n => new Tile {
                 IsAccessible = n > threshold,
+                Difficulty = Convert.ToInt32(Math.Round((n - threshold) / difficultyGap)),
                 Id = Guid.NewGuid().ToString()
             }).ToList();
         }
@@ -117,7 +124,9 @@ namespace WikidataGame.Backend.Services
 
             foreach (var tile in startTiles)
             {
-                tiles.SingleOrDefault(t => t.Id == tile.Value).OwnerId = tile.Key;
+                var startTile = tiles.SingleOrDefault(t => t.Id == tile.Value);
+                startTile.OwnerId = tile.Key;
+                startTile.Difficulty = 0;
             }
 
             return tiles;

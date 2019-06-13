@@ -111,14 +111,14 @@ namespace WikidataGame.Backend.Services
 
         public static IEnumerable<Tile> SetStartPositions (IEnumerable<Tile> tiles, IEnumerable<string> userIds)
         {
-            var accessibleTiles = tiles.Where(t => t.IsAccessible);
+            var candidates = tiles.Where(t => t.IsAccessible && t.Difficulty == 0);
             var startTiles = new Dictionary<string, string>();
             var rnd = new Random();
 
             while (startTiles.Values.Distinct().Count() < userIds.Count())
             {
                 foreach (var userId in userIds) {
-                    startTiles[userId] = accessibleTiles.ElementAt(rnd.Next(accessibleTiles.Count())).Id;
+                    startTiles[userId] = candidates.ElementAt(rnd.Next(candidates.Count())).Id;
                 }
             }
 
@@ -126,7 +126,6 @@ namespace WikidataGame.Backend.Services
             {
                 var startTile = tiles.SingleOrDefault(t => t.Id == tile.Value);
                 startTile.OwnerId = tile.Key;
-                startTile.Difficulty = 0;
             }
 
             return tiles;

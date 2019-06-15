@@ -1,79 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using WikidataGame.Backend.Models;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace WikidataGame.Backend.Helpers
+namespace WikidataGame.Backend.Migrations
 {
-    public static class DatabaseSeeds
+    public partial class GeographyQuestions : Migration
     {
-        public static void SeedCategories(ModelBuilder modelBuilder)
+        protected override void Up(MigrationBuilder migrationBuilder)
         {
-            modelBuilder.Entity<Category>().HasData(
-                new Category
-                {
-                    Id = "e9019ee1-0eed-492d-8aa7-feb1974fb265",
-                    Title = "Nature"
-                },
-                new Category
-                {
-                    Id = "ddd333f7-ef45-4e13-a2ca-fb4494dce324",
-                    Title = "Culture"
-                },
-                new Category
-                {
-                    Id = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
-                    Title = "Geography"
-                },
-                new Category
-                {
-                    Id = "1b9185c0-c46b-4abf-bf82-e464f5116c7d",
-                    Title = "Space"
-                },
-                new Category
-                {
-                    Id = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
-                    Title = "Natural Sciences"
-                },
-                new Category
-                {
-                    Id = "f9c52d1a-9315-423d-a818-94c1769fffe5",
-                    Title = "History"
-                },
-                new Category
-                {
-                    Id = "4941c348-b4c4-43b5-b3d4-85794c68eec4",
-                    Title = "Celebrities"
-                },
-                new Category
-                {
-                    Id = "2a388146-e32c-4a08-a246-472eff12849a",
-                    Title = "Entertainment"
-                },
-                new Category
-                {
-                    Id = "7f2baca7-cdf4-4e24-855b-c868d9030ba4",
-                    Title = "Politics"
-                },
-                new Category
-                {
-                    Id = "3d6c54d3-0fda-4923-a00e-e930640430b3",
-                    Title = "Sports"
-                });
-        }
-
-        public static void SeedQuestions(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Question>().HasData(
-                new Question
-                {
-                    Id = "a4b7c4ba-6acb-4f9a-821b-7a44aa7b6761",
-                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
-                    MiniGameType = MiniGameType.MultipleChoice,
-                    TaskDescription = "What is the name of the capital of {0}?",
-                    SparqlQuery = @"SELECT ?answer ?question WHERE {  
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: "a4b7c4ba-6acb-4f9a-821b-7a44aa7b6761",
+                column: "SparqlQuery",
+                value: @"SELECT ?answer ?question WHERE {  
                           ?item wdt:P31 wd:Q5119.
                           ?item wdt:P1376 ?land.
                           ?land wdt:P31 wd:Q6256.
@@ -84,15 +22,14 @@ namespace WikidataGame.Backend.Helpers
                                     filter(lang(?question) = 'en').
                           }
                             }
-                        ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) LIMIT 4"
-                },
-                new Question
-                {
-                    Id = "aca0f5f7-b000-42fb-b713-f5fe43748761",
-                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
-                    MiniGameType = MiniGameType.MultipleChoice,
-                    TaskDescription = "Which continent has {0} countries?",
-                    SparqlQuery = @"SELECT ?answer (COUNT(?item) AS ?question)
+                        ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) LIMIT 4");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: "aca0f5f7-b000-42fb-b713-f5fe43748761",
+                columns: new[] { "SparqlQuery", "TaskDescription" },
+                values: new object[] { @"SELECT ?answer (COUNT(?item) AS ?question)
                         WHERE 
                         {
                           ?item wdt:P31 wd:Q6256.
@@ -104,15 +41,12 @@ namespace WikidataGame.Backend.Helpers
                         }
                         GROUP BY ?continent ?answer
                         ORDER BY MD5(CONCAT(STR(?answer), STR(NOW())))
-                        LIMIT 4"
-                },
-                new Question
-                {
-                    Id = "9a70639b-3447-475a-905a-e866a0c98a1c",
-                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
-                    MiniGameType = MiniGameType.MultipleChoice,
-                    TaskDescription = "Which country is a part of continent {0}?",
-                    SparqlQuery = @"SELECT ?answer ?question
+                        LIMIT 4", "Which continent has {0} countries?" });
+
+            migrationBuilder.InsertData(
+                table: "Questions",
+                columns: new[] { "Id", "CategoryId", "MiniGameType", "SparqlQuery", "TaskDescription" },
+                values: new object[] { "9a70639b-3447-475a-905a-e866a0c98a1c", "cf3111af-8b18-4c6f-8ee6-115157d54b79", 2, @"SELECT ?answer ?question
                         WITH {
                           SELECT DISTINCT ?state ?continent ?stateLabel ?continentLabel WHERE {
                             ?state wdt:P31/wdt:P279* wd:Q3624078;
@@ -163,15 +97,12 @@ namespace WikidataGame.Backend.Helpers
                             ?continent rdfs:label ?question.
                           }
                         }
-                        ORDER BY DESC(?question)"
-                },
-                new Question
-                {
-                    Id = "46679c4f-ef97-445d-9a70-d95a5337720f",
-                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
-                    MiniGameType = MiniGameType.MultipleChoice,
-                    TaskDescription = "Which country is no basin country of the Baltic Sea?",
-                    SparqlQuery = @"SELECT DISTINCT ?question ?answer
+                        ORDER BY DESC(?question)", "Which country is a part of continent {0}?" });
+
+            migrationBuilder.InsertData(
+                table: "Questions",
+                columns: new[] { "Id", "CategoryId", "MiniGameType", "SparqlQuery", "TaskDescription" },
+                values: new object[] { "46679c4f-ef97-445d-9a70-d95a5337720f", "cf3111af-8b18-4c6f-8ee6-115157d54b79", 2, @"SELECT DISTINCT ?question ?answer
                         WITH {
                           SELECT DISTINCT (?state as ?country) WHERE {
                             ?state wdt:P31/wdt:P279* wd:Q3624078;
@@ -211,15 +142,12 @@ namespace WikidataGame.Backend.Helpers
                             ?noSea rdfs:label ?question. 
                           }
                         }
-                        order by DESC(?question)"
-                },
-                new Question
-                {
-                    Id = "4f6c477e-7025-44b4-a3b0-f3ebd8902902",
-                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
-                    MiniGameType = MiniGameType.MultipleChoice,
-                    TaskDescription = "Which country is no basin country of the {0}?",
-                    SparqlQuery = @"SELECT DISTINCT ?question ?answer
+                        order by DESC(?question)", "Which country is no basin country of the Baltic Sea?" });
+
+            migrationBuilder.InsertData(
+                table: "Questions",
+                columns: new[] { "Id", "CategoryId", "MiniGameType", "SparqlQuery", "TaskDescription" },
+                values: new object[] { "4f6c477e-7025-44b4-a3b0-f3ebd8902902", "cf3111af-8b18-4c6f-8ee6-115157d54b79", 2, @"SELECT DISTINCT ?question ?answer
                         WITH {
                           SELECT DISTINCT (?state as ?country) WHERE {
                             ?state wdt:P31/wdt:P279* wd:Q3624078;
@@ -273,15 +201,12 @@ namespace WikidataGame.Backend.Helpers
                             ?noSea rdfs:label ?question.
                           }
                         }
-                        order by DESC(?noSea)"
-                },
-                new Question
-                {
-                    Id = "a6a470de-9efb-4fde-9388-6eb20f2ff1f4",
-                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
-                    MiniGameType = MiniGameType.MultipleChoice,
-                    TaskDescription = "Which country is no basin country of the {0}?",
-                    SparqlQuery = @"SELECT DISTINCT ?question ?answer
+                        order by DESC(?noSea)", "Which country is no basin country of the {0}?" });
+
+            migrationBuilder.InsertData(
+                table: "Questions",
+                columns: new[] { "Id", "CategoryId", "MiniGameType", "SparqlQuery", "TaskDescription" },
+                values: new object[] { "a6a470de-9efb-4fde-9388-6eb20f2ff1f4", "cf3111af-8b18-4c6f-8ee6-115157d54b79", 2, @"SELECT DISTINCT ?question ?answer
                         WITH {
                           SELECT DISTINCT (?state as ?country) WHERE {
                             ?state wdt:P31/wdt:P279* wd:Q3624078;
@@ -318,15 +243,12 @@ namespace WikidataGame.Backend.Helpers
                             ?noSea rdfs:label ?question.
                           }
                         }
-                        order by DESC(?noSea)"
-                },
-                new Question
-                {
-                    Id = "29fed1d0-d306-4946-8109-63b8aaf0262e",
-                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
-                    MiniGameType = MiniGameType.MultipleChoice,
-                    TaskDescription = "What is the longest river in {0}?",
-                    SparqlQuery = @"SELECT DISTINCT ?answer ?question WHERE {
+                        order by DESC(?noSea)", "Which country is no basin country of the {0}?" });
+
+            migrationBuilder.InsertData(
+                table: "Questions",
+                columns: new[] { "Id", "CategoryId", "MiniGameType", "SparqlQuery", "TaskDescription" },
+                values: new object[] { "29fed1d0-d306-4946-8109-63b8aaf0262e", "cf3111af-8b18-4c6f-8ee6-115157d54b79", 2, @"SELECT DISTINCT ?answer ?question WHERE {
                         { SELECT DISTINCT ?river ?continent (avg(?length2) as ?length)
                             WHERE
                             {
@@ -348,15 +270,12 @@ namespace WikidataGame.Backend.Helpers
                         }
                     }
                     order by desc(?length)
-                    limit 4"
-                },
-                new Question
-                {
-                    Id = "f88a4dc0-8187-43c4-8775-593822bf4af1",
-                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
-                    MiniGameType = MiniGameType.BlurryImage,
-                    TaskDescription = "Which famous monument is this: {0}?",
-                    SparqlQuery = @"SELECT ?question (CONCAT( ?ans, ' (', ?country, ')' ) as ?answer) WHERE {
+                    limit 4", "What is the longest river in {0}?" });
+
+            migrationBuilder.InsertData(
+                table: "Questions",
+                columns: new[] { "Id", "CategoryId", "MiniGameType", "SparqlQuery", "TaskDescription" },
+                values: new object[] { "f88a4dc0-8187-43c4-8775-593822bf4af1", "cf3111af-8b18-4c6f-8ee6-115157d54b79", 1, @"SELECT ?question (CONCAT( ?ans, ' (', ?country, ')' ) as ?answer) WHERE {
                       { SELECT DISTINCT (?answer as ?ans) (MAX(?image) as ?question) ?country WHERE { 
                         ?landmark wdt:P31/wdt:P279* wd:Q2319498;
                                  wikibase:sitelinks ?sitelinks;
@@ -374,9 +293,77 @@ namespace WikidataGame.Backend.Helpers
                         ORDER BY MD5(CONCAT(STR(?question), STR(NOW())))
                         LIMIT 4 
                       }
-                    }"
-                }
-                );
+                    }", "Which famous monument is this: {0}?" });
+        }
+
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DeleteData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: "29fed1d0-d306-4946-8109-63b8aaf0262e");
+
+            migrationBuilder.DeleteData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: "46679c4f-ef97-445d-9a70-d95a5337720f");
+
+            migrationBuilder.DeleteData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: "4f6c477e-7025-44b4-a3b0-f3ebd8902902");
+
+            migrationBuilder.DeleteData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: "9a70639b-3447-475a-905a-e866a0c98a1c");
+
+            migrationBuilder.DeleteData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: "a6a470de-9efb-4fde-9388-6eb20f2ff1f4");
+
+            migrationBuilder.DeleteData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: "f88a4dc0-8187-43c4-8775-593822bf4af1");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: "a4b7c4ba-6acb-4f9a-821b-7a44aa7b6761",
+                column: "SparqlQuery",
+                value: @"SELECT ?answer ?question WHERE {  
+                          ? item wdt:P31 wd:Q5119.
+                          ? item wdt:P1376 ? land.
+                          ? land wdt : P31 wd:Q6256.
+                          OPTIONAL { 
+                            ?item rdfs:label ? answer;
+                                    filter(lang(?answer) = 'en')
+                              ? land rdfs:label? question;
+                                    filter(lang(?question) = 'en').
+                          }
+                            }
+                        ORDER BY RAND() LIMIT 4");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: "aca0f5f7-b000-42fb-b713-f5fe43748761",
+                columns: new[] { "SparqlQuery", "TaskDescription" },
+                values: new object[] { @"SELECT ?answer (COUNT(?item) AS ?question)
+                        WHERE 
+                        {
+                          ?item wdt:P31 wd:Q6256.
+                          ?item wdt:P30 ?continent.
+                          ?continent wdt:P31 wd:Q5107.
+                          OPTIONAL {?continent rdfs:label ?answer ;
+                                    filter(lang(?answer) = 'en')
+                                          }
+                        }
+                        GROUP BY ?continent ?answer
+                        ORDER BY RAND()
+                        LIMIT 4", "How many countries are on the continent {0}?" });
         }
     }
 }

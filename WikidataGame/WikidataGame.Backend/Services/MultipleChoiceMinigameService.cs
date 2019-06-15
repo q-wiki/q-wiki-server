@@ -22,13 +22,15 @@ namespace WikidataGame.Backend.Services
         public MiniGame GenerateMiniGame(string gameId, string playerId, string categoryId)
         {
             var question = _questionRepo.GetRandomQuestionForMinigameType(MiniGameType, categoryId);
-            //TODO: use method in baseclass to query wikidata with question
+
+            // use method in baseclass to query wikidata with question
+            var data = QueryWikidata(question.SparqlQuery); 
 
             var minigame = _minigameRepo.CreateMiniGame(gameId, playerId, MiniGameType);
 
-            minigame.TaskDescription = string.Format(question.TaskDescription, "{placefolder fill}"); //TODO: Add placeholder data from wikidata
-            minigame.AnswerOptions = new List<string> { "", "", "", "" }; //TODO: Add answer options from wikidata
-            minigame.CorrectAnswer = new List<string> { "" }; //TODO: Add correct answer from wikidata
+            minigame.TaskDescription = string.Format(question.TaskDescription, data[0].Item1); // placeholder and answer in first tuple!
+            minigame.CorrectAnswer = new List<string> { data[0].Item2 }; // placeholder and answer in first tuple!
+            minigame.AnswerOptions = data.Select(item => item.Item2).OrderBy(a => Guid.NewGuid()).ToList(); // shuffle answer options
 
             _dataContext.SaveChanges();
 

@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using WikidataGame.Backend.Dto;
 using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Repos;
+using VDS.RDF.Query;
+using VDS.RDF.Nodes;
 
 namespace WikidataGame.Backend.Services
 {
@@ -13,6 +15,8 @@ namespace WikidataGame.Backend.Services
         protected readonly IMinigameRepository _minigameRepo;
         protected readonly IQuestionRepository _questionRepo;
         protected readonly DataContext _dataContext;
+        protected static SparqlRemoteEndpoint endpoint = new SparqlRemoteEndpoint(new Uri(("https://query.wikidata.org/bigdata/namespace/wdq/sparql")));
+
 
         public MinigameServiceBase(
             IMinigameRepository minigameRepo,
@@ -23,11 +27,41 @@ namespace WikidataGame.Backend.Services
             _questionRepo = questionRepo;
             _dataContext = dataContext;
         }
-        //TODO: Add helper methods that communicate with Wikidata
 
-
-        public bool IsMiniGameAnswerCorrect(Models.MiniGame miniGame, IEnumerable<string> answers)
+        /// <summary>
+        /// Query Wikidata for results
+        /// </summary>
+        /// <param name="sparql">the sparql query as a String</param>
+        /// <returns>List of 4 Tuples(question part (placeholder),answer) -> the first tuple contains the correct answer! </returns>
+        protected List<Tuple<string, string>> QueryWikidata(String sparql)
         {
+            // TODO: use something, that is more safe (e.g. an Object with member for correct answer and stuff) -> must work for all Minigame types
+
+            //question = "What is the capital of {0}?";
+            //sparql = "SELECT ?answer ?question WHERE { ?item wdt:P31 wd:Q5119. ?item wdt:P1376 ?land. ?land wdt:P31 wd:Q6256. OPTIONAL { ?item rdfs:label ?answer; filter(lang(?answer) = 'en') ?land rdfs:label ?question; filter(lang(?question) = 'en').} }  ORDER BY RAND() LIMIT 4";
+            var results = new List<Tuple<string, string>>();
+
+            // query results...
+            SparqlResultSet res = endpoint.QueryWithResultSet(sparql);
+
+            // get possible answers
+            foreach (SparqlResult result in res)
+            {
+                string q = (result["question"] != null) ? result["question"].AsValuedNode().AsString() : "";
+                string a = (result["answer"] != null) ? result["answer"].AsValuedNode().AsString() : "";
+                results.Add(new Tuple<string, string>(q, a));
+            }
+
+            return results;
+
+        }
+
+
+        public static bool IsMiniGameAnswerCorrect(Models.MiniGame miniGame, IEnumerable<string> answers)
+        {
+            if (answers == null || answers.Count() < 1)
+                return false;
+
             return answers.SequenceEqual(miniGame.CorrectAnswer);
         }
     }

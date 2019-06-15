@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiClient", "ApiClient", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikidataGame.ApiClient.Sample", "WikidataGame.ApiClient.Sample\WikidataGame.ApiClient.Sample.csproj", "{F0DC3362-69AF-4132-A675-E160B0F72356}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WikidataGame.Backend.Tests", "WikidataGame.Backend.Tests\WikidataGame.Backend.Tests.csproj", "{509DE7AA-0A44-46EB-8A5D-C12D79D583F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikidataGame.Backend.Tests", "WikidataGame.Backend.Tests\WikidataGame.Backend.Tests.csproj", "{509DE7AA-0A44-46EB-8A5D-C12D79D583F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

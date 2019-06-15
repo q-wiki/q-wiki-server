@@ -77,8 +77,15 @@ namespace WikidataGame.Backend.Services
                 }
             } while (accessibleTiles != aboveThreshold);
 
+            // used for difficulties; we basically partition the space we have
+            // into three equally sized bins and assign a difficulty based
+            // on that
+            var highestPoint = noiseField.Max();
+            var difficultyGap = (highestPoint - threshold) / 2;
+
             return noiseField.Select(n => new Tile {
                 IsAccessible = n > threshold,
+                Difficulty = Convert.ToInt32(Math.Round((n - threshold) / difficultyGap)),
                 Id = Guid.NewGuid().ToString()
             }).ToList();
         }
@@ -104,20 +111,21 @@ namespace WikidataGame.Backend.Services
 
         public static IEnumerable<Tile> SetStartPositions (IEnumerable<Tile> tiles, IEnumerable<string> userIds)
         {
-            var accessibleTiles = tiles.Where(t => t.IsAccessible);
+            var candidates = tiles.Where(t => t.IsAccessible && t.Difficulty == 0);
             var startTiles = new Dictionary<string, string>();
             var rnd = new Random();
 
             while (startTiles.Values.Distinct().Count() < userIds.Count())
             {
                 foreach (var userId in userIds) {
-                    startTiles[userId] = accessibleTiles.ElementAt(rnd.Next(accessibleTiles.Count())).Id;
+                    startTiles[userId] = candidates.ElementAt(rnd.Next(candidates.Count())).Id;
                 }
             }
 
             foreach (var tile in startTiles)
             {
-                tiles.SingleOrDefault(t => t.Id == tile.Value).OwnerId = tile.Key;
+                var startTile = tiles.SingleOrDefault(t => t.Id == tile.Value);
+                startTile.OwnerId = tile.Key;
             }
 
             return tiles;

@@ -34,6 +34,22 @@ namespace WikidataGame.Backend.Tests
         }
 
         [Fact]
+        public void GenerateMapCandidate_10x0Map_AllAccessibleTilesHaveADifficulyIn ()
+        {
+            var mapWidth = 10;
+            var mapHeight = 10;
+            var accessibleTiles = 70;
+            var mapCandidate = Services.MapGeneratorService.GenerateMapCandidate(
+                mapWidth, mapHeight, accessibleTiles
+            );
+
+            Assert.All(
+                mapCandidate.Where(t => t.IsAccessible),
+                tile => Assert.True(tile.Difficulty >= 0 && tile.Difficulty <= 2)
+            );
+        }
+
+        [Fact]
         public void GenerateMapCandidate_NonSquare8x21Map_SizeAndAmountOfAccessibleTilesAreCorrect ()
         {
             var mapWidth = 8;
@@ -68,9 +84,11 @@ namespace WikidataGame.Backend.Tests
             
             var p1 = new Models.User { Id="user-a" };
             var p2 = new Models.User { Id="user-b" };
-            var players = new List<Models.User>();
-            players.Add(p1);
-            players.Add(p2);
+            var players = new List<Models.User>
+            {
+                p1,
+                p2
+            };
             Services.MapGeneratorService.SetStartPositions(finalMapCandidate, players.Select(p => p.Id));
 
             var tileForP1 = finalMapCandidate.Where(t => t.OwnerId == p1.Id).First();            
@@ -79,6 +97,8 @@ namespace WikidataGame.Backend.Tests
             Assert.NotNull(tileForP1);
             Assert.NotNull(tileForP2);
             Assert.NotEqual(tileForP1, tileForP2);
+            Assert.Equal(0, tileForP1.Difficulty);
+            Assert.Equal(0, tileForP2.Difficulty);
         }
     }
 }

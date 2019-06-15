@@ -19,12 +19,12 @@ namespace WikidataGame.Backend.Services
 
         public Models.MiniGameType MiniGameType => Models.MiniGameType.BlurryImage;
 
-        public Dto.MiniGame GenerateMiniGame(string gameId, string playerId, string categoryId)
+        public MiniGame GenerateMiniGame(string gameId, string playerId, string categoryId)
         {
             var question = _questionRepo.GetRandomQuestionForMinigameType(MiniGameType, categoryId);
 
             // use method in baseclass to query wikidata with question
-            var data = QueryWikidata(question.TaskDescription, question.SparqlQuery);
+            var data = QueryWikidata(question.SparqlQuery);
 
             var minigame = _minigameRepo.CreateMiniGame(gameId, playerId, MiniGameType);
 

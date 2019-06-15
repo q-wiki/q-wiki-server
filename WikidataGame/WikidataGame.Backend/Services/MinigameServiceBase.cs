@@ -31,10 +31,9 @@ namespace WikidataGame.Backend.Services
         /// <summary>
         /// Query Wikidata for results
         /// </summary>
-        /// <param name="question">the question, containing a placeholder</param>
         /// <param name="sparql">the sparql query as a String</param>
         /// <returns>List of 4 Tuples(question part (placeholder),answer) -> the first tuple contains the correct answer! </returns>
-        protected List<Tuple<string, string>> QueryWikidata(String question, String sparql)
+        protected List<Tuple<string, string>> QueryWikidata(String sparql)
         {
             // TODO: use something, that is more safe (e.g. an Object with member for correct answer and stuff) -> must work for all Minigame types
 
@@ -60,9 +59,10 @@ namespace WikidataGame.Backend.Services
 
         public static bool IsMiniGameAnswerCorrect(Models.MiniGame miniGame, IEnumerable<string> answers)
         {
-            if (answers != null && answers.Count() > 0) 
-                return answers.SequenceEqual(miniGame.CorrectAnswer);
-            return false;
+            if (answers == null || answers.Count() < 1)
+                return false;
+
+            return answers.SequenceEqual(miniGame.CorrectAnswer);
         }
     }
 }

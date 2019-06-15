@@ -39,7 +39,7 @@ namespace WikidataGame.Backend.Controllers
         [ProducesResponseType(typeof(MiniGame), StatusCodes.Status200OK)]
         public IActionResult InitalizeMinigame(string gameId, MiniGameInit minigameParams)
         {
-            if (!IsUserGameParticipant(gameId))
+            if (!IsUserGameParticipant(gameId) && minigameParams != null && !IsTileInGame(gameId, minigameParams.TileId))
                 return Forbid();
             //TODO: check if category allowed
 
@@ -47,9 +47,10 @@ namespace WikidataGame.Backend.Controllers
             var random = new Random();
             var randomService = minigameServices.ElementAt(random.Next(0, minigameServices.Count() - 1));
 
+
             //TODO: Implement sorting and image minigames!
             // TODO: remove hard-coded category id
-            var minigame = randomService.GenerateMiniGame(gameId, GetCurrentUser().Id, "cf3111af-8b18-4c6f-8ee6-115157d54b79");
+            var minigame = randomService.GenerateMiniGame(gameId, GetCurrentUser().Id, "cf3111af-8b18-4c6f-8ee6-115157d54b79", minigameParams.TileId);
 
             return Ok(minigame);
         }
@@ -90,6 +91,23 @@ namespace WikidataGame.Backend.Controllers
             var minigame = _minigameRepo.Get(minigameId);
             minigame.IsWin = MinigameServiceBase.IsMiniGameAnswerCorrect(minigame, answers);
             // TODO: adapt tiles to result
+            if (minigame.IsWin)
+            {
+                if (minigame.Tile.OwnerId == minigame.PlayerId)
+                {
+                    //level up
+                    minigame.Tile.Difficulty = Math.Min(minigame.Tile.Difficulty++, 3);
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(minigame.Tile.OwnerId))
+                    {
+                        //captured new tile
+                        minigame.Tile.ChosenCategoryId = minigame.CategoryId;
+                    }
+                    minigame.Tile.OwnerId = minigame.PlayerId;
+                }
+            }
 
             _dataContext.SaveChanges();
 

@@ -36,5 +36,11 @@ namespace WikidataGame.Backend.Controllers
             var game = _gameRepo.Get(gameId);
             return game != null && game.GameUsers.SingleOrDefault(gu => gu.UserId == user.Id) != null;
         }
+
+        protected bool IsTileInGame(string gameId, string tileId)
+        {
+            var game = _gameRepo.Get(gameId);
+            return game.Tiles.SingleOrDefault(t => t.Id == tileId) != null;
+        }
     }
 }

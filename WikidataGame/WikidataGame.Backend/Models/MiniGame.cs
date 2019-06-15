@@ -65,6 +65,19 @@ namespace WikidataGame.Backend.Models
         [Required]
         public string PlayerId { get; set; }
         public virtual User Player { get; set; }
+
+        [ForeignKey(nameof(Tile))]
+        [StringLength(36)]
+        [Required]
+        public string TileId { get; set; }
+        public virtual Tile Tile { get; set; }
+
+        [ForeignKey(nameof(Category))]
+        [StringLength(36)]
+        [Required]
+        public string CategoryId { get; set; }
+        public virtual Category Category { get; set; }
+
     }
 
     public enum MiniGameType

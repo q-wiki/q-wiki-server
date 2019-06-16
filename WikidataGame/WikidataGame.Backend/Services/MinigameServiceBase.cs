@@ -7,6 +7,7 @@ using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Repos;
 using VDS.RDF.Query;
 using VDS.RDF.Nodes;
+using System.Diagnostics;
 
 namespace WikidataGame.Backend.Services
 {
@@ -42,18 +43,25 @@ namespace WikidataGame.Backend.Services
             var results = new List<Tuple<string, string>>();
 
             // query results...
-            SparqlResultSet res = endpoint.QueryWithResultSet(sparql);
-
-            // get possible answers
-            foreach (SparqlResult result in res)
+            try
             {
-                string q = (result["question"] != null) ? result["question"].AsValuedNode().AsString() : "";
-                string a = (result["answer"] != null) ? result["answer"].AsValuedNode().AsString() : "";
-                results.Add(new Tuple<string, string>(q, a));
+                SparqlResultSet res = endpoint.QueryWithResultSet(sparql);
+
+                // get possible answers
+                foreach (SparqlResult result in res)
+                {
+                    string q = (result["question"] != null) ? result["question"].AsValuedNode().AsString() : "";
+                    string a = (result["answer"] != null) ? result["answer"].AsValuedNode().AsString() : "";
+                    results.Add(new Tuple<string, string>(q, a));
+                }
+
+                return results;
+            }catch(RdfQueryException exception)
+            {
+                Debug.WriteLine(exception.ToString());
             }
-
-            return results;
-
+            return null;
+            
         }
 
 

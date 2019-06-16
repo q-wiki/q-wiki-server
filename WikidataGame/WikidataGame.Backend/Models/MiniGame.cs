@@ -58,7 +58,7 @@ namespace WikidataGame.Backend.Models
         public string CorrectAnswerString { get; set; }
 
         [Required]
-        public bool IsWin { get; set; } = false;
+        public bool? IsWin { get; set; } = null;
 
         [ForeignKey(nameof(User))]
         [StringLength(36)]

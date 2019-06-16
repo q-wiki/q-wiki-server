@@ -21,14 +21,14 @@ namespace WikidataGame.Backend.Dto
 
         public bool AwaitingOpponentToJoin { get; set; }
 
-        public static Game FromModel(Models.Game game, string currentUserId)
+        public static Game FromModel(Models.Game game, string currentUserId, Repos.IRepository<Models.Category, string> categoryRepo)
         {
             if (game == null)
                 return null;
 
             return new Game {
                 Id = game.Id,
-                Tiles = TileHelper.TileEnumerableModel2Dto(game.Tiles),
+                Tiles = TileHelper.TileEnumerableModel2Dto(game.Tiles, categoryRepo),
                 AwaitingOpponentToJoin = game.GameUsers.Count() < 2,
                 NextMovePlayerId = game.NextMovePlayerId,
                 Me = Player.FromModel(game.GameUsers.SingleOrDefault(gu => gu.UserId == currentUserId)?.User),

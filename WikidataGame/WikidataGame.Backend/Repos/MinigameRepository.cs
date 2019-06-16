@@ -23,7 +23,6 @@ namespace WikidataGame.Backend.Repos
                 TileId = tileId,
                 CategoryId = categoryId,
                 Type = type,
-                IsWin = false
             };
             Add(minigame);
             return minigame;

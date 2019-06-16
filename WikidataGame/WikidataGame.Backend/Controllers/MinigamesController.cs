@@ -24,7 +24,8 @@ namespace WikidataGame.Backend.Controllers
             DataContext dataContext,
             IUserRepository userRepo,
             IGameRepository gameRepo,
-            IMinigameRepository minigameRepo) : base(dataContext, userRepo, gameRepo)
+            IMinigameRepository minigameRepo,
+            IRepository<Models.Category, string> categoryRepo) : base(dataContext, userRepo, gameRepo, categoryRepo)
         {
             _minigameRepo = minigameRepo;
         }
@@ -39,9 +40,12 @@ namespace WikidataGame.Backend.Controllers
         [ProducesResponseType(typeof(MiniGame), StatusCodes.Status200OK)]
         public IActionResult InitalizeMinigame(string gameId, MiniGameInit minigameParams)
         {
-            if (!IsUserGameParticipant(gameId) && minigameParams != null && !IsTileInGame(gameId, minigameParams.TileId))
-                return Forbid();
-            //TODO: check if category allowed
+            if (!IsUserGameParticipant(gameId) || minigameParams == null ||
+                !IsTileInGame(gameId, minigameParams.TileId) ||
+                !IsCategoryAllowedForTile(minigameParams.TileId, minigameParams.CategoryId) ||
+                !IsItPlayersTurn(gameId) ||
+                HasPlayerAnOpenMinigame(gameId))
+                    return Forbid();
 
             var minigameServices = ControllerContext.HttpContext.RequestServices.GetServices<IMinigameService>();
             var random = new Random();
@@ -68,7 +72,6 @@ namespace WikidataGame.Backend.Controllers
             if (!IsUserGameParticipant(gameId) || !IsUserMinigamePlayer(gameId, minigameId))
                 return Forbid();
 
-            //TODO: check if game exists
             var minigame = _minigameRepo.Get(minigameId);
 
             return Ok(MiniGame.FromModel(minigame));
@@ -89,14 +92,17 @@ namespace WikidataGame.Backend.Controllers
                 return Forbid();
 
             var minigame = _minigameRepo.Get(minigameId);
+            if (minigame.IsWin.HasValue)
+                return Forbid();
+
             minigame.IsWin = MinigameServiceBase.IsMiniGameAnswerCorrect(minigame, answers);
             // TODO: adapt tiles to result
-            if (minigame.IsWin)
+            if (minigame.IsWin.Value)
             {
                 if (minigame.Tile.OwnerId == minigame.PlayerId)
                 {
                     //level up
-                    minigame.Tile.Difficulty = Math.Min(minigame.Tile.Difficulty++, 3);
+                    minigame.Tile.Difficulty = Math.Min(minigame.Tile.Difficulty + 1, 3);
                 }
                 else
                 {
@@ -109,11 +115,34 @@ namespace WikidataGame.Backend.Controllers
                 }
             }
 
+            var game = _gameRepo.Get(gameId);
+            game.StepsLeftWithinMove--;
+            if(game.StepsLeftWithinMove < 1)
+            {
+                game.MoveCount++;
+                if (game.MoveCount / game.GameUsers.Count >= Models.Game.MaxRounds)
+                {
+                    game.WinningPlayerId = WinningPlayerId(gameId);
+                    //TODO: notify!
+                }
+                else
+                {
+                    //next players move
+                    game.NextMovePlayerId = game.GameUsers.SingleOrDefault(gu => gu.UserId != game.NextMovePlayerId && gu.GameId == gameId).UserId;
+                    game.StepsLeftWithinMove = Models.Game.StepsPerPlayer;
+                    //TODO: notify!
+                }
+            }
             _dataContext.SaveChanges();
 
-            var game = _gameRepo.Get(gameId);
 
-            return Ok(MiniGameResult.FromModel(minigame, game));
+            return Ok(MiniGameResult.FromModel(minigame, game, _categoryRepo));
+        }
+
+        private bool IsItPlayersTurn(string gameId)
+        {
+            var game = _gameRepo.Get(gameId);
+            return game.NextMovePlayerId == GetCurrentUser().Id;
         }
 
         private bool IsUserMinigamePlayer(string gameId, string minigameId)
@@ -121,6 +150,35 @@ namespace WikidataGame.Backend.Controllers
             var user = GetCurrentUser();
             var minigame = _minigameRepo.Get(minigameId);
             return minigame != null && minigame.GameId == gameId && minigame.Player == user;
+        }
+
+        private bool HasPlayerAnOpenMinigame(string gameId)
+        {
+            var user = GetCurrentUser();
+            return _minigameRepo.SingleOrDefault(m => m.PlayerId == user.Id && m.GameId == gameId && m.IsWin == null) != null;
+        }
+
+        private bool IsTileInGame(string gameId, string tileId)
+        {
+            var game = _gameRepo.Get(gameId);
+            return game.Tiles.SingleOrDefault(t => t.Id == tileId) != null;
+        }
+
+        private bool IsCategoryAllowedForTile(string tileId, string categoryId)
+        {
+            return TileHelper.GetCategoriesForTile(_categoryRepo, tileId).SingleOrDefault(c => c.Id == categoryId) != null;
+        }
+
+        private string WinningPlayerId(string gameId)
+        {
+            var game = _gameRepo.Get(gameId);
+            var result = game.GameUsers.ToDictionary(gu => gu.UserId, gu => 0);
+            foreach(var user in result)
+            {
+                result[user.Key] = game.Tiles.Count(t => t.OwnerId == user.Key);
+            }
+            //TODO: Handle draws!
+            return result.OrderByDescending(r => r.Value).First().Key;
         }
     }
 }

@@ -30,8 +30,8 @@ namespace WikidataGame.Backend.Tests
             var tile = new Models.Tile { Id = Guid.NewGuid().ToString() };
             var categoryRepo = CategoryRepo();
 
-            var categoriesForFirstDraw = Helpers.TileHelper.GetCategoriesForTile(categoryRepo, tile);
-            var categoriesForSecondDraw = Helpers.TileHelper.GetCategoriesForTile(categoryRepo, tile);
+            var categoriesForFirstDraw = Helpers.TileHelper.GetCategoriesForTile(categoryRepo, tile.Id);
+            var categoriesForSecondDraw = Helpers.TileHelper.GetCategoriesForTile(categoryRepo, tile.Id);
 
             Assert.Equal(categoriesForFirstDraw, categoriesForSecondDraw);
         }
@@ -43,8 +43,8 @@ namespace WikidataGame.Backend.Tests
             var tileTwo = new Models.Tile { Id = "d3d4e3eb-a90c-4dde-96c9-870f19547529" };
             var categoryRepo = CategoryRepo();
 
-            var categoriesForFirstDraw = Helpers.TileHelper.GetCategoriesForTile(categoryRepo, tileOne);
-            var categoriesForSecondDraw = Helpers.TileHelper.GetCategoriesForTile(categoryRepo, tileTwo);
+            var categoriesForFirstDraw = Helpers.TileHelper.GetCategoriesForTile(categoryRepo, tileOne.Id);
+            var categoriesForSecondDraw = Helpers.TileHelper.GetCategoriesForTile(categoryRepo, tileTwo.Id);
 
             Assert.NotEqual(categoriesForFirstDraw, categoriesForSecondDraw);
         }

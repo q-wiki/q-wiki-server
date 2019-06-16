@@ -42,7 +42,7 @@ namespace WikidataGame.Backend.Controllers
         {
             if (!IsUserGameParticipant(gameId) || minigameParams == null ||
                 !IsTileInGame(gameId, minigameParams.TileId) ||
-                !IsCategoryAllowedForTile(minigameParams.TileId, minigameParams.CategoryId) ||
+                !IsCategoryAllowedForTile(gameId, minigameParams.TileId, minigameParams.CategoryId) ||
                 !IsItPlayersTurn(gameId) ||
                 HasPlayerAnOpenMinigame(gameId))
                     return Forbid();
@@ -102,7 +102,7 @@ namespace WikidataGame.Backend.Controllers
                 if (minigame.Tile.OwnerId == minigame.PlayerId)
                 {
                     //level up
-                    minigame.Tile.Difficulty = Math.Min(minigame.Tile.Difficulty + 1, 3);
+                    minigame.Tile.Difficulty = Math.Min(minigame.Tile.Difficulty + 1, 2);
                 }
                 else
                 {
@@ -128,7 +128,7 @@ namespace WikidataGame.Backend.Controllers
                 else
                 {
                     //next players move
-                    game.NextMovePlayerId = game.GameUsers.SingleOrDefault(gu => gu.UserId != game.NextMovePlayerId && gu.GameId == gameId).UserId;
+                    game.NextMovePlayerId = game.GameUsers.SingleOrDefault(gu => gu.UserId != game.NextMovePlayerId).UserId;
                     game.StepsLeftWithinMove = Models.Game.StepsPerPlayer;
                     //TODO: notify!
                 }
@@ -164,9 +164,12 @@ namespace WikidataGame.Backend.Controllers
             return game.Tiles.SingleOrDefault(t => t.Id == tileId) != null;
         }
 
-        private bool IsCategoryAllowedForTile(string tileId, string categoryId)
+        private bool IsCategoryAllowedForTile(string gameId, string tileId, string categoryId)
         {
-            return TileHelper.GetCategoriesForTile(_categoryRepo, tileId).SingleOrDefault(c => c.Id == categoryId) != null;
+            var game = _gameRepo.Get(gameId);
+            var tile = game.Tiles.SingleOrDefault(t => t.Id == tileId);
+            return (string.IsNullOrWhiteSpace(tile.ChosenCategoryId) || tile.ChosenCategoryId == categoryId) && 
+                TileHelper.GetCategoriesForTile(_categoryRepo, tileId).SingleOrDefault(c => c.Id == categoryId) != null;
         }
 
         private string WinningPlayerId(string gameId)

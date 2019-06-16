@@ -461,6 +461,15 @@ namespace WikidataGame
         /// <summary>
         /// Creates a new game and matches the player with an opponent
         /// </summary>
+        /// <param name='mapWidth'>
+        /// Width of generated map
+        /// </param>
+        /// <param name='mapHeight'>
+        /// Height of generated map
+        /// </param>
+        /// <param name='accessibleTilesCount'>
+        /// How many accessible tiles the generated map should contain.
+        /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
         /// </param>
@@ -476,7 +485,7 @@ namespace WikidataGame
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<GameInfo>> CreateNewGameWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<GameInfo>> CreateNewGameWithHttpMessagesAsync(int? mapWidth = 10, int? mapHeight = 10, int? accessibleTilesCount = 70, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -485,12 +494,32 @@ namespace WikidataGame
             {
                 _invocationId = ServiceClientTracing.NextInvocationId.ToString();
                 Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
+                tracingParameters.Add("mapWidth", mapWidth);
+                tracingParameters.Add("mapHeight", mapHeight);
+                tracingParameters.Add("accessibleTilesCount", accessibleTilesCount);
                 tracingParameters.Add("cancellationToken", cancellationToken);
                 ServiceClientTracing.Enter(_invocationId, this, "CreateNewGame", tracingParameters);
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
             var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/Games").ToString();
+            List<string> _queryParameters = new List<string>();
+            if (mapWidth != null)
+            {
+                _queryParameters.Add(string.Format("mapWidth={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(mapWidth, SerializationSettings).Trim('"'))));
+            }
+            if (mapHeight != null)
+            {
+                _queryParameters.Add(string.Format("mapHeight={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(mapHeight, SerializationSettings).Trim('"'))));
+            }
+            if (accessibleTilesCount != null)
+            {
+                _queryParameters.Add(string.Format("accessibleTilesCount={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(accessibleTilesCount, SerializationSettings).Trim('"'))));
+            }
+            if (_queryParameters.Count > 0)
+            {
+                _url += "?" + string.Join("&", _queryParameters);
+            }
             // Create HTTP transport objects
             var _httpRequest = new HttpRequestMessage();
             HttpResponseMessage _httpResponse = null;

@@ -20,7 +20,8 @@ namespace WikidataGame.Backend.Controllers
             DataContext dataContext,
             IUserRepository userRepo,
             IGameRepository gameRepo,
-            IOptions<AppSettings> appSettings) : base(dataContext, userRepo, gameRepo)
+            IOptions<AppSettings> appSettings,
+            IRepository<Models.Category, string> categoryRepo) : base(dataContext, userRepo, gameRepo, categoryRepo)
         {
             _appSettings = appSettings.Value;
         }

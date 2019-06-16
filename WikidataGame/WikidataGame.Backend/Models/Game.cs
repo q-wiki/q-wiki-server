@@ -10,6 +10,12 @@ namespace WikidataGame.Backend.Models
 {
     public class Game
     {
+        [NotMapped]
+        public const int StepsPerPlayer = 3;
+
+        [NotMapped]
+        public const int MaxRounds = 6;
+
         [Key]
         [StringLength(36)]
         public string Id { get; set; }
@@ -22,6 +28,10 @@ namespace WikidataGame.Backend.Models
         [StringLength(36)]
         public string NextMovePlayerId { get; set; }
         public virtual User NextMovePlayer { get; set; }
+
+        public int StepsLeftWithinMove { get; set; }
+
+        public int MoveCount { get; set; }
 
         [ForeignKey(nameof(User))]
         [StringLength(36)]

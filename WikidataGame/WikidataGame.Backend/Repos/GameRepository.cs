@@ -17,7 +17,9 @@ namespace WikidataGame.Backend.Repos
             var game = new Game
             {
                 Id = Guid.NewGuid().ToString(),
-                Tiles = MapGeneratorService.GenerateMap(GameConstants.MapWidth, GameConstants.MapHeight, GameConstants.AccessibleTiles).ToList()
+                Tiles = MapGeneratorService.GenerateMap(GameConstants.MapWidth, GameConstants.MapHeight, GameConstants.AccessibleTiles).ToList(),
+                StepsLeftWithinMove = Game.StepsPerPlayer,
+                MoveCount = 0
             };
             var gameUser = new GameUser
             {

@@ -5,6 +5,6 @@ namespace WikidataGame.Backend.Helpers
     {
         public const int DefaultMapWidth = 10;
         public const int DefaultMapHeight = 10;
-        public const int DefaultAccessibleTiles = 70;
+        public const int DefaultAccessibleTilesCount = 70;
     }
 }

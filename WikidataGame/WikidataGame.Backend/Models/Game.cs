@@ -18,7 +18,7 @@ namespace WikidataGame.Backend.Models
 
         public int MapWidth { get; set; }
         public int MapHeight { get; set; }
-        public int AccessibleTiles { get; set; }
+        public int AccessibleTilesCount { get; set; }
 
         public virtual ICollection<GameUser> GameUsers { get; set; } = new List<GameUser>();
 

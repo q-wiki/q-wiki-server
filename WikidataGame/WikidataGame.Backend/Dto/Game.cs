@@ -28,7 +28,7 @@ namespace WikidataGame.Backend.Dto
 
             return new Game {
                 Id = game.Id,
-                Tiles = TileHelper.TileEnumerableModel2Dto(game.Tiles),
+                Tiles = TileHelper.TileEnumerableModel2Dto(game),
                 AwaitingOpponentToJoin = game.GameUsers.Count() < 2,
                 NextMovePlayerId = game.NextMovePlayerId,
                 Me = Player.FromModel(game.GameUsers.SingleOrDefault(gu => gu.UserId == currentUserId)?.User),

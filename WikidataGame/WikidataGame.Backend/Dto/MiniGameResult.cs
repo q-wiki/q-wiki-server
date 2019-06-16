@@ -22,7 +22,7 @@ namespace WikidataGame.Backend.Dto
             {
                 IsWin = miniGame.IsWin.Value,
                 CorrectAnswer = miniGame.CorrectAnswer,
-                Tiles = TileHelper.TileEnumerableModel2Dto(game.Tiles, categoryRepo),
+                Tiles = TileHelper.TileEnumerableModel2Dto(game, categoryRepo),
                 NextMovePlayerId = game.NextMovePlayerId
             };
         }

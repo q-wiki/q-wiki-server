@@ -9,12 +9,12 @@ namespace WikidataGame.Backend.Helpers
 {
     public static class TileHelper
     {
-        public static IEnumerable<IEnumerable<Dto.Tile>> TileEnumerableModel2Dto(IEnumerable<Tile> tiles, IRepository<Category, string> categoryRepo)
+        public static IEnumerable<IEnumerable<Dto.Tile>> TileEnumerableModel2Dto(Game game, IRepository<Category, string> categoryRepo)
         {
-            return Enumerable.Range(0, GameConstants.MapHeight)
+            return Enumerable.Range(0, game.MapHeight)
                 .Select(yCoord =>
-                    tiles.Skip(yCoord * GameConstants.MapWidth)
-                        .Take(GameConstants.MapWidth)
+                    game.Tiles.Skip(yCoord * game.MapWidth)
+                        .Take(game.MapWidth)
                         // inaccessible tiles are represented as `null`
                         .Select(t => t.IsAccessible ? Dto.Tile.FromModel(t, categoryRepo) : null)
                 );

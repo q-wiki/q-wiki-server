@@ -22,6 +22,10 @@ namespace WikidataGame.Backend.Models
 
         public virtual ICollection<Tile> Tiles { get; set; } = new List<Tile>();
 
+        public int MapWidth { get; set; }
+        public int MapHeight { get; set; }
+        public int AccessibleTilesCount { get; set; }
+
         public virtual ICollection<GameUser> GameUsers { get; set; } = new List<GameUser>();
 
         [ForeignKey(nameof(User))]

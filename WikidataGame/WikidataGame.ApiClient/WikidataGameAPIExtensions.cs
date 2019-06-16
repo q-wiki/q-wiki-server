@@ -63,9 +63,18 @@ namespace WikidataGame
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            public static GameInfo CreateNewGame(this IWikidataGameAPI operations)
+            /// <param name='mapWidth'>
+            /// Width of generated map
+            /// </param>
+            /// <param name='mapHeight'>
+            /// Height of generated map
+            /// </param>
+            /// <param name='accessibleTilesCount'>
+            /// How many accessible tiles the generated map should contain.
+            /// </param>
+            public static GameInfo CreateNewGame(this IWikidataGameAPI operations, int? mapWidth = 10, int? mapHeight = 10, int? accessibleTilesCount = 70)
             {
-                return operations.CreateNewGameAsync().GetAwaiter().GetResult();
+                return operations.CreateNewGameAsync(mapWidth, mapHeight, accessibleTilesCount).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -74,12 +83,21 @@ namespace WikidataGame
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
+            /// <param name='mapWidth'>
+            /// Width of generated map
+            /// </param>
+            /// <param name='mapHeight'>
+            /// Height of generated map
+            /// </param>
+            /// <param name='accessibleTilesCount'>
+            /// How many accessible tiles the generated map should contain.
+            /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<GameInfo> CreateNewGameAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<GameInfo> CreateNewGameAsync(this IWikidataGameAPI operations, int? mapWidth = 10, int? mapHeight = 10, int? accessibleTilesCount = 70, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.CreateNewGameWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.CreateNewGameWithHttpMessagesAsync(mapWidth, mapHeight, accessibleTilesCount, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }

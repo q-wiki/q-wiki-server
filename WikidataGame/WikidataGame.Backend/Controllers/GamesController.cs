@@ -32,10 +32,16 @@ namespace WikidataGame.Backend.Controllers
         /// <summary>
         /// Creates a new game and matches the player with an opponent
         /// </summary>
+        /// <param name="mapWidth">Width of generated map</param>
+        /// <param name="mapHeight">Height of generated map</param>
+        /// <param name="accessibleTilesCount">How many accessible tiles the generated map should contain.</param>
         /// <returns>Info about the newly created game</returns>
         [HttpPost]
         [ProducesResponseType(typeof(GameInfo), StatusCodes.Status200OK)]
-        public IActionResult CreateNewGame()
+        public IActionResult CreateNewGame(
+            int mapWidth = GameConstants.DefaultMapWidth,
+            int mapHeight = GameConstants.DefaultMapHeight,
+            int accessibleTilesCount = GameConstants.DefaultAccessibleTilesCount)
         {
             var user = GetCurrentUser();            
             var game = _gameRepo.RunningGameForPlayer(user);
@@ -44,7 +50,7 @@ namespace WikidataGame.Backend.Controllers
                 game = _gameRepo.GetOpenGame();
                 if (game == default(Models.Game))
                 {
-                    game = _gameRepo.CreateNewGame(user);
+                    game = _gameRepo.CreateNewGame(user, mapWidth, mapHeight, accessibleTilesCount);
                 }
                 else
                 {

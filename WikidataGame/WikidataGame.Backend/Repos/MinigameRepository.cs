@@ -13,15 +13,16 @@ namespace WikidataGame.Backend.Repos
         {
         }
 
-        public MiniGame CreateMiniGame(string gameId, string playerId, MiniGameType type)
+        public MiniGame CreateMiniGame(string gameId, string playerId, string tileId, string categoryId, MiniGameType type)
         {
             var minigame = new MiniGame
             {
                 Id = Guid.NewGuid().ToString(),
                 GameId = gameId,
                 PlayerId = playerId,
+                TileId = tileId,
+                CategoryId = categoryId,
                 Type = type,
-                IsWin = false
             };
             Add(minigame);
             return minigame;

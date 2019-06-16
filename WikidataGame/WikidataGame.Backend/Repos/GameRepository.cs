@@ -20,7 +20,9 @@ namespace WikidataGame.Backend.Repos
                 Tiles = MapGeneratorService.GenerateMap(mapWidth, mapHeight, accessibleTiles).ToList(),
                 MapWidth = mapWidth,
                 MapHeight = mapHeight,
-                AccessibleTilesCount = accessibleTiles
+                AccessibleTilesCount = accessibleTiles,
+                StepsLeftWithinMove = Game.StepsPerPlayer,
+                MoveCount = 0
             };
             var gameUser = new GameUser
             {

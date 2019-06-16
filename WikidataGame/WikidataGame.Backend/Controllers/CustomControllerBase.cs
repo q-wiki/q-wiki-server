@@ -13,16 +13,19 @@ namespace WikidataGame.Backend.Controllers
     {
         protected readonly IGameRepository _gameRepo;
         protected readonly IUserRepository _userRepo;
+        protected readonly IRepository<Category, string> _categoryRepo;
         protected readonly DataContext _dataContext;
 
         public CustomControllerBase(
             DataContext dataContext,
             IUserRepository userRepo,
-            IGameRepository gameRepo)
+            IGameRepository gameRepo,
+            IRepository<Category, string> categoryRepo)
         {
             _dataContext = dataContext;
             _userRepo = userRepo;
             _gameRepo = gameRepo;
+            _categoryRepo = categoryRepo;
         }
 
         protected User GetCurrentUser()

@@ -2,20 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WikidataGame.Backend.Dto;
+using WikidataGame.Backend.Models;
+using WikidataGame.Backend.Repos;
 
 namespace WikidataGame.Backend.Helpers
 {
     public static class TileHelper
     {
-        public static IEnumerable<IEnumerable<Tile>> TileEnumerableModel2Dto(Models.Game game)
+        public static IEnumerable<IEnumerable<Dto.Tile>> TileEnumerableModel2Dto(Game game, IRepository<Category, string> categoryRepo)
         {
             return Enumerable.Range(0, game.MapHeight)
                 .Select(yCoord =>
                     game.Tiles.Skip(yCoord * game.MapWidth)
                         .Take(game.MapWidth)
                         // inaccessible tiles are represented as `null`
-                        .Select(t => t.IsAccessible ? Tile.FromModel(t) : null)
+                        .Select(t => t.IsAccessible ? Dto.Tile.FromModel(t, categoryRepo) : null)
                 );
         }
 
@@ -26,15 +27,15 @@ namespace WikidataGame.Backend.Helpers
         /// <param name="categoryRepo"></param>
         /// <param name="tile"></param>
         /// <returns></returns>
-        public static IEnumerable<Models.Category> GetCategoriesForTile(Repos.IRepository<Models.Category, string> categoryRepo, Models.Tile tile)
+        public static IEnumerable<Category> GetCategoriesForTile(IRepository<Category, string> categoryRepo, string tileId)
         {
             // we get all categories, draw 3 distinct random ints in
             // [i, categories.Count()[ and return the categories for
             // these draws
-            var rnd = new Random(tile.Id.GetHashCode());
+            var rnd = new Random(tileId.GetHashCode());
             var categories = categoryRepo.GetAll();
 
-            var draws = new HashSet<Models.Category>();
+            var draws = new HashSet<Category>();
             while (draws.Count() < 3)
             {
                 var pick = rnd.Next(categories.Count());
@@ -56,7 +57,7 @@ namespace WikidataGame.Backend.Helpers
         /// <param name="width">Map width</param>
         /// <param name="height">Map height</param>
         /// <returns>A dict of neighbors that maps coordinates to tiles.</returns>
-        public static Dictionary<(int, int), Models.Tile> GetNeighbors(IEnumerable<Models.Tile> tiles, int x, int y, int width, int height)
+        public static Dictionary<(int, int), Tile> GetNeighbors(IEnumerable<Tile> tiles, int x, int y, int width, int height)
         {
             // odd and even tiles behave differently in a hexagonal grid; in our
             // grid, the [0, 0] sits to the top left of [1, 0] and right above [0, 1]
@@ -86,7 +87,7 @@ namespace WikidataGame.Backend.Helpers
                 );
         }
 
-        public static bool HasIslands (IEnumerable<Models.Tile> tiles, int width, int height) 
+        public static bool HasIslands (IEnumerable<Tile> tiles, int width, int height) 
         {
             var colors = new Dictionary<(int, int), int>(); // maps a tuple of (x, y) to chosen colors
             var color = -1;

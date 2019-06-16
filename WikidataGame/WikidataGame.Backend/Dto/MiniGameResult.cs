@@ -16,13 +16,13 @@ namespace WikidataGame.Backend.Dto
 
         public string NextMovePlayerId { get; set; }
 
-        public static MiniGameResult FromModel(Models.MiniGame miniGame, Models.Game game)
+        public static MiniGameResult FromModel(Models.MiniGame miniGame, Models.Game game, Repos.IRepository<Models.Category, string> categoryRepo)
         {
             return new MiniGameResult
             {
-                IsWin = miniGame.IsWin,
+                IsWin = miniGame.IsWin.Value,
                 CorrectAnswer = miniGame.CorrectAnswer,
-                Tiles = TileHelper.TileEnumerableModel2Dto(game),
+                Tiles = TileHelper.TileEnumerableModel2Dto(game, categoryRepo),
                 NextMovePlayerId = game.NextMovePlayerId
             };
         }

@@ -9,6 +9,6 @@ namespace WikidataGame.Backend.Services
     public interface IMinigameService
     {
         Models.MiniGameType MiniGameType { get; }
-        MiniGame GenerateMiniGame(string gameId, string playerId, string categoryId);
+        MiniGame GenerateMiniGame(string gameId, string playerId, string categoryId, string tileId);
     }
 }

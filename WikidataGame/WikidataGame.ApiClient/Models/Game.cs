@@ -24,10 +24,11 @@ namespace WikidataGame.Models
         /// <summary>
         /// Initializes a new instance of the Game class.
         /// </summary>
-        public Game(string id = default(string), IList<IList<Tile>> tiles = default(IList<IList<Tile>>), Player me = default(Player), Player opponent = default(Player), string nextMovePlayerId = default(string), bool? awaitingOpponentToJoin = default(bool?))
+        public Game(string id = default(string), IList<IList<Tile>> tiles = default(IList<IList<Tile>>), IList<string> winningPlayerIds = default(IList<string>), Player me = default(Player), Player opponent = default(Player), string nextMovePlayerId = default(string), bool? awaitingOpponentToJoin = default(bool?))
         {
             Id = id;
             Tiles = tiles;
+            WinningPlayerIds = winningPlayerIds;
             Me = me;
             Opponent = opponent;
             NextMovePlayerId = nextMovePlayerId;
@@ -49,6 +50,11 @@ namespace WikidataGame.Models
         /// </summary>
         [JsonProperty(PropertyName = "tiles")]
         public IList<IList<Tile>> Tiles { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "winningPlayerIds")]
+        public IList<string> WinningPlayerIds { get; set; }
 
         /// <summary>
         /// </summary>

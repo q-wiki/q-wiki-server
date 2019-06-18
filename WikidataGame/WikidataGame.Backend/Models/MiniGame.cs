@@ -58,7 +58,7 @@ namespace WikidataGame.Backend.Models
         public string CorrectAnswerString { get; set; }
 
         [Required]
-        public bool? IsWin { get; set; } = null;
+        public MiniGameStatus Status { get; set; } = MiniGameStatus.Unknown;
 
         [ForeignKey(nameof(User))]
         [StringLength(36)]
@@ -85,5 +85,12 @@ namespace WikidataGame.Backend.Models
         Sort,
         BlurryImage,
         MultipleChoice
+    }
+
+    public enum MiniGameStatus
+    {
+        Win,
+        Lost,
+        Unknown
     }
 }

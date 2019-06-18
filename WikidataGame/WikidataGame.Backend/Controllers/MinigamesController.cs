@@ -92,12 +92,13 @@ namespace WikidataGame.Backend.Controllers
                 return Forbid();
 
             var minigame = _minigameRepo.Get(minigameId);
-            if (minigame.IsWin.HasValue)
+            if (minigame.Status !=  Models.MiniGameStatus.Unknown)
                 return Forbid();
 
-            minigame.IsWin = MinigameServiceBase.IsMiniGameAnswerCorrect(minigame, answers);
+            minigame.Status = MinigameServiceBase.IsMiniGameAnswerCorrect(minigame, answers)
+                ? Models.MiniGameStatus.Win : Models.MiniGameStatus.Lost;
             // TODO: adapt tiles to result
-            if (minigame.IsWin.Value)
+            if (minigame.Status == Models.MiniGameStatus.Win)
             {
                 if (minigame.Tile.OwnerId == minigame.PlayerId)
                 {
@@ -155,7 +156,7 @@ namespace WikidataGame.Backend.Controllers
         private bool HasPlayerAnOpenMinigame(string gameId)
         {
             var user = GetCurrentUser();
-            return _minigameRepo.SingleOrDefault(m => m.PlayerId == user.Id && m.GameId == gameId && m.IsWin == null) != null;
+            return _minigameRepo.SingleOrDefault(m => m.PlayerId == user.Id && m.GameId == gameId && m.Status == Models.MiniGameStatus.Unknown) != null;
         }
 
         private bool IsTileInGame(string gameId, string tileId)

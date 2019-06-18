@@ -8,8 +8,8 @@ using WikidataGame.Backend.Helpers;
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20190613112625_GeographyQuestions")]
-    partial class GeographyQuestions
+    [Migration("20190618101232_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -90,8 +90,18 @@ namespace WikidataGame.Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(36);
 
+                    b.Property<int>("AccessibleTilesCount");
+
+                    b.Property<int>("MapHeight");
+
+                    b.Property<int>("MapWidth");
+
+                    b.Property<int>("MoveCount");
+
                     b.Property<string>("NextMovePlayerId")
                         .HasMaxLength(36);
+
+                    b.Property<int>("StepsLeftWithinMove");
 
                     b.Property<string>("WinningPlayerId")
                         .HasMaxLength(36);
@@ -129,6 +139,10 @@ namespace WikidataGame.Backend.Migrations
                     b.Property<string>("AnswerOptionsString")
                         .IsRequired();
 
+                    b.Property<string>("CategoryId")
+                        .IsRequired()
+                        .HasMaxLength(36);
+
                     b.Property<string>("CorrectAnswerString")
                         .IsRequired();
 
@@ -136,22 +150,30 @@ namespace WikidataGame.Backend.Migrations
                         .IsRequired()
                         .HasMaxLength(36);
 
-                    b.Property<bool>("IsWin");
-
                     b.Property<string>("PlayerId")
                         .IsRequired()
                         .HasMaxLength(36);
 
+                    b.Property<int>("Status");
+
                     b.Property<string>("TaskDescription")
                         .IsRequired();
+
+                    b.Property<string>("TileId")
+                        .IsRequired()
+                        .HasMaxLength(36);
 
                     b.Property<int>("Type");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
                     b.HasIndex("GameId");
 
                     b.HasIndex("PlayerId");
+
+                    b.HasIndex("TileId");
 
                     b.ToTable("MiniGames");
                 });
@@ -565,6 +587,11 @@ namespace WikidataGame.Backend.Migrations
 
             modelBuilder.Entity("WikidataGame.Backend.Models.MiniGame", b =>
                 {
+                    b.HasOne("WikidataGame.Backend.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("WikidataGame.Backend.Models.Game", "Game")
                         .WithMany()
                         .HasForeignKey("GameId")
@@ -573,6 +600,11 @@ namespace WikidataGame.Backend.Migrations
                     b.HasOne("WikidataGame.Backend.Models.User", "Player")
                         .WithMany()
                         .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("WikidataGame.Backend.Models.Tile", "Tile")
+                        .WithMany()
+                        .HasForeignKey("TileId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

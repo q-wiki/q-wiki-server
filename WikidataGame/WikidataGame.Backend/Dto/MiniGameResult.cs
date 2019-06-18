@@ -20,7 +20,7 @@ namespace WikidataGame.Backend.Dto
         {
             return new MiniGameResult
             {
-                IsWin = miniGame.IsWin.Value,
+                IsWin = miniGame.Status == Models.MiniGameStatus.Win,
                 CorrectAnswer = miniGame.CorrectAnswer,
                 Tiles = TileHelper.TileEnumerableModel2Dto(game, categoryRepo),
                 NextMovePlayerId = game.NextMovePlayerId

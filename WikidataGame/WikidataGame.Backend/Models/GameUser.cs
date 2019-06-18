@@ -17,5 +17,7 @@ namespace WikidataGame.Backend.Models
         [StringLength(36)]
         public string UserId { get; set; }
         public virtual User User { get; set; }
+
+        public bool IsWinner { get; set; } = false;
     }
 }

@@ -97,7 +97,7 @@ namespace WikidataGame.Backend.Controllers
 
             minigame.Status = MinigameServiceBase.IsMiniGameAnswerCorrect(minigame, answers)
                 ? Models.MiniGameStatus.Win : Models.MiniGameStatus.Lost;
-            // TODO: adapt tiles to result
+
             if (minigame.Status == Models.MiniGameStatus.Win)
             {
                 if (minigame.Tile.OwnerId == minigame.PlayerId)
@@ -123,7 +123,10 @@ namespace WikidataGame.Backend.Controllers
                 game.MoveCount++;
                 if (game.MoveCount / game.GameUsers.Count >= Models.Game.MaxRounds)
                 {
-                    game.WinningPlayerId = WinningPlayerId(gameId);
+                    foreach (var winnerId in WinningPlayerIds(gameId))
+                    {
+                        game.GameUsers.SingleOrDefault(gu => gu.UserId == winnerId).IsWinner = true;
+                    }
                     //TODO: notify!
                 }
                 else
@@ -173,7 +176,7 @@ namespace WikidataGame.Backend.Controllers
                 TileHelper.GetCategoriesForTile(_categoryRepo, tileId).SingleOrDefault(c => c.Id == categoryId) != null;
         }
 
-        private string WinningPlayerId(string gameId)
+        private IEnumerable<string> WinningPlayerIds(string gameId)
         {
             var game = _gameRepo.Get(gameId);
             var result = game.GameUsers.ToDictionary(gu => gu.UserId, gu => 0);
@@ -181,8 +184,8 @@ namespace WikidataGame.Backend.Controllers
             {
                 result[user.Key] = game.Tiles.Count(t => t.OwnerId == user.Key);
             }
-            //TODO: Handle draws!
-            return result.OrderByDescending(r => r.Value).First().Key;
+            var rankedPlayers = result.OrderByDescending(r => r.Value);
+            return rankedPlayers.Where(p => p.Value >= rankedPlayers.First().Value).Select(p => p.Key).ToList();
         }
     }
 }

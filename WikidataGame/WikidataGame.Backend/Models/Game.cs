@@ -37,9 +37,5 @@ namespace WikidataGame.Backend.Models
 
         public int MoveCount { get; set; }
 
-        [ForeignKey(nameof(User))]
-        [StringLength(36)]
-        public string WinningPlayerId { get; set; }
-        public virtual User WinningPlayer { get; set; }
     }
 }

@@ -56,7 +56,7 @@ namespace WikidataGame.Backend.Repos
 
         public Game RunningGameForPlayer(User player)
         {
-            return SingleOrDefault(g => g.GameUsers.Select(gu => gu.UserId).Contains(player.Id) && string.IsNullOrEmpty(g.WinningPlayerId));
+            return SingleOrDefault(g => g.GameUsers.Select(gu => gu.UserId).Contains(player.Id) && g.GameUsers.Count(gu => gu.IsWinner) <= 0);
         }
     }
 }

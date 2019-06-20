@@ -30,6 +30,7 @@ namespace WikidataGame.Backend.Helpers
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<GameUser>().HasKey(table => new { table.GameId, table.UserId });
+            modelBuilder.Entity<User>().HasAlternateKey(c => c.DeviceId);
 
             //Seed Database
             DatabaseSeeds.SeedCategories(modelBuilder);

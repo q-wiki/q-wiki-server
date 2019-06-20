@@ -424,6 +424,55 @@ namespace WikidataGame.Backend.Helpers
                                       INCLUDE %states.
                                       BIND('number of inhabitants' as ?question).
                                     } ORDER BY ?population"
+                },
+                // Space
+                new Question
+                {
+                    Id = "a4a7289a-3053-4ad7-9c60-c75a18305243",
+                    CategoryId = "1b9185c0-c46b-4abf-bf82-e464f5116c7d",
+                    MiniGameType = MiniGameType.Sort,
+                    TaskDescription = "Sort planets by {0} (ascending)",
+                    SparqlQuery = @"# sort planets by average distance to sun
+                        SELECT ?answer ?question WHERE {
+                          {SELECT DISTINCT ?answer ?avgDistanceToSun
+                                                   WHERE 
+                                                   {
+                                                     # fetch planets in our solar system
+                                                     ?planet wdt:P31/wdt:P279+ wd:Q17362350.
+                                                     ?planet p:P2243/psv:P2243 [wikibase:quantityAmount ?apoapsis; wikibase:quantityUnit ?apoapsisUnit].
+                                                     ?planet p:P2244/psv:P2244 [wikibase:quantityAmount ?periapsis; wikibase:quantityUnit ?periapsisUnit].
+                                                     # NOTE: there are only three planets with apoapsis and periapsis in AU; 4 planets in total
+                                                     # FILTER (?apoapsisUnit = wd:Q1811 && ?periapsisUnit = wd:Q1811)
+                                                     BIND ((?apoapsis + ?periapsis) / 2 as ?avgDistanceToSun)
+                                                     FILTER (?apoapsisUnit = wd:Q828224 && ?periapsisUnit = wd:Q828224)
+                                                     SERVICE wikibase:label { 
+                                                       bd:serviceParam wikibase:language 'en'.
+                                                       ?planet  rdfs:label ?answer.} 
+                                                   } ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) LIMIT 4}
+                          BIND('average distance to sun' as ?question)
+                        } ORDER BY ?avgDistanceToSun"
+                },
+                new Question
+                {
+                    Id = "2ed01768-9ab6-4895-8cbf-09dbc6f957e0",
+                    CategoryId = "1b9185c0-c46b-4abf-bf82-e464f5116c7d", // Space
+                    MiniGameType = MiniGameType.Sort,
+                    TaskDescription = "Sort planets by {0} (ascending)",
+                    SparqlQuery = @"# sort planets by radius
+                        SELECT ?answer ?question WHERE {
+                          {SELECT ?planet ?answer ?radius WHERE {
+                            ?planet wdt:P397 wd:Q525;
+                                    p:P2120 [
+                                      ps:P2120 ?radius;
+                                               pq:P518 wd:Q23538
+                                    ].
+                            SERVICE wikibase:label { 
+                              bd:serviceParam wikibase:language 'en'.
+                              ?planet  rdfs:label ?answer.}
+                          } ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) LIMIT 4}
+                          BIND ('radius' as ?question)
+                        }
+                        ORDER BY ?radius"
                 }
                 );
         }

@@ -25,7 +25,8 @@ namespace WikidataGame.Backend.Migrations
                     Id = table.Column<string>(maxLength: 36, nullable: false),
                     DeviceId = table.Column<string>(nullable: false),
                     Platform = table.Column<int>(nullable: false),
-                    PushChannelUrl = table.Column<string>(nullable: true)
+                    PushToken = table.Column<string>(nullable: true),
+                    PushRegistrationId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -63,8 +64,7 @@ namespace WikidataGame.Backend.Migrations
                     AccessibleTilesCount = table.Column<int>(nullable: false),
                     NextMovePlayerId = table.Column<string>(maxLength: 36, nullable: true),
                     StepsLeftWithinMove = table.Column<int>(nullable: false),
-                    MoveCount = table.Column<int>(nullable: false),
-                    WinningPlayerId = table.Column<string>(maxLength: 36, nullable: true)
+                    MoveCount = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -74,13 +74,7 @@ namespace WikidataGame.Backend.Migrations
                         column: x => x.NextMovePlayerId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Games_Users_WinningPlayerId",
-                        column: x => x.WinningPlayerId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -88,7 +82,8 @@ namespace WikidataGame.Backend.Migrations
                 columns: table => new
                 {
                     GameId = table.Column<string>(maxLength: 36, nullable: false),
-                    UserId = table.Column<string>(maxLength: 36, nullable: false)
+                    UserId = table.Column<string>(maxLength: 36, nullable: false),
+                    IsWinner = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -126,19 +121,19 @@ namespace WikidataGame.Backend.Migrations
                         column: x => x.ChosenCategoryId,
                         principalTable: "Categories",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Tiles_Games_GameId",
                         column: x => x.GameId,
                         principalTable: "Games",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Tiles_Users_OwnerId",
                         column: x => x.OwnerId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -524,11 +519,6 @@ namespace WikidataGame.Backend.Migrations
                 name: "IX_Games_NextMovePlayerId",
                 table: "Games",
                 column: "NextMovePlayerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Games_WinningPlayerId",
-                table: "Games",
-                column: "WinningPlayerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GameUser_UserId",

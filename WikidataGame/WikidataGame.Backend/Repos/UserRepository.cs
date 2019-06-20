@@ -11,7 +11,7 @@ namespace WikidataGame.Backend.Repos
     {
         public UserRepository(DataContext context) : base(context) { }
 
-        public User CreateOrUpdateUser(string deviceId, string pushUrl)
+        public User CreateOrUpdateUser(string deviceId, string pushToken)
         {
             User user = SingleOrDefault(u => u.DeviceId == deviceId);
             if (user == null)
@@ -20,13 +20,13 @@ namespace WikidataGame.Backend.Repos
                 {
                     Id = Guid.NewGuid().ToString(),
                     DeviceId = deviceId,
-                    PushChannelUrl = pushUrl
+                    PushToken = pushToken
                 };
                 Add(user);
             }
             else
             {
-                user.PushChannelUrl = pushUrl;
+                user.PushToken = pushToken;
                 Update(user);
             }
             return user;

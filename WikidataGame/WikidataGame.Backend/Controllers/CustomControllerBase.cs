@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Models;
 using WikidataGame.Backend.Repos;
+using WikidataGame.Backend.Services;
 
 namespace WikidataGame.Backend.Controllers
 {
@@ -15,17 +16,20 @@ namespace WikidataGame.Backend.Controllers
         protected readonly IUserRepository _userRepo;
         protected readonly IRepository<Category, string> _categoryRepo;
         protected readonly DataContext _dataContext;
+        protected readonly INotificationService _notificationService;
 
         public CustomControllerBase(
             DataContext dataContext,
             IUserRepository userRepo,
             IGameRepository gameRepo,
-            IRepository<Category, string> categoryRepo)
+            IRepository<Category, string> categoryRepo,
+            INotificationService notificationService)
         {
             _dataContext = dataContext;
             _userRepo = userRepo;
             _gameRepo = gameRepo;
             _categoryRepo = categoryRepo;
+            _notificationService = notificationService;
         }
 
         protected User GetCurrentUser()

@@ -549,7 +549,9 @@ namespace WikidataGame.Backend.Migrations
 
                     b.Property<int>("Platform");
 
-                    b.Property<string>("PushChannelUrl");
+                    b.Property<string>("PushRegistrationId");
+
+                    b.Property<string>("PushToken");
 
                     b.HasKey("Id");
 

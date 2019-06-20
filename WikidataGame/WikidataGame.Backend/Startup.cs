@@ -111,6 +111,7 @@ namespace WikidataGame.Backend
                 };
             });
 
+            services.AddSingleton<INotificationService>(new NotificationService(Configuration));
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IGameRepository, GameRepository>();
             services.AddScoped<IMinigameRepository, MinigameRepository>();

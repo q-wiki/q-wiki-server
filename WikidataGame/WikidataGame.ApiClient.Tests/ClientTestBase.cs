@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using WikidataGame.Models;
+using Xunit;
 
+[assembly: CollectionBehavior(CollectionBehavior.CollectionPerClass, DisableTestParallelization = true)]
 namespace WikidataGame.ApiClient.Tests
 {
     public abstract class ClientTestBase

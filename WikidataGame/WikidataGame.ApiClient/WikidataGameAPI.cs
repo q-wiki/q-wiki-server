@@ -314,8 +314,8 @@ namespace WikidataGame
         /// <param name='xDeviceID'>
         /// device identifier
         /// </param>
-        /// <param name='xPushURL'>
-        /// push notification channel url
+        /// <param name='xPushToken'>
+        /// push token generated through firebase/apns
         /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
@@ -332,7 +332,7 @@ namespace WikidataGame
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<AuthInfo>> AuthenticateWithHttpMessagesAsync(string xDeviceID = default(string), string xPushURL = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<AuthInfo>> AuthenticateWithHttpMessagesAsync(string xDeviceID = default(string), string xPushToken = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -342,7 +342,7 @@ namespace WikidataGame
                 _invocationId = ServiceClientTracing.NextInvocationId.ToString();
                 Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
                 tracingParameters.Add("xDeviceID", xDeviceID);
-                tracingParameters.Add("xPushURL", xPushURL);
+                tracingParameters.Add("xPushToken", xPushToken);
                 tracingParameters.Add("cancellationToken", cancellationToken);
                 ServiceClientTracing.Enter(_invocationId, this, "Authenticate", tracingParameters);
             }
@@ -363,13 +363,13 @@ namespace WikidataGame
                 }
                 _httpRequest.Headers.TryAddWithoutValidation("X-Device-ID", xDeviceID);
             }
-            if (xPushURL != null)
+            if (xPushToken != null)
             {
-                if (_httpRequest.Headers.Contains("X-Push-URL"))
+                if (_httpRequest.Headers.Contains("X-Push-Token"))
                 {
-                    _httpRequest.Headers.Remove("X-Push-URL");
+                    _httpRequest.Headers.Remove("X-Push-Token");
                 }
-                _httpRequest.Headers.TryAddWithoutValidation("X-Push-URL", xPushURL);
+                _httpRequest.Headers.TryAddWithoutValidation("X-Push-Token", xPushToken);
             }
 
 

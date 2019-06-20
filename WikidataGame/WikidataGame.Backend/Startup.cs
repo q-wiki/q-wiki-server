@@ -68,7 +68,8 @@ namespace WikidataGame.Backend
             }
             else
             {
-                services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("TestDb").UseLazyLoadingProxies());
+                //services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("TestDb").UseLazyLoadingProxies());
+                services.AddDbContext<DataContext>(x => x.UseSqlite("Filename=qwiki.db").UseLazyLoadingProxies());
             }
 
             // configure strongly typed settings objects

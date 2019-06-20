@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikidataGame.ApiClient.Samp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikidataGame.Backend.Tests", "WikidataGame.Backend.Tests\WikidataGame.Backend.Tests.csproj", "{509DE7AA-0A44-46EB-8A5D-C12D79D583F0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WikidataGame.ApiClient.Tests", "WikidataGame.ApiClient.Tests\WikidataGame.ApiClient.Tests.csproj", "{83E47AB3-E883-47FB-A158-0ED5AD1D0E6B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{509DE7AA-0A44-46EB-8A5D-C12D79D583F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{509DE7AA-0A44-46EB-8A5D-C12D79D583F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{509DE7AA-0A44-46EB-8A5D-C12D79D583F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83E47AB3-E883-47FB-A158-0ED5AD1D0E6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83E47AB3-E883-47FB-A158-0ED5AD1D0E6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83E47AB3-E883-47FB-A158-0ED5AD1D0E6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83E47AB3-E883-47FB-A158-0ED5AD1D0E6B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -42,6 +48,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{18721432-242F-4FA5-BFB9-170A37BF86F0} = {98C7F354-FB28-404A-B861-CD7741ED3A93}
 		{F0DC3362-69AF-4132-A675-E160B0F72356} = {98C7F354-FB28-404A-B861-CD7741ED3A93}
+		{83E47AB3-E883-47FB-A158-0ED5AD1D0E6B} = {98C7F354-FB28-404A-B861-CD7741ED3A93}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D4C5B4A0-071D-452A-B26D-ACF9F3261175}

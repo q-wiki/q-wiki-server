@@ -35,7 +35,7 @@ namespace WikidataGame.Backend.Helpers
                 //new Category
                 //{
                 //    Id = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
-                //    Title = "Natural Sciences"
+                //    Title = "Chemistry"
                 //},
                 //new Category
                 //{

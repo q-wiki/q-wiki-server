@@ -27,11 +27,11 @@ namespace WikidataGame.Backend.Helpers
                     Id = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                     Title = "Geography"
                 }
-                //,new Category
-                //{
-                //    Id = "1b9185c0-c46b-4abf-bf82-e464f5116c7d",
-                //    Title = "Space"
-                //},
+                , new Category
+                {
+                    Id = "1b9185c0-c46b-4abf-bf82-e464f5116c7d",
+                    Title = "Space"
+                },
                 //new Category
                 //{
                 //    Id = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
@@ -473,6 +473,89 @@ namespace WikidataGame.Backend.Helpers
                           BIND ('radius' as ?question)
                         }
                         ORDER BY ?radius"
+                },
+                new Question
+                {
+                    Id = "14d93797-c61c-4415-b1ed-359d180237ff",
+                    CategoryId = "1b9185c0-c46b-4abf-bf82-e464f5116c7d", // Space
+                    MiniGameType = MiniGameType.MultipleChoice,
+                    TaskDescription = "Which of these moons belongs to planet {0}?",
+                    SparqlQuery = @"#Which of these moons belongs to the planet {0}?
+                        SELECT ?question ?answer 
+                        WITH {
+                          # subquery 1: get all moons of planets of our solar system
+                          SELECT ?moon ?parent ?question ?answer WHERE {
+                          {
+                            SELECT ?moon ?moonLabel ?parent WHERE {
+                              ?moon wdt:P31/wdt:P279* wd:Q2537;
+                                    wdt:P397 ?parent.
+                              ?parent wdt:P361+ wd:Q544.
+                              BIND (?parent as ?planet).
+                              SERVICE wikibase:label { bd:serviceParam wikibase:language '[AUTO_LANGUAGE],en'. }
+                            }
+                          }
+                          FILTER(!CONTAINS(?moonLabel, '/'))
+                        } ORDER BY MD5(CONCAT(STR(?moon), STR(NOW()))) # order by random
+                        } as %moons
+
+                        WITH {
+                          # subquery 2:
+                          # get one random planet
+                          # get all moons out of list 1 which belong to that planet
+                          SELECT ?moon ?parent WHERE {
+                            INCLUDE %moons.
+                            {
+                              SELECT DISTINCT ?parent WHERE {
+                                {
+                                  SELECT ?moon ?moonLabel ?parentLabel ?parent WHERE {
+                                    ?moon wdt:P31/wdt:P279* wd:Q2537;
+                                          wdt:P397 ?parent.
+                                    ?parent wdt:P361+ wd:Q544.
+                                    SERVICE wikibase:label { bd:serviceParam wikibase:language '[AUTO_LANGUAGE],en'. }
+                                  }
+                                }
+                                FILTER(!CONTAINS(?moonLabel, '/'))
+                              } 
+                              GROUP BY ?parent
+                                       ORDER BY MD5(CONCAT(STR(?parentLabel), STR(NOW()))) # order by random
+                                       LIMIT 1
+                            }
+                          }
+                        } AS %selectedPlanet
+
+                        WITH {
+                          # subquery 3: get one moon out of list 2 (= correct answer)
+                          SELECT DISTINCT ?moon ?parent WHERE {
+                            INCLUDE %selectedPlanet.
+                          } ORDER BY MD5(CONCAT(STR(?moon), STR(NOW()))) 
+                          LIMIT 1
+  
+                        } AS %oneMoon
+
+                        WITH {
+                        # subquery 4 get three false answers (question/parent must be empty here!)
+                          SELECT DISTINCT ?moon ?empty WHERE {
+                            INCLUDE %moons.
+                            FILTER NOT EXISTS { INCLUDE %selectedPlanet. }
+                          }
+                          LIMIT 3
+                        } AS %threeMoons
+
+                        WITH {
+                          # another subquery because of dubios server errors
+                          SELECT * WHERE {
+
+                             {INCLUDE %threeMoons } UNION {INCLUDE %oneMoon}
+                          }
+                        } AS %final WHERE {
+                          INCLUDE %final.
+  
+                          SERVICE wikibase:label {
+                            bd:serviceParam wikibase:language 'en'.
+                            ?parent  rdfs:label ?answer.
+                            ?moon rdfs:label ?question.
+                          }
+                        } ORDER BY DESC(?answer)"
                 }
                 );
         }

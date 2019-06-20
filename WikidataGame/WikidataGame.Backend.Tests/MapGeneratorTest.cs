@@ -43,10 +43,9 @@ namespace WikidataGame.Backend.Tests
                 mapWidth, mapHeight, accessibleTiles
             );
 
-            Assert.All(
-                mapCandidate.Where(t => t.IsAccessible),
-                tile => Assert.True(tile.Difficulty >= 0 && tile.Difficulty <= 2)
-            );
+            Assert.True(mapCandidate.Count(t => t.IsAccessible && t.Difficulty == 0) >= 1);
+            Assert.True(mapCandidate.Count(t => t.IsAccessible && t.Difficulty == 1) >= 1);
+            Assert.True(mapCandidate.Count(t => t.IsAccessible && t.Difficulty == 2) >= 1);
         }
 
         [Fact]

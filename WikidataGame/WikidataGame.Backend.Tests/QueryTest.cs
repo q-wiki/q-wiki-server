@@ -27,6 +27,7 @@ namespace WikidataGame.Backend.Tests
 
             var result = service.QueryWikidata(q.SparqlQuery);
             Assert.True(result.Count == 4);
+            // result is tuple(q,a)
             Assert.False(string.IsNullOrWhiteSpace(result.First().Item1));
             foreach (var option in result)
             {

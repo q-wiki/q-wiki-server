@@ -8,7 +8,7 @@ using WikidataGame.Backend.Helpers;
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20190620194920_InitialCreate")]
+    [Migration("20190625100819_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,16 +34,6 @@ namespace WikidataGame.Backend.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "e9019ee1-0eed-492d-8aa7-feb1974fb265",
-                            Title = "Nature"
-                        },
-                        new
-                        {
-                            Id = "ddd333f7-ef45-4e13-a2ca-fb4494dce324",
-                            Title = "Culture"
-                        },
-                        new
-                        {
                             Id = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                             Title = "Geography"
                         },
@@ -55,32 +45,7 @@ namespace WikidataGame.Backend.Migrations
                         new
                         {
                             Id = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
-                            Title = "Natural Sciences"
-                        },
-                        new
-                        {
-                            Id = "f9c52d1a-9315-423d-a818-94c1769fffe5",
-                            Title = "History"
-                        },
-                        new
-                        {
-                            Id = "4941c348-b4c4-43b5-b3d4-85794c68eec4",
-                            Title = "Celebrities"
-                        },
-                        new
-                        {
-                            Id = "2a388146-e32c-4a08-a246-472eff12849a",
-                            Title = "Entertainment"
-                        },
-                        new
-                        {
-                            Id = "7f2baca7-cdf4-4e24-855b-c868d9030ba4",
-                            Title = "Politics"
-                        },
-                        new
-                        {
-                            Id = "3d6c54d3-0fda-4923-a00e-e930640430b3",
-                            Title = "Sports"
+                            Title = "Chemistry"
                         });
                 });
 
@@ -508,6 +473,317 @@ namespace WikidataGame.Backend.Migrations
                       }
                     }",
                             TaskDescription = "Which famous monument is this: {0}?"
+                        },
+                        new
+                        {
+                            Id = "bc7a22ee-4985-44c3-9388-5c7dd6b8762e",
+                            CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                            MiniGameType = 0,
+                            SparqlQuery = @"#sort countries by number of inhabitants (ascending)
+                                    SELECT (?stateLabel as ?answer) ?question 
+                                    WITH {
+                                      # subquery: get 4 random countries with their average number of inhabitants
+                                      SELECT DISTINCT ?state ?stateLabel (ROUND(AVG(?population) / 1000) * 1000 as ?population) {
+
+                                        {
+                                          # subquery: list of all countries in the world
+                                          SELECT DISTINCT ?state ?stateLabel ?population ?dateOfCensus
+                                                                 WHERE {
+                                                                   ?state wdt:P31/wdt:P279* wd:Q3624078;
+                                                                          p:P463 ?memberOfStatement;
+                                                                          p:P1082 [
+                                                                            ps:P1082 ?population;
+                                                                                     pq:P585 ?dateOfCensus
+                                                                          ].
+                                                                   ?memberOfStatement a wikibase:BestRank;
+                                                                                        ps:P463 wd:Q1065.
+                                                                   MINUS { ?memberOfStatement pq:P582 ?endTime. }
+                                                                   MINUS { ?state wdt:P576|wdt:P582 ?end. }
+                                                                   ?state p:P30 ?continentStatement.
+                                                                   ?continentStatement a wikibase:BestRank;
+                                                                                         ps:P30 ?continent.
+                                                                   VALUES ?continent { wd:Q49 wd:Q48 wd:Q46 wd:Q18 wd:Q15 } # ohne Ozeanien
+                                                                   MINUS { ?continentStatement pq:P582 ?endTime. }
+                                                                   SERVICE wikibase:label {
+                                                                     bd:serviceParam wikibase:language '[AUTO_LANGUAGE],en'.
+                                                                   }
+                                                                   FILTER(YEAR(?dateOfCensus) > YEAR(NOW()) - 5)
+                                                                 }
+                                        }
+                                      }
+                                      GROUP BY ?state ?stateLabel
+                                      ORDER BY MD5(CONCAT(STR(?item), STR(NOW()))) LIMIT 4
+                                    } as %states
+
+                                    WHERE {
+                                      # fill the question (hard-coded) and sort by population (= correct sort order needed for sorting game)
+                                      INCLUDE %states.
+                                      BIND('number of inhabitants' as ?question).
+                                    } ORDER BY ?population",
+                            TaskDescription = "Sort countries by {0} (ascending)"
+                        },
+                        new
+                        {
+                            Id = "a4a7289a-3053-4ad7-9c60-c75a18305243",
+                            CategoryId = "1b9185c0-c46b-4abf-bf82-e464f5116c7d",
+                            MiniGameType = 0,
+                            SparqlQuery = @"# sort planets by average distance to sun
+                        SELECT ?answer ?question WHERE {
+                          {SELECT DISTINCT ?answer ?avgDistanceToSun
+                                                   WHERE 
+                                                   {
+                                                     # fetch planets in our solar system
+                                                     ?planet wdt:P31/wdt:P279+ wd:Q17362350.
+                                                     ?planet p:P2243/psv:P2243 [wikibase:quantityAmount ?apoapsis; wikibase:quantityUnit ?apoapsisUnit].
+                                                     ?planet p:P2244/psv:P2244 [wikibase:quantityAmount ?periapsis; wikibase:quantityUnit ?periapsisUnit].
+                                                     # NOTE: there are only three planets with apoapsis and periapsis in AU; 4 planets in total
+                                                     # FILTER (?apoapsisUnit = wd:Q1811 && ?periapsisUnit = wd:Q1811)
+                                                     BIND ((?apoapsis + ?periapsis) / 2 as ?avgDistanceToSun)
+                                                     FILTER (?apoapsisUnit = wd:Q828224 && ?periapsisUnit = wd:Q828224)
+                                                     SERVICE wikibase:label { 
+                                                       bd:serviceParam wikibase:language 'en'.
+                                                       ?planet  rdfs:label ?answer.} 
+                                                   } ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) LIMIT 4}
+                          BIND('average distance to sun' as ?question)
+                        } ORDER BY ?avgDistanceToSun",
+                            TaskDescription = "Sort planets by {0} (ascending)"
+                        },
+                        new
+                        {
+                            Id = "2ed01768-9ab6-4895-8cbf-09dbc6f957e0",
+                            CategoryId = "1b9185c0-c46b-4abf-bf82-e464f5116c7d",
+                            MiniGameType = 0,
+                            SparqlQuery = @"# sort planets by radius
+                        SELECT ?answer ?question WHERE {
+                          {SELECT ?planet ?answer ?radius WHERE {
+                            ?planet wdt:P397 wd:Q525;
+                                    p:P2120 [
+                                      ps:P2120 ?radius;
+                                               pq:P518 wd:Q23538
+                                    ].
+                            SERVICE wikibase:label { 
+                              bd:serviceParam wikibase:language 'en'.
+                              ?planet  rdfs:label ?answer.}
+                          } ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) LIMIT 4}
+                          BIND ('radius' as ?question)
+                        }
+                        ORDER BY ?radius",
+                            TaskDescription = "Sort planets by {0} (ascending)"
+                        },
+                        new
+                        {
+                            Id = "14d93797-c61c-4415-b1ed-359d180237ff",
+                            CategoryId = "1b9185c0-c46b-4abf-bf82-e464f5116c7d",
+                            MiniGameType = 2,
+                            SparqlQuery = @"#Which of these moons belongs to the planet {0}?
+                        SELECT ?question ?answer 
+                        WITH {
+                          # subquery 1: get all moons of planets of our solar system
+                          SELECT ?moon ?parent ?question ?answer WHERE {
+                          {
+                            SELECT ?moon ?moonLabel ?parent WHERE {
+                              ?moon wdt:P31/wdt:P279* wd:Q2537;
+                                    wdt:P397 ?parent.
+                              ?parent wdt:P361+ wd:Q544.
+                              BIND (?parent as ?planet).
+                              SERVICE wikibase:label { bd:serviceParam wikibase:language '[AUTO_LANGUAGE],en'. }
+                            }
+                          }
+                          FILTER(!CONTAINS(?moonLabel, '/'))
+                        } ORDER BY MD5(CONCAT(STR(?moon), STR(NOW()))) # order by random
+                        } as %moons
+
+                        WITH {
+                          # subquery 2:
+                          # get one random planet
+                          # get all moons out of list 1 which belong to that planet
+                          SELECT ?moon ?parent WHERE {
+                            INCLUDE %moons.
+                            {
+                              SELECT DISTINCT ?parent WHERE {
+                                {
+                                  SELECT ?moon ?moonLabel ?parentLabel ?parent WHERE {
+                                    ?moon wdt:P31/wdt:P279* wd:Q2537;
+                                          wdt:P397 ?parent.
+                                    ?parent wdt:P361+ wd:Q544.
+                                    SERVICE wikibase:label { bd:serviceParam wikibase:language '[AUTO_LANGUAGE],en'. }
+                                  }
+                                }
+                                FILTER(!CONTAINS(?moonLabel, '/'))
+                              } 
+                              GROUP BY ?parent
+                                       ORDER BY MD5(CONCAT(STR(?parentLabel), STR(NOW()))) # order by random
+                                       LIMIT 1
+                            }
+                          }
+                        } AS %selectedPlanet
+
+                        WITH {
+                          # subquery 3: get one moon out of list 2 (= correct answer)
+                          SELECT DISTINCT ?moon ?parent WHERE {
+                            INCLUDE %selectedPlanet.
+                          } ORDER BY MD5(CONCAT(STR(?moon), STR(NOW()))) 
+                          LIMIT 1
+  
+                        } AS %oneMoon
+
+                        WITH {
+                        # subquery 4 get three false answers (question/parent must be empty here!)
+                          SELECT DISTINCT ?moon ?empty WHERE {
+                            INCLUDE %moons.
+                            FILTER NOT EXISTS { INCLUDE %selectedPlanet. }
+                          }
+                          LIMIT 3
+                        } AS %threeMoons
+
+                        WITH {
+                          # another subquery because of dubios server errors
+                          SELECT * WHERE {
+
+                             {INCLUDE %threeMoons } UNION {INCLUDE %oneMoon}
+                          }
+                        } AS %final WHERE {
+                          INCLUDE %final.
+  
+                          SERVICE wikibase:label {
+                            bd:serviceParam wikibase:language 'en'.
+                            ?parent  rdfs:label ?question.
+                            ?moon rdfs:label ?answer.
+                          }
+                        } ORDER BY DESC(?answer)",
+                            TaskDescription = "Which of these moons belongs to planet {0}?"
+                        },
+                        new
+                        {
+                            Id = "5f7e813a-3cfa-4617-86d1-514b481b37a8",
+                            CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
+                            MiniGameType = 2,
+                            SparqlQuery = @"SELECT ?question ?answer WHERE {
+                      ?element wdt:P31 wd:Q11344;
+                               wdt:P1086 ?number;
+                               wdt:P246 ?answer.
+                      FILTER(1 <= ?number &&
+                             ?number <= 118)
+                      SERVICE wikibase:label {
+                        bd:serviceParam wikibase:language 'en'.
+                        ?element  rdfs:label ?question.
+                      }
+                    }
+                    ORDER BY MD5(CONCAT(STR(?question), STR(NOW()))) # order by random
+                    LIMIT 4",
+                            TaskDescription = "What's the chemical symbol for {0}?"
+                        },
+                        new
+                        {
+                            Id = "40677b0f-9d5f-46d2-ab85-a6c40afb5f87",
+                            CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
+                            MiniGameType = 2,
+                            SparqlQuery = @"SELECT ?question ?answer WHERE {
+                      ?element wdt:P31 wd:Q11344;
+                               wdt:P1086 ?number;
+                               wdt:P246 ?question.
+                      FILTER(1 <= ?number &&
+                             ?number <= 118)
+                      SERVICE wikibase:label {
+                        bd:serviceParam wikibase:language 'en'.
+                        ?element  rdfs:label ?answer.
+                      }
+                    }
+                    ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) # order by random
+                    LIMIT 4",
+                            TaskDescription = "Which element has the chemical symbol {0}?"
+                        },
+                        new
+                        {
+                            Id = "e8f99165-baa3-47b2-be35-c42ab2d5f0a0",
+                            CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
+                            MiniGameType = 0,
+                            SparqlQuery = @"#sort chemical elements by number in period system
+                        SELECT ?question ?answer WHERE {
+                          BIND ('number in period system' as ?question).
+                          {SELECT ?item ?element ?number ?symbol WHERE {
+                            ?item wdt:P31 wd:Q11344;
+                                  wdt:P1086 ?number;
+                                  wdt:P246 ?symbol.
+                            FILTER(1 <= ?number &&
+                                   ?number <= 118)
+                            SERVICE wikibase:label {
+                              bd:serviceParam wikibase:language 'en'.
+                              ?item  rdfs:label ?element.
+                            }
+                          }
+                          ORDER BY MD5(CONCAT(STR(?element), STR(NOW()))) # order by random
+                          LIMIT 4}
+                          BIND (?element as ?answer).
+                        } ORDER BY ASC(?number)",
+                            TaskDescription = "Sort chemical elements by {0} (ascending)."
+                        },
+                        new
+                        {
+                            Id = "d9011896-04e5-4d32-8d3a-02a6d2b0bdb6",
+                            CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
+                            MiniGameType = 0,
+                            SparqlQuery = @"#English kings until 1707
+                        SELECT DISTINCT ?question ?answer WHERE {
+                          {SELECT DISTINCT ?human ?name ?reignstart ?reignend WHERE {
+                            ?human wdt:P31 wd:Q5.      #find humans
+                            ?human p:P39 ?memberOfStatement.
+                            ?memberOfStatement a wikibase:BestRank;
+                                                 ps:P39 wd:Q18810062. # position
+
+                            ?memberOfStatement pq:P580 ?reignstart;
+                                               pq:P582 ?reignend. 
+                            FILTER (?reignstart >= '1066-12-31T00:00:00Z'^^xsd:dateTime) . #start with William the Conquerer
+                            MINUS {?human wdt:P97 wd:Q719039.}
+
+                            SERVICE wikibase:label {
+                              bd:serviceParam wikibase:language 'en'.
+                              ?human  rdfs:label ?name.
+                            }
+                          } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW())))
+                          LIMIT 4}
+                                BIND (?name as ?answer).
+                                BIND ('the beginning of their reigning period' as ?question).
+                        } ORDER BY ?reignstart",
+                            TaskDescription = "Sort these English kings by {0} (ascending)."
+                        },
+                        new
+                        {
+                            Id = "909182d1-4ae6-46ea-bd9b-8c4323ea53fa",
+                            CategoryId = "55a4622b-0fed-4284-af0b-3c7f4c3e88d0",
+                            MiniGameType = 0,
+                            SparqlQuery = @"# sort EU countries by the date they joined
+                        SELECT ?date (SAMPLE(?answer) AS ?answer) (SAMPLE(?question) AS ?question) 
+                        WITH {
+                          SELECT DISTINCT (?memberOfEuSince as ?date) ?answer WHERE {
+                            {SELECT ?item ?memberOfEuSince
+                                          WHERE 
+                                          {
+                                            ?item p:P463 [ps:P463 wd:Q458;
+                                                                  pq:P580 ?memberOfEuSince].
+                                          }
+                            }
+                            SERVICE wikibase:label {
+                              bd:serviceParam wikibase:language 'en'.
+                              ?item  rdfs:label ?answer.
+                            }
+                          }
+                        } AS %dates
+                        WITH {
+                          SELECT DISTINCT ?date WHERE {
+                            INCLUDE %dates.
+                          }
+                          ORDER BY MD5(CONCAT(STR(?continent), STR(NOW())))
+                          LIMIT 4
+                        } AS %fourDates
+                        WHERE {
+                          INCLUDE %fourDates.
+                          INCLUDE %dates.
+                          BIND('the date they joined the EU' as ?question).
+                        }
+                        GROUP BY ?date
+                        ORDER BY ?date",
+                            TaskDescription = "Sort the countries by {0} (ascending)."
                         });
                 });
 

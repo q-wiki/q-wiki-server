@@ -27,7 +27,8 @@ namespace WikidataGame.Backend.Controllers
             DataContext dataContext,
             IUserRepository userRepo,
             IGameRepository gameRepo,
-            IRepository<Models.Category, string> categoryRepo) : base(dataContext, userRepo, gameRepo, categoryRepo) {}
+            IRepository<Models.Category, string> categoryRepo,
+            INotificationService notificationService) : base(dataContext, userRepo, gameRepo, categoryRepo, notificationService) {}
 
         /// <summary>
         /// Creates a new game and matches the player with an opponent
@@ -86,12 +87,16 @@ namespace WikidataGame.Backend.Controllers
         /// <returns>204 status code</returns>
         [HttpDelete("{gameId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public IActionResult DeleteGame(string gameId)
+        public async Task<IActionResult> DeleteGame(string gameId)
         {
             if (!IsUserGameParticipant(gameId))
                 return Forbid();
 
-            //TODO: notify opponent
+            var opponents = _gameRepo.Get(gameId).GameUsers.Select(gu => gu.User).Where(u => u.DeviceId != User.Identity.Name).ToList();
+            foreach(var opponent in opponents)
+            {
+                await _notificationService.SendNotification(opponent, "Congrats", "You won, because your opponent left the game!");
+            }
             var game = _gameRepo.Get(gameId);
             _gameRepo.Remove(game);
             _dataContext.SaveChanges();

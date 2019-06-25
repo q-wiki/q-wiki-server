@@ -18,7 +18,9 @@ namespace WikidataGame.Backend.Models
         [Required]
         public GamePlatform Platform { get; set; } = GamePlatform.Android;
 
-        public string PushChannelUrl { get; set; }
+        public string PushToken { get; set; }
+
+        public string PushRegistrationId { get; set; }
     }
 
     public enum GamePlatform

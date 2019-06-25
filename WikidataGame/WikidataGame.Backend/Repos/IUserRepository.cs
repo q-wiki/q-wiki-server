@@ -8,6 +8,6 @@ namespace WikidataGame.Backend.Repos
 {
     public interface IUserRepository : IRepository<User, string>
     {
-        User CreateOrUpdateUser(string deviceId, string pushUrl);
+        User CreateOrUpdateUser(string deviceId, string pushToken);
     }
 }

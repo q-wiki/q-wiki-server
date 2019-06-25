@@ -623,6 +623,35 @@ namespace WikidataGame.Backend.Helpers
                           LIMIT 4}
                           BIND (?element as ?answer).
                         } ORDER BY ASC(?number)"
+                },
+                new Question
+                {
+                    Id = "d9011896-04e5-4d32-8d3a-02a6d2b0bdb6",
+                    CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5", // History
+                    MiniGameType = MiniGameType.Sort,
+                    TaskDescription = "Sort these English kings by {0} (ascending).",
+                    SparqlQuery = @"#English kings until 1707
+                        SELECT DISTINCT ?question ?answer WHERE {
+                          {SELECT DISTINCT ?human ?name ?reignstart ?reignend WHERE {
+                            ?human wdt:P31 wd:Q5.      #find humans
+                            ?human p:P39 ?memberOfStatement.
+                            ?memberOfStatement a wikibase:BestRank;
+                                                 ps:P39 wd:Q18810062. # position
+
+                            ?memberOfStatement pq:P580 ?reignstart;
+                                               pq:P582 ?reignend. 
+                            FILTER (?reignstart >= '1066-12-31T00:00:00Z'^^xsd:dateTime) . #start with William the Conquerer
+                            MINUS {?human wdt:P97 wd:Q719039.}
+
+                            SERVICE wikibase:label {
+                              bd:serviceParam wikibase:language 'en'.
+                              ?human  rdfs:label ?name.
+                            }
+                          } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW())))
+                          LIMIT 4}
+                                BIND (?name as ?answer).
+                                BIND ('the beginning of their reigning period' as ?question).
+                        } ORDER BY ?reignstart"
                 }
                 );
         }

@@ -52,10 +52,7 @@ namespace WikidataGame.Backend.Controllers
             var random = new Random();
             var randomService = minigameServices.ElementAt(random.Next(0, minigameServices.Count() - 1));
 
-
-            //TODO: Implement sorting and image minigames!
-            // TODO: remove hard-coded category id
-            var minigame = randomService.GenerateMiniGame(gameId, GetCurrentUser().Id, "cf3111af-8b18-4c6f-8ee6-115157d54b79", minigameParams.TileId);
+            var minigame = randomService.GenerateMiniGame(gameId, GetCurrentUser().Id, minigameParams.CategoryId, minigameParams.TileId);
 
             return Ok(minigame);
         }

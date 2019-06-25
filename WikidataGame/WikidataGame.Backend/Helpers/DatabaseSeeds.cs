@@ -624,6 +624,7 @@ namespace WikidataGame.Backend.Helpers
                           BIND (?element as ?answer).
                         } ORDER BY ASC(?number)"
                 },
+                // History
                 new Question
                 {
                     Id = "d9011896-04e5-4d32-8d3a-02a6d2b0bdb6",
@@ -652,6 +653,44 @@ namespace WikidataGame.Backend.Helpers
                                 BIND (?name as ?answer).
                                 BIND ('the beginning of their reigning period' as ?question).
                         } ORDER BY ?reignstart"
+                },
+                new Question
+                {
+                    Id = "d9011896-04e5-4d32-8d3a-02a6d2b0bdb6",
+                    CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5", // History
+                    MiniGameType = MiniGameType.Sort,
+                    TaskDescription = "Sort the countries by {0} (ascending).",
+                    SparqlQuery = @"# sort EU countries by the date they joined
+                        SELECT ?date (SAMPLE(?answer) AS ?answer) (SAMPLE(?question) AS ?question) 
+                        WITH {
+                          SELECT DISTINCT (?memberOfEuSince as ?date) ?answer WHERE {
+                            {SELECT ?item ?memberOfEuSince
+                                          WHERE 
+                                          {
+                                            ?item p:P463 [ps:P463 wd:Q458;
+                                                                  pq:P580 ?memberOfEuSince].
+                                          }
+                            }
+                            SERVICE wikibase:label {
+                              bd:serviceParam wikibase:language 'en'.
+                              ?item  rdfs:label ?answer.
+                            }
+                          }
+                        } AS %dates
+                        WITH {
+                          SELECT DISTINCT ?date WHERE {
+                            INCLUDE %dates.
+                          }
+                          ORDER BY MD5(CONCAT(STR(?continent), STR(NOW())))
+                          LIMIT 4
+                        } AS %fourDates
+                        WHERE {
+                          INCLUDE %fourDates.
+                          INCLUDE %dates.
+                          BIND('the date they joined the EU' as ?question).
+                        }
+                        GROUP BY ?date
+                        ORDER BY ?date"
                 }
                 );
         }

@@ -656,8 +656,8 @@ namespace WikidataGame.Backend.Helpers
                 },
                 new Question
                 {
-                    Id = "d9011896-04e5-4d32-8d3a-02a6d2b0bdb6",
-                    CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5", // History
+                    Id = "909182d1-4ae6-46ea-bd9b-8c4323ea53fa",
+                    CategoryId = "55a4622b-0fed-4284-af0b-3c7f4c3e88d0", // History
                     MiniGameType = MiniGameType.Sort,
                     TaskDescription = "Sort the countries by {0} (ascending).",
                     SparqlQuery = @"# sort EU countries by the date they joined

@@ -26,17 +26,18 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                     Title = "Geography"
-                }
-                , new Category
+                }, 
+                new Category
                 {
                     Id = "1b9185c0-c46b-4abf-bf82-e464f5116c7d",
                     Title = "Space"
                 },
-                //new Category
-                //{
-                //    Id = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
-                //    Title = "Chemistry"
-                //},
+                new Category
+                {
+                    Id = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
+                    Title = "Chemistry"
+                }
+                //,
                 //new Category
                 //{
                 //    Id = "f9c52d1a-9315-423d-a818-94c1769fffe5",
@@ -556,6 +557,72 @@ namespace WikidataGame.Backend.Helpers
                             ?moon rdfs:label ?question.
                           }
                         } ORDER BY DESC(?answer)"
+                },
+                // Chemistry
+                new Question
+                {
+                    Id = "5f7e813a-3cfa-4617-86d1-514b481b37a8",
+                    CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5", // Chemistry
+                    MiniGameType = MiniGameType.MultipleChoice,
+                    TaskDescription = "What's the chemical symbol for {0}?",
+                    SparqlQuery = @"SELECT ?question ?answer WHERE {
+                      ?element wdt:P31 wd:Q11344;
+                               wdt:P1086 ?number;
+                               wdt:P246 ?answer.
+                      FILTER(1 <= ?number &&
+                             ?number <= 118)
+                      SERVICE wikibase:label {
+                        bd:serviceParam wikibase:language 'en'.
+                        ?element  rdfs:label ?question.
+                      }
+                    }
+                    ORDER BY MD5(CONCAT(STR(?question), STR(NOW()))) # order by random
+                    LIMIT 4"
+                },
+                new Question
+                {
+                    Id = "40677b0f-9d5f-46d2-ab85-a6c40afb5f87",
+                    CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5", // Chemistry
+                    MiniGameType = MiniGameType.MultipleChoice,
+                    TaskDescription = "Which element has the chemical symbol {0}?",
+                    SparqlQuery = @"SELECT ?question ?answer WHERE {
+                      ?element wdt:P31 wd:Q11344;
+                               wdt:P1086 ?number;
+                               wdt:P246 ?question.
+                      FILTER(1 <= ?number &&
+                             ?number <= 118)
+                      SERVICE wikibase:label {
+                        bd:serviceParam wikibase:language 'en'.
+                        ?element  rdfs:label ?answer.
+                      }
+                    }
+                    ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) # order by random
+                    LIMIT 4"
+                },
+                new Question
+                {
+                    Id = "e8f99165-baa3-47b2-be35-c42ab2d5f0a0",
+                    CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5", // Chemistry
+                    MiniGameType = MiniGameType.Sort,
+                    TaskDescription = "Sort chemical elements by {0} (ascending).",
+                    SparqlQuery = @"#sort chemical elements by number in period system
+                        SELECT ?question ?answer WHERE {
+                          BIND ('number in period system' as ?question).
+                          {SELECT ?item ?element ?number ?symbol WHERE {
+                            ?item wdt:P31 wd:Q11344;
+                                  wdt:P1086 ?number;
+                                  wdt:P246 ?symbol.
+                            FILTER(1 <= ?number &&
+                                   ?number <= 118)
+                            SERVICE wikibase:label {
+                              bd:serviceParam wikibase:language 'en'.
+                              ?item  rdfs:label ?element.
+                            }
+                          }
+                          ORDER BY MD5(CONCAT(STR(?element), STR(NOW()))) # order by random
+                          LIMIT 4}
+                          BIND (?element as ?answer).
+                        } ORDER BY ASC(?number)"
                 }
                 );
         }

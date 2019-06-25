@@ -36,10 +36,6 @@ namespace WikidataGame.Backend.Services
         /// <returns>List of 4 Tuples(question part (placeholder),answer) -> the first tuple contains the correct answer! </returns>
         protected List<Tuple<string, string>> QueryWikidata(String sparql)
         {
-            // TODO: use something, that is more safe (e.g. an Object with member for correct answer and stuff) -> must work for all Minigame types
-
-            //question = "What is the capital of {0}?";
-            //sparql = "SELECT ?answer ?question WHERE { ?item wdt:P31 wd:Q5119. ?item wdt:P1376 ?land. ?land wdt:P31 wd:Q6256. OPTIONAL { ?item rdfs:label ?answer; filter(lang(?answer) = 'en') ?land rdfs:label ?question; filter(lang(?question) = 'en').} }  ORDER BY RAND() LIMIT 4";
             var results = new List<Tuple<string, string>>();
 
             // query results...
@@ -60,8 +56,7 @@ namespace WikidataGame.Backend.Services
             {
                 Debug.WriteLine(exception.ToString());
             }
-            return null;
-            
+            return null;   
         }
 
 

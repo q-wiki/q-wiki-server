@@ -34,5 +34,18 @@ namespace WikidataGame.Backend.Tests
                 Assert.False(string.IsNullOrWhiteSpace(option.Item2));
             }
         }
+
+        [Theory]
+        [ClassData(typeof(QueryTestData))]
+        public void QueryWikidata_WithAllQuestions_ReturnsDifferentQuestions(Question q)
+        {
+            _output.WriteLine($"Question Info: Id({q.Id}), Type({q.MiniGameType.ToString()}), Description({q.TaskDescription})");
+            TestMinigameService service = new TestMinigameService(Db.Instance.MinigameRepo, Db.Instance.QuestionRepo, Db.Instance.Context);
+            var result = service.QueryWikidata(q.SparqlQuery);
+
+            TestMinigameService service2 = new TestMinigameService(Db.Instance.MinigameRepo, Db.Instance.QuestionRepo, Db.Instance.Context);
+            var result2 = service2.QueryWikidata(q.SparqlQuery);
+            Assert.NotSame(result, result2);
+        }
     }
 }

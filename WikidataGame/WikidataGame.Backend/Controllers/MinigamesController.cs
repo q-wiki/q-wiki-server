@@ -25,7 +25,8 @@ namespace WikidataGame.Backend.Controllers
             IUserRepository userRepo,
             IGameRepository gameRepo,
             IMinigameRepository minigameRepo,
-            IRepository<Models.Category, string> categoryRepo) : base(dataContext, userRepo, gameRepo, categoryRepo)
+            IRepository<Models.Category, string> categoryRepo,
+            INotificationService notificationService) : base(dataContext, userRepo, gameRepo, categoryRepo, notificationService)
         {
             _minigameRepo = minigameRepo;
         }
@@ -86,7 +87,7 @@ namespace WikidataGame.Backend.Controllers
         /// <returns></returns>
         [HttpPost("{minigameId}")]
         [ProducesResponseType(typeof(MiniGameResult), StatusCodes.Status200OK)]
-        public IActionResult AnswerMinigame(string gameId, string minigameId, IEnumerable<string> answers)
+        public async Task<IActionResult> AnswerMinigame(string gameId, string minigameId, IEnumerable<string> answers)
         {
             if (!IsUserGameParticipant(gameId) || !IsUserMinigamePlayer(gameId, minigameId))
                 return Forbid();
@@ -123,18 +124,25 @@ namespace WikidataGame.Backend.Controllers
                 game.MoveCount++;
                 if (game.MoveCount / game.GameUsers.Count >= Models.Game.MaxRounds)
                 {
-                    foreach (var winnerId in WinningPlayerIds(gameId))
+                    var winningPlayerIds = WinningPlayerIds(gameId);
+                    foreach (var winnerId in winningPlayerIds)
                     {
-                        game.GameUsers.SingleOrDefault(gu => gu.UserId == winnerId).IsWinner = true;
+                        var user = game.GameUsers.SingleOrDefault(gu => gu.UserId == winnerId);
+                        user.IsWinner = true;
+                        await _notificationService.SendNotification(user.User, "Congrats", "You won this game on points!");
                     }
-                    //TODO: notify!
+                    foreach (var looser in game.GameUsers.Where(gu => !winningPlayerIds.Contains(gu.UserId)))
+                    {
+                        await _notificationService.SendNotification(looser.User, "Too bad.", "You lost the game!");
+                    }
                 }
                 else
                 {
                     //next players move
-                    game.NextMovePlayerId = game.GameUsers.SingleOrDefault(gu => gu.UserId != game.NextMovePlayerId).UserId;
+                    var nextPlayer = game.GameUsers.SingleOrDefault(gu => gu.UserId != game.NextMovePlayerId);
+                    game.NextMovePlayerId = nextPlayer.UserId;
                     game.StepsLeftWithinMove = Models.Game.StepsPerPlayer;
-                    //TODO: notify!
+                    await _notificationService.SendNotification(nextPlayer.User, "Your turn", "It's your turn!");
                 }
             }
             _dataContext.SaveChanges();

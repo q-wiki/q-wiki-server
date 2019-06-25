@@ -46,8 +46,8 @@ namespace WikidataGame
         /// <param name='xDeviceID'>
         /// device identifier
         /// </param>
-        /// <param name='xPushURL'>
-        /// push notification channel url
+        /// <param name='xPushToken'>
+        /// push token generated through firebase/apns
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -55,7 +55,7 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<AuthInfo>> AuthenticateWithHttpMessagesAsync(string xDeviceID = default(string), string xPushURL = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<AuthInfo>> AuthenticateWithHttpMessagesAsync(string xDeviceID = default(string), string xPushToken = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Creates a new game and matches the player with an opponent

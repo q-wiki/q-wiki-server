@@ -8,7 +8,7 @@ using WikidataGame.Backend.Helpers;
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20190618101232_InitialCreate")]
+    [Migration("20190620194920_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -103,14 +103,9 @@ namespace WikidataGame.Backend.Migrations
 
                     b.Property<int>("StepsLeftWithinMove");
 
-                    b.Property<string>("WinningPlayerId")
-                        .HasMaxLength(36);
-
                     b.HasKey("Id");
 
                     b.HasIndex("NextMovePlayerId");
-
-                    b.HasIndex("WinningPlayerId");
 
                     b.ToTable("Games");
                 });
@@ -122,6 +117,8 @@ namespace WikidataGame.Backend.Migrations
 
                     b.Property<string>("UserId")
                         .HasMaxLength(36);
+
+                    b.Property<bool>("IsWinner");
 
                     b.HasKey("GameId", "UserId");
 
@@ -554,7 +551,9 @@ namespace WikidataGame.Backend.Migrations
 
                     b.Property<int>("Platform");
 
-                    b.Property<string>("PushChannelUrl");
+                    b.Property<string>("PushRegistrationId");
+
+                    b.Property<string>("PushToken");
 
                     b.HasKey("Id");
 
@@ -565,11 +564,8 @@ namespace WikidataGame.Backend.Migrations
                 {
                     b.HasOne("WikidataGame.Backend.Models.User", "NextMovePlayer")
                         .WithMany()
-                        .HasForeignKey("NextMovePlayerId");
-
-                    b.HasOne("WikidataGame.Backend.Models.User", "WinningPlayer")
-                        .WithMany()
-                        .HasForeignKey("WinningPlayerId");
+                        .HasForeignKey("NextMovePlayerId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("WikidataGame.Backend.Models.GameUser", b =>
@@ -620,15 +616,18 @@ namespace WikidataGame.Backend.Migrations
                 {
                     b.HasOne("WikidataGame.Backend.Models.Category", "ChosenCategory")
                         .WithMany()
-                        .HasForeignKey("ChosenCategoryId");
+                        .HasForeignKey("ChosenCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("WikidataGame.Backend.Models.Game")
                         .WithMany("Tiles")
-                        .HasForeignKey("GameId");
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("WikidataGame.Backend.Models.User", "Owner")
                         .WithMany()
-                        .HasForeignKey("OwnerId");
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

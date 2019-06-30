@@ -50,7 +50,7 @@ namespace WikidataGame.Backend.Controllers
 
             var minigameServices = ControllerContext.HttpContext.RequestServices.GetServices<IMinigameService>();
             var random = new Random();
-            var randomService = minigameServices.ElementAt(random.Next(0, minigameServices.Count() - 1));
+            var randomService = minigameServices.ElementAt(random.Next(0, minigameServices.Count()));
 
             var minigame = randomService.GenerateMiniGame(gameId, GetCurrentUser().Id, minigameParams.CategoryId, minigameParams.TileId);
 

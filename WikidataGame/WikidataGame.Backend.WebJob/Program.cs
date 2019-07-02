@@ -22,42 +22,40 @@ namespace WikidataGame.Backend.WebJob
         private static async Task Main()
         {
             var builder = new HostBuilder()
-              .ConfigureWebJobs(b =>
-              {
-                  b.AddAzureStorageCoreServices().AddAzureStorage().AddTimers();
-              })
-              .ConfigureAppConfiguration(b =>
-              {
-              })
-              .ConfigureLogging((context, b) =>
-              {
-                  b.AddConsole();
-              });
-
-            builder.ConfigureServices((services) => {
-                Configuration = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
+                .ConfigureWebJobs(b =>
+                {
+                    b.AddAzureStorageCoreServices().AddAzureStorage().AddTimers();
+                })
+                .ConfigureAppConfiguration(b =>
+                {
+                    Configuration = b.SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                     .AddEnvironmentVariables()
                     .Build();
-
-                if (!string.IsNullOrWhiteSpace(Configuration.GetConnectionString("SQL")))
+                })
+                .ConfigureLogging((context, b) =>
                 {
-                    services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("SQL"))
-                        .UseLazyLoadingProxies());
-                }
-                else
+                    b.AddConsole();
+                })
+                .ConfigureServices((services) =>
                 {
+                    if (!string.IsNullOrWhiteSpace(Configuration.GetConnectionString("SQL")))
+                    {
+                        services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("SQL"))
+                            .UseLazyLoadingProxies());
+                    }
+                    else
+                    {
 #if DEBUG
-                    var filename = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\WikidataGame.Backend", "qwiki.db");
+                        var filename = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\WikidataGame.Backend", "qwiki.db");
 #else
-                    var filename = Path.Combine("d:\\home\\site\\wwwroot", "qwiki.db");
+                        var filename = Path.Combine("d:\\home\\site\\wwwroot", "qwiki.db");
 #endif
-                    services.AddDbContext<DataContext>(x => x.UseSqlite($"Filename={filename}").UseLazyLoadingProxies());
-                }
-                services.AddSingleton<INotificationService>(new NotificationService(Configuration.GetConnectionString("NotificationHub")));
-                services.AddScoped<IGameRepository, GameRepository>();
-            });
+                        services.AddDbContext<DataContext>(x => x.UseSqlite($"Filename={filename}").UseLazyLoadingProxies());
+                    }
+                    services.AddSingleton<INotificationService>(new NotificationService(Configuration.GetConnectionString("NotificationHub")));
+                    services.AddScoped<IGameRepository, GameRepository>();
+                });
 
             var host = builder.Build();
             using (host)

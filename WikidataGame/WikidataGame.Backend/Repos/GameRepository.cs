@@ -49,7 +49,8 @@ namespace WikidataGame.Backend.Repos
                 GameId = game.Id,
                 UserId = player.Id
             });
-            game.NextMovePlayer = player;
+            game.NextMovePlayerId = player.Id;
+            game.MoveStartedAt = DateTime.UtcNow;
             game.Tiles = MapGeneratorService.SetStartPositions(game.Tiles, game.GameUsers.Select(gu => gu.UserId)).ToList();
             return game;
         }

@@ -16,6 +16,9 @@ namespace WikidataGame.Backend.Models
         [NotMapped]
         public const int MaxRounds = 6;
 
+        [NotMapped]
+        public static readonly TimeSpan MaxMoveDuration = TimeSpan.FromHours(12);
+
         [Key]
         [StringLength(36)]
         public string Id { get; set; }
@@ -37,5 +40,6 @@ namespace WikidataGame.Backend.Models
 
         public int MoveCount { get; set; }
 
+        public DateTime? MoveStartedAt { get; set; }
     }
 }

@@ -138,6 +138,7 @@ namespace WikidataGame.Backend.Controllers
                     //next players move
                     var nextPlayer = game.GameUsers.SingleOrDefault(gu => gu.UserId != game.NextMovePlayerId);
                     game.NextMovePlayerId = nextPlayer.UserId;
+                    game.MoveStartedAt = DateTime.UtcNow;
                     game.StepsLeftWithinMove = Models.Game.StepsPerPlayer;
                     await _notificationService.SendNotification(nextPlayer.User, "Your turn", "It's your turn!");
                 }

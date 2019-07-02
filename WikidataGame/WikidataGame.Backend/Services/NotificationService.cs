@@ -18,13 +18,12 @@ namespace WikidataGame.Backend.Services
 
         private readonly NotificationHubClient _hub;
 
-        public NotificationService(IConfiguration configuration)
+        public NotificationService(string connectionString)
         {
-            var pushConnStr = configuration.GetConnectionString("NotificationHub");
-            if (!string.IsNullOrWhiteSpace(pushConnStr))
+            if (!string.IsNullOrWhiteSpace(connectionString))
             {
                 _hub = NotificationHubClient.CreateClientFromConnectionString(
-                    pushConnStr, "WikidataGameNotifications");
+                    connectionString, "WikidataGameNotifications");
             }
         }
 

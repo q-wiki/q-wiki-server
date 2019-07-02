@@ -21,6 +21,8 @@ namespace WikidataGame.Backend.Dto
 
         public string NextMovePlayerId { get; set; }
 
+        public DateTime? MoveExpiry { get; set; }
+
         public bool AwaitingOpponentToJoin { get; set; }
 
         public static Game FromModel(Models.Game game, string currentUserId, Repos.IRepository<Models.Category, string> categoryRepo)
@@ -34,6 +36,7 @@ namespace WikidataGame.Backend.Dto
                 AwaitingOpponentToJoin = game.GameUsers.Count() < 2,
                 WinningPlayerIds = game.GameUsers.Where(gu => gu.IsWinner).Select(gu => gu.UserId).ToList(),
                 NextMovePlayerId = game.NextMovePlayerId,
+                MoveExpiry = game.MoveStartedAt.HasValue ? game.MoveStartedAt.Value.Add(Models.Game.MaxMoveDuration) : (DateTime?)null,
                 Me = Player.FromModel(game.GameUsers.SingleOrDefault(gu => gu.UserId == currentUserId)?.User),
                 Opponent = Player.FromModel(game.GameUsers.SingleOrDefault(gu => gu.UserId != currentUserId)?.User)
             };

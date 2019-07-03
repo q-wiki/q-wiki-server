@@ -9,8 +9,8 @@ namespace WikidataGame.Backend.Helpers
 {
     public class WikidataSparqlEndpoint : SparqlRemoteEndpoint
     {
-        public static string WikidataSparqlEndpointUrl = $"https://query.wikidata.org/bigdata/namespace/wdq/sparql?foo={DateTime.UtcNow.ToString()}";
-        public WikidataSparqlEndpoint() : base(new Uri(WikidataSparqlEndpointUrl))
+        public static string WikidataSparqlEndpointUrl = "https://query.wikidata.org/bigdata/namespace/wdq/sparql";
+        public WikidataSparqlEndpoint() : base(new Uri($"{WikidataSparqlEndpointUrl}?foo={Guid.NewGuid().ToString()}"))
         {
         }
 

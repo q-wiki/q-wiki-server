@@ -16,7 +16,7 @@ namespace WikidataGame.Backend.Services
         protected readonly IMinigameRepository _minigameRepo;
         protected readonly IQuestionRepository _questionRepo;
         protected readonly DataContext _dataContext;
-        protected static SparqlRemoteEndpoint endpoint = new WikidataSparqlEndpoint();
+        protected SparqlRemoteEndpoint endpoint = new WikidataSparqlEndpoint();
 
 
         public MinigameServiceBase(

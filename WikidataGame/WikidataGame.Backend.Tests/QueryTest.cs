@@ -45,7 +45,7 @@ namespace WikidataGame.Backend.Tests
 
             TestMinigameService service2 = new TestMinigameService(Db.Instance.MinigameRepo, Db.Instance.QuestionRepo, Db.Instance.Context);
             var result2 = service2.QueryWikidata(q.SparqlQuery);
-            Assert.NotSame(result, result2);
+            Assert.NotEqual(result, result2);
         }
     }
 }

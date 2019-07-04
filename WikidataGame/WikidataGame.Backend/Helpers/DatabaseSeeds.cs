@@ -496,7 +496,7 @@ namespace WikidataGame.Backend.Helpers
                             }
                           }
                           FILTER(!CONTAINS(?moonLabel, '/'))
-                        } ORDER BY MD5(CONCAT(STR(?moon), STR(NOW()))) # order by random
+                        } ORDER BY MD5(CONCAT(STR(?moonLabel), STR(NOW()))) # order by random
                         } as %moons
 
                         WITH {
@@ -518,10 +518,9 @@ namespace WikidataGame.Backend.Helpers
                                 FILTER(!CONTAINS(?moonLabel, '/'))
                               } 
                               GROUP BY ?parent
-                                       ORDER BY MD5(CONCAT(STR(?parentLabel), STR(NOW()))) # order by random
-                                       LIMIT 1
                             }
-                          }
+                          } ORDER BY MD5(CONCAT(STR(?moon), STR(NOW()))) # order by random
+                            LIMIT 1
                         } AS %selectedPlanet
 
                         WITH {
@@ -538,7 +537,7 @@ namespace WikidataGame.Backend.Helpers
                           SELECT DISTINCT ?moon ?empty WHERE {
                             INCLUDE %moons.
                             FILTER NOT EXISTS { INCLUDE %selectedPlanet. }
-                          }
+                          } ORDER BY MD5(CONCAT(STR(?moon), STR(NOW()))) 
                           LIMIT 3
                         } AS %threeMoons
 
@@ -553,8 +552,8 @@ namespace WikidataGame.Backend.Helpers
   
                           SERVICE wikibase:label {
                             bd:serviceParam wikibase:language 'en'.
-                            ?parent  rdfs:label ?question.
-                            ?moon rdfs:label ?answer.
+                            ?parent  rdfs:label ?answer.
+                            ?moon rdfs:label ?question.
                           }
                         } ORDER BY DESC(?answer)"
                 },

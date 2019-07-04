@@ -552,10 +552,10 @@ namespace WikidataGame.Backend.Helpers
   
                           SERVICE wikibase:label {
                             bd:serviceParam wikibase:language 'en'.
-                            ?parent  rdfs:label ?answer.
-                            ?moon rdfs:label ?question.
+                            ?parent  rdfs:label ?question.
+                            ?moon rdfs:label ?answer.
                           }
-                        } ORDER BY DESC(?answer)"
+                        } ORDER BY DESC(?question)"
                 },
                 // Chemistry
                 new Question

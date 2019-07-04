@@ -94,17 +94,17 @@ namespace WikidataGame.Backend.Helpers
                     CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "Which continent has {0} countries?",
-                    SparqlQuery = @"SELECT ?answer (COUNT(?item) AS ?question)
-                        WHERE 
-                        {
-                          ?item wdt:P31 wd:Q6256.
-                          ?item wdt:P30 ?continent.
-                          ?continent wdt:P31 wd:Q5107.
-                          OPTIONAL {?continent rdfs:label ?answer ;
-                                    filter(lang(?answer) = 'en')
-                                          }
+                    SparqlQuery = @"SELECT ?continent ?answer ?question WHERE {
+                        { SELECT ?continent ?answer (COUNT(?item) AS ?question) WHERE {
+                            ?item wdt:P31 wd:Q6256.
+                            ?item wdt:P30 ?continent.
+                            ?continent wdt:P31 wd:Q5107.
+                            MINUS {VALUES ?continent {wd:Q51}}. # w/o Antarctica
+                            OPTIONAL {?continent rdfs:label ?answer ;
+                                                filter(lang(?answer) = 'en')
+                                    }
+                            } GROUP BY ?continent ?answer}
                         }
-                        GROUP BY ?continent ?answer
                         ORDER BY MD5(CONCAT(STR(?answer), STR(NOW())))
                         LIMIT 4"
                 },

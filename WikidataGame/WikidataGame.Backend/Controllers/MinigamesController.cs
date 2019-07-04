@@ -19,6 +19,7 @@ namespace WikidataGame.Backend.Controllers
     public class MinigamesController : CustomControllerBase
     {
         private readonly IMinigameRepository _minigameRepo;
+        private readonly CategoryCacheService _categoryCacheService;
 
         public MinigamesController(
             DataContext dataContext,
@@ -26,9 +27,11 @@ namespace WikidataGame.Backend.Controllers
             IGameRepository gameRepo,
             IMinigameRepository minigameRepo,
             IRepository<Models.Category, string> categoryRepo,
-            INotificationService notificationService) : base(dataContext, userRepo, gameRepo, categoryRepo, notificationService)
+            INotificationService notificationService,
+            CategoryCacheService categoryCacheService) : base(dataContext, userRepo, gameRepo, categoryRepo, notificationService)
         {
             _minigameRepo = minigameRepo;
+            _categoryCacheService = categoryCacheService;
         }
 
         /// <summary>
@@ -146,7 +149,7 @@ namespace WikidataGame.Backend.Controllers
             _dataContext.SaveChanges();
 
 
-            return Ok(MiniGameResult.FromModel(minigame, game, _categoryRepo));
+            return Ok(MiniGameResult.FromModel(minigame, game, _categoryCacheService));
         }
 
         private bool IsItPlayersTurn(string gameId)
@@ -179,7 +182,7 @@ namespace WikidataGame.Backend.Controllers
             var game = _gameRepo.Get(gameId);
             var tile = game.Tiles.SingleOrDefault(t => t.Id == tileId);
             return (string.IsNullOrWhiteSpace(tile.ChosenCategoryId) || tile.ChosenCategoryId == categoryId) && 
-                TileHelper.GetCategoriesForTile(_categoryRepo, tileId).SingleOrDefault(c => c.Id == categoryId) != null;
+                TileHelper.GetCategoriesForTile(_categoryCacheService, tileId).SingleOrDefault(c => c.Id == categoryId) != null;
         }
 
         private IEnumerable<string> WinningPlayerIds(string gameId)

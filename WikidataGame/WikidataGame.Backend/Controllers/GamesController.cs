@@ -22,13 +22,17 @@ namespace WikidataGame.Backend.Controllers
     [Authorize]
     public class GamesController : CustomControllerBase
     {
-
+        private readonly CategoryCacheService _categoryCacheService;
         public GamesController(
             DataContext dataContext,
             IUserRepository userRepo,
             IGameRepository gameRepo,
             IRepository<Models.Category, string> categoryRepo,
-            INotificationService notificationService) : base(dataContext, userRepo, gameRepo, categoryRepo, notificationService) {}
+            CategoryCacheService categoryCacheService,
+            INotificationService notificationService) : base(dataContext, userRepo, gameRepo, categoryRepo, notificationService)
+        {
+            _categoryCacheService = categoryCacheService;
+        }
 
         /// <summary>
         /// Creates a new game and matches the player with an opponent
@@ -77,7 +81,7 @@ namespace WikidataGame.Backend.Controllers
                 return Forbid();
             var game = _gameRepo.Get(gameId);
 
-            return Ok(Game.FromModel(game, GetCurrentUser().Id, _categoryRepo));
+            return Ok(Game.FromModel(game, GetCurrentUser().Id, _categoryCacheService));
         }
 
         /// <summary>

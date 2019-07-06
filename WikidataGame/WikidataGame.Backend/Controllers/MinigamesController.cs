@@ -189,9 +189,13 @@ namespace WikidataGame.Backend.Controllers
         {
             var game = _gameRepo.Get(gameId);
             var result = game.GameUsers.ToDictionary(gu => gu.UserId, gu => 0);
-            foreach(var user in result)
+            var tiles = game.Tiles.ToList();
+            foreach (var tile in tiles)
             {
-                result[user.Key] = game.Tiles.Count(t => t.OwnerId == user.Key);
+                if (!string.IsNullOrEmpty(tile.OwnerId))
+                {
+                    result[tile.OwnerId] = ++result[tile.OwnerId];
+                }
             }
             var rankedPlayers = result.OrderByDescending(r => r.Value);
             return rankedPlayers.Where(p => p.Value >= rankedPlayers.First().Value).Select(p => p.Key).ToList();

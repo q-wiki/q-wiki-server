@@ -119,22 +119,17 @@ namespace WikidataGame.Backend.Controllers
 
             var game = _gameRepo.Get(gameId);
             game.StepsLeftWithinMove--;
+            if(AllTilesConquered(gameId))
+            {
+                await SetGameWonAsync(game);
+            }
+
             if(game.StepsLeftWithinMove < 1)
             {
                 game.MoveCount++;
                 if (game.MoveCount / game.GameUsers.Count >= Models.Game.MaxRounds)
                 {
-                    var winningPlayerIds = WinningPlayerIds(gameId);
-                    foreach (var winnerId in winningPlayerIds)
-                    {
-                        var user = game.GameUsers.SingleOrDefault(gu => gu.UserId == winnerId);
-                        user.IsWinner = true;
-                        await _notificationService.SendNotification(user.User, "Congrats", "You won this game on points!");
-                    }
-                    foreach (var looser in game.GameUsers.Where(gu => !winningPlayerIds.Contains(gu.UserId)))
-                    {
-                        await _notificationService.SendNotification(looser.User, "Too bad.", "You lost the game!");
-                    }
+                    await SetGameWonAsync(game);
                 }
                 else
                 {
@@ -199,6 +194,28 @@ namespace WikidataGame.Backend.Controllers
             }
             var rankedPlayers = result.OrderByDescending(r => r.Value);
             return rankedPlayers.Where(p => p.Value >= rankedPlayers.First().Value).Select(p => p.Key).ToList();
+        }
+
+        private bool AllTilesConquered(string gameId)
+        {
+            var game = _gameRepo.Get(gameId);
+            var opponentId = game.GameUsers.SingleOrDefault(gu => gu.UserId != GetCurrentUser().Id).UserId;
+            return game.Tiles.Count(t => t.OwnerId == opponentId) < 1;
+        }
+
+        private async Task SetGameWonAsync(Models.Game game)
+        {
+            var winningPlayerIds = WinningPlayerIds(game.Id);
+            foreach (var winnerId in winningPlayerIds)
+            {
+                var user = game.GameUsers.SingleOrDefault(gu => gu.UserId == winnerId);
+                user.IsWinner = true;
+                await _notificationService.SendNotification(user.User, "Congrats", "You won this game on points!");
+            }
+            foreach (var looser in game.GameUsers.Where(gu => !winningPlayerIds.Contains(gu.UserId)))
+            {
+                await _notificationService.SendNotification(looser.User, "Too bad.", "You lost the game!");
+            }
         }
     }
 }

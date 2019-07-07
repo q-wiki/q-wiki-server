@@ -609,19 +609,21 @@ namespace WikidataGame.Backend.Helpers
                     SparqlQuery = @"#sort chemical elements by number in period system
                         SELECT ?question ?answer WHERE {
                           BIND ('number in period system' as ?question).
-                          {SELECT ?item ?element ?number ?symbol WHERE {
-                            ?item wdt:P31 wd:Q11344;
-                                  wdt:P1086 ?number;
-                                  wdt:P246 ?symbol.
-                            FILTER(1 <= ?number &&
-                                   ?number <= 118)
-                            SERVICE wikibase:label {
-                              bd:serviceParam wikibase:language 'en'.
-                              ?item  rdfs:label ?element.
+                          {
+                            SELECT ?item ?element ?number ?symbol WHERE {
+                              ?item wdt:P31 wd:Q11344;
+                                    wdt:P1086 ?number;
+                                    wdt:P246 ?symbol.
+                              FILTER(1 <= ?number &&
+                                     ?number <= 118)
+                              SERVICE wikibase:label {
+                                bd:serviceParam wikibase:language 'en'.
+                                ?item  rdfs:label ?element.
+                              }
                             }
+                            ORDER BY MD5(CONCAT(STR(?element), STR(NOW()))) # order by random
+                            LIMIT 4
                           }
-                          ORDER BY MD5(CONCAT(STR(?element), STR(NOW()))) # order by random
-                          LIMIT 4}
                           BIND (?element as ?answer).
                         } ORDER BY ASC(?number)"
                 }//,

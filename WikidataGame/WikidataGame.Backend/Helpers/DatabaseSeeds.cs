@@ -396,10 +396,9 @@ namespace WikidataGame.Backend.Helpers
                         WITH {
                           # subquery: get 4 random countries with their average number of inhabitants
                           SELECT DISTINCT ?state ?stateLabel (ROUND(AVG(?population) / 1000) * 1000 AS ?population) {
- 
+
                             {
                               # subquery: list of all countries in the world
-                                                       }
                               SELECT DISTINCT ?state ?stateLabel ?population ?dateOfCensus WHERE {
                                 ?state wdt:P31/wdt:P279* wd:Q3624078;
                                        p:P463 ?memberOfStatement;

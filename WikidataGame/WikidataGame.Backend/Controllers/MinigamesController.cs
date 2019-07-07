@@ -105,6 +105,7 @@ namespace WikidataGame.Backend.Controllers
                 {
                     //level up
                     minigame.Tile.Difficulty = Math.Min(minigame.Tile.Difficulty + 1, 2);
+                    minigame.Tile.ChosenCategoryId = minigame.CategoryId;
                 }
                 else
                 {

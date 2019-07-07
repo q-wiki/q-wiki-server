@@ -221,7 +221,8 @@ namespace WikidataGame.Backend.Helpers
                     CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "Which country is no basin country of the {0}?",
-                    SparqlQuery = @"SELECT DISTINCT ?question ?answer
+                    SparqlQuery = @"# Which country is no basin country of the Caribbean Sea?
+                        SELECT DISTINCT ?question ?answer
                         WITH {
                           SELECT DISTINCT (?state as ?country) WHERE {
                             ?state wdt:P31/wdt:P279* wd:Q3624078;

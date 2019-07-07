@@ -352,7 +352,7 @@ namespace WikidataGame.Backend.Helpers
                     order by desc(?length)
                     limit 4"
                 },
-                new Question
+                /*new Question
                 {
                     Id = "f88a4dc0-8187-43c4-8775-593822bf4af1",
                     CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
@@ -377,7 +377,7 @@ namespace WikidataGame.Backend.Helpers
                         LIMIT 4 
                       }
                     }"
-                },
+                },*/
                 new Question
                 {
                     Id = "bc7a22ee-4985-44c3-9388-5c7dd6b8762e",

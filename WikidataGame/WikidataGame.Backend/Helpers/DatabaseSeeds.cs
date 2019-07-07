@@ -566,19 +566,20 @@ namespace WikidataGame.Backend.Helpers
                     CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5", // Chemistry
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "What's the chemical symbol for {0}?",
-                    SparqlQuery = @"SELECT ?question ?answer WHERE {
-                      ?element wdt:P31 wd:Q11344;
-                               wdt:P1086 ?number;
-                               wdt:P246 ?answer.
-                      FILTER(1 <= ?number &&
-                             ?number <= 118)
-                      SERVICE wikibase:label {
-                        bd:serviceParam wikibase:language 'en'.
-                        ?element  rdfs:label ?question.
-                      }
-                    }
-                    ORDER BY MD5(CONCAT(STR(?question), STR(NOW()))) # order by random
-                    LIMIT 4"
+                    SparqlQuery = @"# What's the chemical symbol for {element}?
+                        SELECT ?question ?answer WHERE {
+                          ?element wdt:P31 wd:Q11344;
+                                   wdt:P1086 ?number;
+                                   wdt:P246 ?answer.
+                          FILTER(1 <= ?number &&
+                                 ?number <= 118)
+                          SERVICE wikibase:label {
+                            bd:serviceParam wikibase:language 'en'.
+                            ?element  rdfs:label ?question.
+                          }
+                        }
+                        ORDER BY MD5(CONCAT(STR(?question), STR(NOW()))) # order by random
+                        LIMIT 4"
                 },
                 new Question
                 {

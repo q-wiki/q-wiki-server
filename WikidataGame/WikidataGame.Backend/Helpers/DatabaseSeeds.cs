@@ -331,29 +331,33 @@ namespace WikidataGame.Backend.Helpers
                     CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "What is the longest river in {0}?",
-                    SparqlQuery = @"SELECT DISTINCT ?answer ?question WHERE {
-                        { SELECT DISTINCT ?river ?continent (avg(?length2) as ?length)
-                            WHERE
-                            {
+                    SparqlQuery = @"# What is the longest river in {continent}?
+                        SELECT DISTINCT ?answer ?question 
+                        WITH {
+                          SELECT DISTINCT ?continent WHERE {
+                            VALUES ?continent { wd:Q49 wd:Q48 wd:Q46 wd:Q18 wd:Q15  } # ohne Ozeanien
+                          } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW()))) LIMIT 1
+                        } as %continent
+
+                        WHERE {
+                          { 
+                            SELECT DISTINCT ?river ?continent (avg(?length2) as ?length) WHERE {
+                              INCLUDE %continent.
                               ?river wdt:P31/wdt:P279* wd:Q355304;
-                                 wdt:P2043 ?length2;
-                                 wdt:P30 ?continent.
-                              {
-                                SELECT DISTINCT ?continent WHERE {
-                                  VALUES ?continent { wd:Q49 wd:Q48 wd:Q46 wd:Q18 wd:Q15  } # ohne Ozeanien
-                                } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW()))) LIMIT 1
-                               } 
+                                     wdt:P2043 ?length2;
+                                     wdt:P30 ?continent.
                             }
                             group by ?river ?continent
+                          }
+                          OPTIONAL {
+                            ?continent rdfs:label ?question;
+                                       filter(lang(?question) = 'en')
+                                       ?river rdfs:label ?answer ;
+                                       filter(lang(?answer) = 'en')
+                          }
                         }
-                        OPTIONAL {?continent rdfs:label ?question;
-                            filter(lang(?question) = 'en')
-                            ?river rdfs:label ?answer ;
-                            filter(lang(?answer) = 'en')
-                        }
-                    }
-                    order by desc(?length)
-                    limit 4"
+                        order by desc(?length)
+                        limit 4"
                 },
                 /*new Question
                 {

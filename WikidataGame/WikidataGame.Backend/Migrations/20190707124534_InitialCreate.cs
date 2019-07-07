@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WikidataGame.Backend.Migrations
 {
@@ -64,7 +65,8 @@ namespace WikidataGame.Backend.Migrations
                     AccessibleTilesCount = table.Column<int>(nullable: false),
                     NextMovePlayerId = table.Column<string>(maxLength: 36, nullable: true),
                     StepsLeftWithinMove = table.Column<int>(nullable: false),
-                    MoveCount = table.Column<int>(nullable: false)
+                    MoveCount = table.Column<int>(nullable: false),
+                    MoveStartedAt = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -214,17 +216,17 @@ namespace WikidataGame.Backend.Migrations
             migrationBuilder.InsertData(
                 table: "Questions",
                 columns: new[] { "Id", "CategoryId", "MiniGameType", "SparqlQuery", "TaskDescription" },
-                values: new object[] { "aca0f5f7-b000-42fb-b713-f5fe43748761", "cf3111af-8b18-4c6f-8ee6-115157d54b79", 2, @"SELECT ?answer (COUNT(?item) AS ?question)
-                        WHERE 
-                        {
-                          ?item wdt:P31 wd:Q6256.
-                          ?item wdt:P30 ?continent.
-                          ?continent wdt:P31 wd:Q5107.
-                          OPTIONAL {?continent rdfs:label ?answer ;
-                                    filter(lang(?answer) = 'en')
-                                          }
+                values: new object[] { "aca0f5f7-b000-42fb-b713-f5fe43748761", "cf3111af-8b18-4c6f-8ee6-115157d54b79", 2, @"SELECT ?continent ?answer ?question WHERE {
+                        { SELECT ?continent ?answer (COUNT(?item) AS ?question) WHERE {
+                            ?item wdt:P31 wd:Q6256.
+                            ?item wdt:P30 ?continent.
+                            ?continent wdt:P31 wd:Q5107.
+                            MINUS {VALUES ?continent {wd:Q51}}. # w/o Antarctica
+                            OPTIONAL {?continent rdfs:label ?answer ;
+                                                filter(lang(?answer) = 'en')
+                                    }
+                            } GROUP BY ?continent ?answer}
                         }
-                        GROUP BY ?continent ?answer
                         ORDER BY MD5(CONCAT(STR(?answer), STR(NOW())))
                         LIMIT 4", "Which continent has {0} countries?" });
 
@@ -460,29 +462,6 @@ namespace WikidataGame.Backend.Migrations
             migrationBuilder.InsertData(
                 table: "Questions",
                 columns: new[] { "Id", "CategoryId", "MiniGameType", "SparqlQuery", "TaskDescription" },
-                values: new object[] { "f88a4dc0-8187-43c4-8775-593822bf4af1", "cf3111af-8b18-4c6f-8ee6-115157d54b79", 1, @"SELECT ?question (CONCAT( ?ans, ' (', ?country, ')' ) as ?answer) WHERE {
-                      { SELECT DISTINCT (?answer as ?ans) (MAX(?image) as ?question) ?country WHERE { 
-                        ?landmark wdt:P31/wdt:P279* wd:Q2319498;
-                                 wikibase:sitelinks ?sitelinks;
-                                 wdt:P18 ?image;
-                                 wdt:P17 ?cntr.
-                        ?landmark wdt:P1435 ?type.
-                        FILTER(?sitelinks >= 10)
-
-                        SERVICE wikibase:label { 
-                            bd:serviceParam wikibase:language 'en'.
-                            ?cntr rdfs:label ?country.
-                            ?landmark rdfs:label ?answer.}
-                        }
-                        GROUP BY ?answer ?country
-                        ORDER BY MD5(CONCAT(STR(?question), STR(NOW())))
-                        LIMIT 4 
-                      }
-                    }", "Which famous monument is this: {0}?" });
-
-            migrationBuilder.InsertData(
-                table: "Questions",
-                columns: new[] { "Id", "CategoryId", "MiniGameType", "SparqlQuery", "TaskDescription" },
                 values: new object[] { "bc7a22ee-4985-44c3-9388-5c7dd6b8762e", "cf3111af-8b18-4c6f-8ee6-115157d54b79", 0, @"#sort countries by number of inhabitants (ascending)
                                     SELECT (?stateLabel as ?answer) ?question 
                                     WITH {
@@ -529,22 +508,24 @@ namespace WikidataGame.Backend.Migrations
                 table: "Questions",
                 columns: new[] { "Id", "CategoryId", "MiniGameType", "SparqlQuery", "TaskDescription" },
                 values: new object[] { "a4a7289a-3053-4ad7-9c60-c75a18305243", "1b9185c0-c46b-4abf-bf82-e464f5116c7d", 0, @"# sort planets by average distance to sun
-                        SELECT ?answer ?question WHERE {
-                          {SELECT DISTINCT ?answer ?avgDistanceToSun
-                                                   WHERE 
-                                                   {
-                                                     # fetch planets in our solar system
-                                                     ?planet wdt:P31/wdt:P279+ wd:Q17362350.
-                                                     ?planet p:P2243/psv:P2243 [wikibase:quantityAmount ?apoapsis; wikibase:quantityUnit ?apoapsisUnit].
-                                                     ?planet p:P2244/psv:P2244 [wikibase:quantityAmount ?periapsis; wikibase:quantityUnit ?periapsisUnit].
-                                                     # NOTE: there are only three planets with apoapsis and periapsis in AU; 4 planets in total
-                                                     # FILTER (?apoapsisUnit = wd:Q1811 && ?periapsisUnit = wd:Q1811)
-                                                     BIND ((?apoapsis + ?periapsis) / 2 as ?avgDistanceToSun)
-                                                     FILTER (?apoapsisUnit = wd:Q828224 && ?periapsisUnit = wd:Q828224)
-                                                     SERVICE wikibase:label { 
-                                                       bd:serviceParam wikibase:language 'en'.
-                                                       ?planet  rdfs:label ?answer.} 
-                                                   } ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) LIMIT 4}
+                        # NOTE: there are only three planets with apoapsis and periapsis in AU; 4 planets in total
+                        SELECT ?answer ?question WHERE 
+                        {
+                          { SELECT DISTINCT ?answer ?avgDistanceToSun WHERE 
+                            {
+                                # fetch planets in our solar system
+                                ?planet wdt:P31/wdt:P279+ wd:Q17362350.
+                                ?planet p:P2243/psv:P2243 [wikibase:quantityAmount ?apoapsis; wikibase:quantityUnit ?apoapsisUnit].
+                                ?planet p:P2244/psv:P2244 [wikibase:quantityAmount ?periapsis; wikibase:quantityUnit ?periapsisUnit].
+
+                                # FILTER (?apoapsisUnit = wd:Q1811 && ?periapsisUnit = wd:Q1811)
+                                BIND ((?apoapsis + ?periapsis) / 2 as ?avgDistanceToSun)
+                                FILTER (?apoapsisUnit = wd:Q828224 && ?periapsisUnit = wd:Q828224)
+                                SERVICE wikibase:label { 
+                                bd:serviceParam wikibase:language 'en'.
+                                ?planet  rdfs:label ?answer.} 
+                            } ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) LIMIT 4
+                          }
                           BIND('average distance to sun' as ?question)
                         } ORDER BY ?avgDistanceToSun", "Sort planets by {0} (ascending)" });
 
@@ -585,7 +566,7 @@ namespace WikidataGame.Backend.Migrations
                             }
                           }
                           FILTER(!CONTAINS(?moonLabel, '/'))
-                        } ORDER BY MD5(CONCAT(STR(?moon), STR(NOW()))) # order by random
+                        } ORDER BY MD5(CONCAT(STR(?moonLabel), STR(NOW()))) # order by random
                         } as %moons
 
                         WITH {
@@ -607,10 +588,9 @@ namespace WikidataGame.Backend.Migrations
                                 FILTER(!CONTAINS(?moonLabel, '/'))
                               } 
                               GROUP BY ?parent
-                                       ORDER BY MD5(CONCAT(STR(?parentLabel), STR(NOW()))) # order by random
-                                       LIMIT 1
                             }
-                          }
+                          } ORDER BY MD5(CONCAT(STR(?moon), STR(NOW()))) # order by random
+                            LIMIT 1
                         } AS %selectedPlanet
 
                         WITH {
@@ -627,7 +607,7 @@ namespace WikidataGame.Backend.Migrations
                           SELECT DISTINCT ?moon ?empty WHERE {
                             INCLUDE %moons.
                             FILTER NOT EXISTS { INCLUDE %selectedPlanet. }
-                          }
+                          } ORDER BY MD5(CONCAT(STR(?moon), STR(NOW()))) 
                           LIMIT 3
                         } AS %threeMoons
 
@@ -645,24 +625,25 @@ namespace WikidataGame.Backend.Migrations
                             ?parent  rdfs:label ?question.
                             ?moon rdfs:label ?answer.
                           }
-                        } ORDER BY DESC(?answer)", "Which of these moons belongs to planet {0}?" });
+                        } ORDER BY DESC(?question)", "Which of these moons belongs to planet {0}?" });
 
             migrationBuilder.InsertData(
                 table: "Questions",
                 columns: new[] { "Id", "CategoryId", "MiniGameType", "SparqlQuery", "TaskDescription" },
-                values: new object[] { "5f7e813a-3cfa-4617-86d1-514b481b37a8", "6c22af9b-2f45-413b-995d-7ee6c61674e5", 2, @"SELECT ?question ?answer WHERE {
-                      ?element wdt:P31 wd:Q11344;
-                               wdt:P1086 ?number;
-                               wdt:P246 ?answer.
-                      FILTER(1 <= ?number &&
-                             ?number <= 118)
-                      SERVICE wikibase:label {
-                        bd:serviceParam wikibase:language 'en'.
-                        ?element  rdfs:label ?question.
-                      }
-                    }
-                    ORDER BY MD5(CONCAT(STR(?question), STR(NOW()))) # order by random
-                    LIMIT 4", "What's the chemical symbol for {0}?" });
+                values: new object[] { "5f7e813a-3cfa-4617-86d1-514b481b37a8", "6c22af9b-2f45-413b-995d-7ee6c61674e5", 2, @"# What's the chemical symbol for {element}?
+                        SELECT ?question ?answer WHERE {
+                          ?element wdt:P31 wd:Q11344;
+                                   wdt:P1086 ?number;
+                                   wdt:P246 ?answer.
+                          FILTER(1 <= ?number &&
+                                 ?number <= 118)
+                          SERVICE wikibase:label {
+                            bd:serviceParam wikibase:language 'en'.
+                            ?element  rdfs:label ?question.
+                          }
+                        }
+                        ORDER BY MD5(CONCAT(STR(?question), STR(NOW()))) # order by random
+                        LIMIT 4", "What's the chemical symbol for {0}?" });
 
             migrationBuilder.InsertData(
                 table: "Questions",
@@ -687,19 +668,21 @@ namespace WikidataGame.Backend.Migrations
                 values: new object[] { "e8f99165-baa3-47b2-be35-c42ab2d5f0a0", "6c22af9b-2f45-413b-995d-7ee6c61674e5", 0, @"#sort chemical elements by number in period system
                         SELECT ?question ?answer WHERE {
                           BIND ('number in period system' as ?question).
-                          {SELECT ?item ?element ?number ?symbol WHERE {
-                            ?item wdt:P31 wd:Q11344;
-                                  wdt:P1086 ?number;
-                                  wdt:P246 ?symbol.
-                            FILTER(1 <= ?number &&
-                                   ?number <= 118)
-                            SERVICE wikibase:label {
-                              bd:serviceParam wikibase:language 'en'.
-                              ?item  rdfs:label ?element.
+                          {
+                            SELECT ?item ?element ?number ?symbol WHERE {
+                              ?item wdt:P31 wd:Q11344;
+                                    wdt:P1086 ?number;
+                                    wdt:P246 ?symbol.
+                              FILTER(1 <= ?number &&
+                                     ?number <= 118)
+                              SERVICE wikibase:label {
+                                bd:serviceParam wikibase:language 'en'.
+                                ?item  rdfs:label ?element.
+                              }
                             }
+                            ORDER BY MD5(CONCAT(STR(?element), STR(NOW()))) # order by random
+                            LIMIT 4
                           }
-                          ORDER BY MD5(CONCAT(STR(?element), STR(NOW()))) # order by random
-                          LIMIT 4}
                           BIND (?element as ?answer).
                         } ORDER BY ASC(?number)", "Sort chemical elements by {0} (ascending)." });
 

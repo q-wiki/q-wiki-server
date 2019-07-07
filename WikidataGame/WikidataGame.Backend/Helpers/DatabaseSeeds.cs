@@ -385,47 +385,51 @@ namespace WikidataGame.Backend.Helpers
                     CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                     MiniGameType = MiniGameType.Sort,
                     TaskDescription = "Sort countries by {0} (ascending)",
-                    SparqlQuery = @"#sort countries by number of inhabitants (ascending)
-                                    SELECT (?stateLabel as ?answer) ?question 
-                                    WITH {
-                                      # subquery: get 4 random countries with their average number of inhabitants
-                                      SELECT DISTINCT ?state ?stateLabel (ROUND(AVG(?population) / 1000) * 1000 as ?population) {
+                    SparqlQuery = @"# sort countries by number of inhabitants (ascending)
+                        SELECT (?stateLabel AS ?answer) ?question
+                        WITH {
+                          # subquery: get 4 random countries with their average number of inhabitants
+                          SELECT DISTINCT ?state ?stateLabel (ROUND(AVG(?population) / 1000) * 1000 AS ?population) {
+ 
+                            {
+                              # subquery: list of all countries in the world
+                              SELECT DISTINCT ?state ?stateLabel ?population ?dateOfCensus
+                                                     WHERE {
+                                                       ?state wdt:P31/wdt:P279* wd:Q3624078;
+                                                              p:P463 ?memberOfStatement;
+                                                              p:P1082 [
+                                                                ps:P1082 ?population;
+                                                                         pq:P585 ?dateOfCensus
+                                                              ].
+                                                       ?memberOfStatement a wikibase:BestRank;
+                                                                            ps:P463 wd:Q1065.
+                                                       MINUS { ?memberOfStatement pq:P582 ?endTime. }
+                                                       MINUS { ?state wdt:P576|wdt:P582 ?end. }
+                                                       ?state p:P30 ?continentStatement.
+                                                       ?continentStatement a wikibase:BestRank;
+                                                                             ps:P30 ?continent.
+                                                       VALUES ?continent { wd:Q49 wd:Q48 wd:Q46 wd:Q18 wd:Q15 } # ohne Ozeanien
+                                                       MINUS { ?continentStatement pq:P582 ?endTime. }
+                                                       SERVICE wikibase:label {
+                                                         bd:serviceParam wikibase:language '[AUTO_LANGUAGE],en'.
+                                                       }
+                                                       FILTER(YEAR(?dateOfCensus) > YEAR(NOW()) - 5)
+                                                     }
+                            }
+                          } GROUP BY ?state ?stateLabel
+                        } AS %allStates
 
-                                        {
-                                          # subquery: list of all countries in the world
-                                          SELECT DISTINCT ?state ?stateLabel ?population ?dateOfCensus
-                                                                 WHERE {
-                                                                   ?state wdt:P31/wdt:P279* wd:Q3624078;
-                                                                          p:P463 ?memberOfStatement;
-                                                                          p:P1082 [
-                                                                            ps:P1082 ?population;
-                                                                                     pq:P585 ?dateOfCensus
-                                                                          ].
-                                                                   ?memberOfStatement a wikibase:BestRank;
-                                                                                        ps:P463 wd:Q1065.
-                                                                   MINUS { ?memberOfStatement pq:P582 ?endTime. }
-                                                                   MINUS { ?state wdt:P576|wdt:P582 ?end. }
-                                                                   ?state p:P30 ?continentStatement.
-                                                                   ?continentStatement a wikibase:BestRank;
-                                                                                         ps:P30 ?continent.
-                                                                   VALUES ?continent { wd:Q49 wd:Q48 wd:Q46 wd:Q18 wd:Q15 } # ohne Ozeanien
-                                                                   MINUS { ?continentStatement pq:P582 ?endTime. }
-                                                                   SERVICE wikibase:label {
-                                                                     bd:serviceParam wikibase:language '[AUTO_LANGUAGE],en'.
-                                                                   }
-                                                                   FILTER(YEAR(?dateOfCensus) > YEAR(NOW()) - 5)
-                                                                 }
-                                        }
-                                      }
-                                      GROUP BY ?state ?stateLabel
-                                      ORDER BY MD5(CONCAT(STR(?item), STR(NOW()))) LIMIT 4
-                                    } as %states
-
-                                    WHERE {
-                                      # fill the question (hard-coded) and sort by population (= correct sort order needed for sorting game)
-                                      INCLUDE %states.
-                                      BIND('number of inhabitants' as ?question).
-                                    } ORDER BY ?population"
+                        WITH {
+                          SELECT DISTINCT ?state ?stateLabel ?population WHERE {
+                              INCLUDE %allStates.
+                          } ORDER BY MD5(CONCAT(STR(?item), STR(NOW()))) LIMIT 4
+                        } AS %states
+ 
+                        WHERE {
+                          # fill the question (hard-coded) and sort by population (= correct sort order needed for sorting game)
+                          INCLUDE %states.
+                          BIND('number of inhabitants' AS ?question).
+                        } ORDER BY ?population"
                 },
                 // Space
                 new Question

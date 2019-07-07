@@ -4,19 +4,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using WikidataGame.Backend.Models;
 using WikidataGame.Backend.Repos;
+using WikidataGame.Backend.Services;
 
 namespace WikidataGame.Backend.Helpers
 {
     public static class TileHelper
     {
-        public static IEnumerable<IEnumerable<Dto.Tile>> TileEnumerableModel2Dto(Game game, IRepository<Category, string> categoryRepo)
+        public static IEnumerable<IEnumerable<Dto.Tile>> TileEnumerableModel2Dto(Game game, CategoryCacheService categoryCacheService)
         {
             return Enumerable.Range(0, game.MapHeight)
                 .Select(yCoord =>
                     game.Tiles.Skip(yCoord * game.MapWidth)
                         .Take(game.MapWidth)
                         // inaccessible tiles are represented as `null`
-                        .Select(t => t.IsAccessible ? Dto.Tile.FromModel(t, categoryRepo) : null)
+                        .Select(t => t.IsAccessible ? Dto.Tile.FromModel(t, categoryCacheService) : null)
                 );
         }
 
@@ -24,16 +25,16 @@ namespace WikidataGame.Backend.Helpers
         /// Returns 3 categories for a tile. The categories that are returned are
         /// stable and depend on the tile id.
         /// </summary>
-        /// <param name="categoryRepo"></param>
-        /// <param name="tile"></param>
+        /// <param name="categoryService"></param>
+        /// <param name="tileId"></param>
         /// <returns></returns>
-        public static IEnumerable<Category> GetCategoriesForTile(IRepository<Category, string> categoryRepo, string tileId)
+        public static IEnumerable<Category> GetCategoriesForTile(CategoryCacheService categoryService, string tileId)
         {
             // we get all categories, draw 3 distinct random ints in
             // [i, categories.Count()[ and return the categories for
             // these draws
             var rnd = new Random(tileId.GetHashCode());
-            var categories = categoryRepo.GetAll();
+            var categories = categoryService.Categories;
 
             var draws = new HashSet<Category>();
             while (draws.Count() < 3)

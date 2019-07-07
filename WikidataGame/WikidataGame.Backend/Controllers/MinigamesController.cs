@@ -19,6 +19,7 @@ namespace WikidataGame.Backend.Controllers
     public class MinigamesController : CustomControllerBase
     {
         private readonly IMinigameRepository _minigameRepo;
+        private readonly CategoryCacheService _categoryCacheService;
 
         public MinigamesController(
             DataContext dataContext,
@@ -26,9 +27,11 @@ namespace WikidataGame.Backend.Controllers
             IGameRepository gameRepo,
             IMinigameRepository minigameRepo,
             IRepository<Models.Category, string> categoryRepo,
-            INotificationService notificationService) : base(dataContext, userRepo, gameRepo, categoryRepo, notificationService)
+            INotificationService notificationService,
+            CategoryCacheService categoryCacheService) : base(dataContext, userRepo, gameRepo, categoryRepo, notificationService)
         {
             _minigameRepo = minigameRepo;
+            _categoryCacheService = categoryCacheService;
         }
 
         /// <summary>
@@ -102,6 +105,7 @@ namespace WikidataGame.Backend.Controllers
                 {
                     //level up
                     minigame.Tile.Difficulty = Math.Min(minigame.Tile.Difficulty + 1, 2);
+                    minigame.Tile.ChosenCategoryId = minigame.CategoryId;
                 }
                 else
                 {
@@ -116,22 +120,17 @@ namespace WikidataGame.Backend.Controllers
 
             var game = _gameRepo.Get(gameId);
             game.StepsLeftWithinMove--;
+            if(AllTilesConquered(gameId))
+            {
+                await SetGameWonAsync(game);
+            }
+
             if(game.StepsLeftWithinMove < 1)
             {
                 game.MoveCount++;
                 if (game.MoveCount / game.GameUsers.Count >= Models.Game.MaxRounds)
                 {
-                    var winningPlayerIds = WinningPlayerIds(gameId);
-                    foreach (var winnerId in winningPlayerIds)
-                    {
-                        var user = game.GameUsers.SingleOrDefault(gu => gu.UserId == winnerId);
-                        user.IsWinner = true;
-                        await _notificationService.SendNotification(user.User, "Congrats", "You won this game on points!");
-                    }
-                    foreach (var looser in game.GameUsers.Where(gu => !winningPlayerIds.Contains(gu.UserId)))
-                    {
-                        await _notificationService.SendNotification(looser.User, "Too bad.", "You lost the game!");
-                    }
+                    await SetGameWonAsync(game);
                 }
                 else
                 {
@@ -146,7 +145,7 @@ namespace WikidataGame.Backend.Controllers
             _dataContext.SaveChanges();
 
 
-            return Ok(MiniGameResult.FromModel(minigame, game, _categoryRepo));
+            return Ok(MiniGameResult.FromModel(minigame, game, _categoryCacheService));
         }
 
         private bool IsItPlayersTurn(string gameId)
@@ -179,19 +178,45 @@ namespace WikidataGame.Backend.Controllers
             var game = _gameRepo.Get(gameId);
             var tile = game.Tiles.SingleOrDefault(t => t.Id == tileId);
             return (string.IsNullOrWhiteSpace(tile.ChosenCategoryId) || tile.ChosenCategoryId == categoryId) && 
-                TileHelper.GetCategoriesForTile(_categoryRepo, tileId).SingleOrDefault(c => c.Id == categoryId) != null;
+                TileHelper.GetCategoriesForTile(_categoryCacheService, tileId).SingleOrDefault(c => c.Id == categoryId) != null;
         }
 
         private IEnumerable<string> WinningPlayerIds(string gameId)
         {
             var game = _gameRepo.Get(gameId);
             var result = game.GameUsers.ToDictionary(gu => gu.UserId, gu => 0);
-            foreach(var user in result)
+            var tiles = game.Tiles.ToList();
+            foreach (var tile in tiles)
             {
-                result[user.Key] = game.Tiles.Count(t => t.OwnerId == user.Key);
+                if (!string.IsNullOrEmpty(tile.OwnerId))
+                {
+                    result[tile.OwnerId] = ++result[tile.OwnerId];
+                }
             }
             var rankedPlayers = result.OrderByDescending(r => r.Value);
             return rankedPlayers.Where(p => p.Value >= rankedPlayers.First().Value).Select(p => p.Key).ToList();
+        }
+
+        private bool AllTilesConquered(string gameId)
+        {
+            var game = _gameRepo.Get(gameId);
+            var opponentId = game.GameUsers.SingleOrDefault(gu => gu.UserId != GetCurrentUser().Id).UserId;
+            return game.Tiles.Count(t => t.OwnerId == opponentId) < 1;
+        }
+
+        private async Task SetGameWonAsync(Models.Game game)
+        {
+            var winningPlayerIds = WinningPlayerIds(game.Id);
+            foreach (var winnerId in winningPlayerIds)
+            {
+                var user = game.GameUsers.SingleOrDefault(gu => gu.UserId == winnerId);
+                user.IsWinner = true;
+                await _notificationService.SendNotification(user.User, "Congrats", "You won this game on points!");
+            }
+            foreach (var looser in game.GameUsers.Where(gu => !winningPlayerIds.Contains(gu.UserId)))
+            {
+                await _notificationService.SendNotification(looser.User, "Too bad.", "You lost the game!");
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Repos;
+using WikidataGame.Backend.Services;
 
 namespace WikidataGame.Backend.Dto
 {
@@ -20,7 +21,7 @@ namespace WikidataGame.Backend.Dto
 
         public string OwnerId { get; set; }
 
-        public static Tile FromModel(Models.Tile tile, IRepository<Models.Category, string> categoryRepo)
+        public static Tile FromModel(Models.Tile tile, CategoryCacheService categoryService)
         {
             if (tile == null)
                 return null;
@@ -29,7 +30,7 @@ namespace WikidataGame.Backend.Dto
             {
                 Id = tile.Id,
                 ChosenCategoryId = tile.ChosenCategoryId,
-                AvailableCategories = TileHelper.GetCategoriesForTile(categoryRepo, tile.Id).Select(c => Category.FromModel(c)),
+                AvailableCategories = TileHelper.GetCategoriesForTile(categoryService, tile.Id).Select(c => Category.FromModel(c)).ToList(),
                 Difficulty = tile.Difficulty,
                 OwnerId = tile.OwnerId
             };

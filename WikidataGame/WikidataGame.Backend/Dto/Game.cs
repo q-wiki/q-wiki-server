@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Models;
+using WikidataGame.Backend.Services;
 
 namespace WikidataGame.Backend.Dto
 {
@@ -25,14 +26,14 @@ namespace WikidataGame.Backend.Dto
 
         public bool AwaitingOpponentToJoin { get; set; }
 
-        public static Game FromModel(Models.Game game, string currentUserId, Repos.IRepository<Models.Category, string> categoryRepo)
+        public static Game FromModel(Models.Game game, string currentUserId, CategoryCacheService cacheService)
         {
             if (game == null)
                 return null;
 
             return new Game {
                 Id = game.Id,
-                Tiles = TileHelper.TileEnumerableModel2Dto(game, categoryRepo),
+                Tiles = TileHelper.TileEnumerableModel2Dto(game, cacheService),
                 AwaitingOpponentToJoin = game.GameUsers.Count() < 2,
                 WinningPlayerIds = game.GameUsers.Where(gu => gu.IsWinner).Select(gu => gu.UserId).ToList(),
                 NextMovePlayerId = game.NextMovePlayerId,

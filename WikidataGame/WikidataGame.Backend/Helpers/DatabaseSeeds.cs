@@ -434,22 +434,24 @@ namespace WikidataGame.Backend.Helpers
                     MiniGameType = MiniGameType.Sort,
                     TaskDescription = "Sort planets by {0} (ascending)",
                     SparqlQuery = @"# sort planets by average distance to sun
-                        SELECT ?answer ?question WHERE {
-                          {SELECT DISTINCT ?answer ?avgDistanceToSun
-                                                   WHERE 
-                                                   {
-                                                     # fetch planets in our solar system
-                                                     ?planet wdt:P31/wdt:P279+ wd:Q17362350.
-                                                     ?planet p:P2243/psv:P2243 [wikibase:quantityAmount ?apoapsis; wikibase:quantityUnit ?apoapsisUnit].
-                                                     ?planet p:P2244/psv:P2244 [wikibase:quantityAmount ?periapsis; wikibase:quantityUnit ?periapsisUnit].
-                                                     # NOTE: there are only three planets with apoapsis and periapsis in AU; 4 planets in total
-                                                     # FILTER (?apoapsisUnit = wd:Q1811 && ?periapsisUnit = wd:Q1811)
-                                                     BIND ((?apoapsis + ?periapsis) / 2 as ?avgDistanceToSun)
-                                                     FILTER (?apoapsisUnit = wd:Q828224 && ?periapsisUnit = wd:Q828224)
-                                                     SERVICE wikibase:label { 
-                                                       bd:serviceParam wikibase:language 'en'.
-                                                       ?planet  rdfs:label ?answer.} 
-                                                   } ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) LIMIT 4}
+                        # NOTE: there are only three planets with apoapsis and periapsis in AU; 4 planets in total
+                        SELECT ?answer ?question WHERE 
+                        {
+                          { SELECT DISTINCT ?answer ?avgDistanceToSun WHERE 
+                            {
+                                # fetch planets in our solar system
+                                ?planet wdt:P31/wdt:P279+ wd:Q17362350.
+                                ?planet p:P2243/psv:P2243 [wikibase:quantityAmount ?apoapsis; wikibase:quantityUnit ?apoapsisUnit].
+                                ?planet p:P2244/psv:P2244 [wikibase:quantityAmount ?periapsis; wikibase:quantityUnit ?periapsisUnit].
+
+                                # FILTER (?apoapsisUnit = wd:Q1811 && ?periapsisUnit = wd:Q1811)
+                                BIND ((?apoapsis + ?periapsis) / 2 as ?avgDistanceToSun)
+                                FILTER (?apoapsisUnit = wd:Q828224 && ?periapsisUnit = wd:Q828224)
+                                SERVICE wikibase:label { 
+                                bd:serviceParam wikibase:language 'en'.
+                                ?planet  rdfs:label ?answer.} 
+                            } ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) LIMIT 4
+                          }
                           BIND('average distance to sun' as ?question)
                         } ORDER BY ?avgDistanceToSun"
                 },

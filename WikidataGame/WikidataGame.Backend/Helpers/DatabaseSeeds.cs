@@ -220,7 +220,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = "4f6c477e-7025-44b4-a3b0-f3ebd8902902",
                     CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                     MiniGameType = MiniGameType.MultipleChoice,
-                    TaskDescription = "Which country is no basin country of the {0}?",
+                    TaskDescription = "Which country is no basin country of the Caribbean Sea?",
                     SparqlQuery = @"# Which country is no basin country of the Caribbean Sea?
                         SELECT DISTINCT ?question ?answer
                         WITH {
@@ -283,8 +283,9 @@ namespace WikidataGame.Backend.Helpers
                     Id = "a6a470de-9efb-4fde-9388-6eb20f2ff1f4",
                     CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                     MiniGameType = MiniGameType.MultipleChoice,
-                    TaskDescription = "Which country is no basin country of the {0}?",
-                    SparqlQuery = @"SELECT DISTINCT ?question ?answer
+                    TaskDescription = "Which country is no basin country of the Mediterranean Sea?",
+                    SparqlQuery = @"# Which country is no basin country of the Mediterranean Sea?
+                        SELECT DISTINCT ?question ?answer
                         WITH {
                           SELECT DISTINCT (?state as ?country) WHERE {
                             ?state wdt:P31/wdt:P279* wd:Q3624078;
@@ -294,24 +295,25 @@ namespace WikidataGame.Backend.Helpers
                             MINUS { ?memberOfStatement pq:P582 ?endTime. }
                             MINUS { ?state wdt:P576|wdt:P582 ?end. }
                           }
-                          ORDER BY MD5(CONCAT(STR(?state), STR(NOW())))
                         } AS %states
+
                         WITH { 
-                              SELECT DISTINCT ?country WHERE {
-                                  BIND(wd:Q4918 AS ?sea).
-                                  ?sea wdt:P205 ?country.
-                                } LIMIT 3
-                            } as %threeBasins
+                          SELECT DISTINCT ?country WHERE {
+                            BIND(wd:Q4918 AS ?sea).
+                            ?sea wdt:P205 ?country.
+                          } ORDER BY MD5(CONCAT(STR(?country), STR(NOW()))) LIMIT 3 # random three
+                        } as %threeBasins
+
                         WITH {
-                          SELECT DISTINCT ?country ?noSea
-                            WHERE {
-                              BIND(wd:Q4918 AS ?noSea).
-                              INCLUDE %states.
-                              ?country wdt:P361 ?region.
-                              VALUES ?region { wd:Q7204 wd:Q984212 wd:Q27449 wd:Q263686 wd:Q50807777 wd:Q27468 wd:Q27381 }.
-                              FILTER NOT EXISTS {?country wdt:P31 wd:Q51576574.}
-                          } LIMIT 1
+                          SELECT DISTINCT ?country ?noSea WHERE {
+                            BIND(wd:Q4918 AS ?noSea).
+                            INCLUDE %states.
+                            ?country wdt:P361 ?region.
+                            VALUES ?region { wd:Q7204 wd:Q984212 wd:Q27449 wd:Q263686 wd:Q50807777 wd:Q27468 wd:Q27381 }.
+                            FILTER NOT EXISTS {?country wdt:P31 wd:Q51576574.}
+                          } ORDER BY MD5(CONCAT(STR(?country), STR(NOW()))) LIMIT 1 # random one
                         } AS %oneOther
+
                         WHERE {
                           { INCLUDE %oneOther. } UNION
                           { INCLUDE %threeBasins. }

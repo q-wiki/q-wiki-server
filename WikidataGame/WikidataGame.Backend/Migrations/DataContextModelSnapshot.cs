@@ -171,18 +171,31 @@ namespace WikidataGame.Backend.Migrations
                             Id = "a4b7c4ba-6acb-4f9a-821b-7a44aa7b6761",
                             CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                             MiniGameType = 2,
-                            SparqlQuery = @"SELECT ?answer ?question WHERE {  
-                          ?item wdt:P31 wd:Q5119.
-                          ?item wdt:P1376 ?land.
-                          ?land wdt:P31 wd:Q6256.
-                          OPTIONAL { 
-                            ?item rdfs:label ?answer;
-                                    filter(lang(?answer) = 'en')
-                              ?land rdfs:label ?question;
-                                    filter(lang(?question) = 'en').
-                          }
-                            }
-                        ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) LIMIT 4",
+                            SparqlQuery = @"SELECT DISTINCT ?state ?capital ?answer ?question WHERE {
+                      ?state wdt:P31/wdt:P279* wd:Q3624078;
+                             p:P463 ?memberOfStatement.
+                      ?memberOfStatement a wikibase:BestRank;
+                                           ps:P463 wd:Q1065.
+                      MINUS { ?memberOfStatement pq:P582 ?endTime. }
+                      MINUS { ?state wdt:P576|wdt:P582 ?end. }
+  
+                      ?state p:P36 ?capitalStatement.
+                      ?capitalStatement a wikibase:BestRank;
+                                          ps:P36 ?capital.
+                      MINUS { ?capitalStatement pq:P582 ?capitalEnd. } # exclude former capitals
+                      MINUS { ?capitalStatement pq:P459 ?capitalType. } # exclude lands that have more than one capital
+                      MINUS { ?capitalStatement pq:P642 ?capitalType2. } # exclude lands that have more than one capital II
+                      #MINUS { ?capital wdt:P576|wdt:P582 ?end2. }  
+  
+                      OPTIONAL { 
+                        ?state rdfs:label ?answer;
+                        filter(lang(?answer) = 'en').
+                        ?capital rdfs:label ?question;
+                        filter(lang(?question) = 'en').
+                      }
+                    } 
+                    ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) # order by random
+                    LIMIT 4",
                             TaskDescription = "What is the name of the capital of {0}?"
                         },
                         new
@@ -466,10 +479,9 @@ namespace WikidataGame.Backend.Migrations
                         WITH {
                           # subquery: get 4 random countries with their average number of inhabitants
                           SELECT DISTINCT ?state ?stateLabel (ROUND(AVG(?population) / 1000) * 1000 AS ?population) {
- 
+
                             {
                               # subquery: list of all countries in the world
-                                                       }
                               SELECT DISTINCT ?state ?stateLabel ?population ?dateOfCensus WHERE {
                                 ?state wdt:P31/wdt:P279* wd:Q3624078;
                                        p:P463 ?memberOfStatement;

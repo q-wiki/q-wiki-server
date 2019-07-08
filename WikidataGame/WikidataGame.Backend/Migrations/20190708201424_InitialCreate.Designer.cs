@@ -9,7 +9,7 @@ using WikidataGame.Backend.Helpers;
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20190708114356_InitialCreate")]
+    [Migration("20190708201424_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -173,7 +173,7 @@ namespace WikidataGame.Backend.Migrations
                             Id = "a4b7c4ba-6acb-4f9a-821b-7a44aa7b6761",
                             CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                             MiniGameType = 2,
-                            SparqlQuery = @"SELECT DISTINCT ?state ?capital ?answer ?question WHERE {
+                            SparqlQuery = @"SELECT DISTINCT ?answer ?question WHERE {
                       ?state wdt:P31/wdt:P279* wd:Q3624078;
                              p:P463 ?memberOfStatement.
                       ?memberOfStatement a wikibase:BestRank;
@@ -235,11 +235,10 @@ namespace WikidataGame.Backend.Migrations
                             MINUS { ?memberOfStatement pq:P582 ?endTime. }
                             MINUS { ?state wdt:P576|wdt:P582 ?end. }
                             ?state p:P30 ?continentStatement.
-                          ?continentStatement a wikibase:BestRank;
+                            ?continentStatement a wikibase:BestRank;
                                               ps:P30 ?continent.
                             VALUES ?continent { wd:Q49 wd:Q48 wd:Q46 wd:Q18 wd:Q15 } # ohne Ozeanien
-                            MINUS { ?continentStatement pq:P582 ?endTime. }
-                          } ORDER BY MD5(CONCAT(STR(?state), STR(NOW())))
+                          }
                         } AS %states
                         WITH {
                           SELECT ?state ?continent WHERE {
@@ -255,17 +254,16 @@ namespace WikidataGame.Backend.Migrations
                         WITH {
                           SELECT DISTINCT ?state ?continent WHERE {
                             INCLUDE %selectedContinent.
-                          }
+                          } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW()))) # order by random
                           LIMIT 1
-                        } AS %threeStates
+                        } AS %oneState
                         WITH {
-                          # dump continent for false answers (needed for sorting)
                           SELECT ?state ?empty WHERE {
                             INCLUDE %states.
                             FILTER NOT EXISTS { INCLUDE %selectedContinent. }
-                          }
+                          } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW()))) # order by random
                           LIMIT 3
-                        } AS %oneState
+                        } AS %threeStates
                         WHERE {
                             { INCLUDE %oneState. } UNION
                             { INCLUDE %threeStates. }

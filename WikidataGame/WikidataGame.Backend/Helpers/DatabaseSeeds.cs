@@ -137,11 +137,10 @@ namespace WikidataGame.Backend.Helpers
                             MINUS { ?memberOfStatement pq:P582 ?endTime. }
                             MINUS { ?state wdt:P576|wdt:P582 ?end. }
                             ?state p:P30 ?continentStatement.
-                          ?continentStatement a wikibase:BestRank;
+                            ?continentStatement a wikibase:BestRank;
                                               ps:P30 ?continent.
                             VALUES ?continent { wd:Q49 wd:Q48 wd:Q46 wd:Q18 wd:Q15 } # ohne Ozeanien
-                            MINUS { ?continentStatement pq:P582 ?endTime. }
-                          } ORDER BY MD5(CONCAT(STR(?state), STR(NOW())))
+                          }
                         } AS %states
                         WITH {
                           SELECT ?state ?continent WHERE {
@@ -157,17 +156,16 @@ namespace WikidataGame.Backend.Helpers
                         WITH {
                           SELECT DISTINCT ?state ?continent WHERE {
                             INCLUDE %selectedContinent.
-                          }
+                          } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW()))) # order by random
                           LIMIT 1
-                        } AS %threeStates
+                        } AS %oneState
                         WITH {
-                          # dump continent for false answers (needed for sorting)
                           SELECT ?state ?empty WHERE {
                             INCLUDE %states.
                             FILTER NOT EXISTS { INCLUDE %selectedContinent. }
-                          }
+                          } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW()))) # order by random
                           LIMIT 3
-                        } AS %oneState
+                        } AS %threeStates
                         WHERE {
                             { INCLUDE %oneState. } UNION
                             { INCLUDE %threeStates. }

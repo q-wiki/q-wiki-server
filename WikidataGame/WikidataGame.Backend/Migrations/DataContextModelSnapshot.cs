@@ -188,9 +188,9 @@ namespace WikidataGame.Backend.Migrations
                       #MINUS { ?capital wdt:P576|wdt:P582 ?end2. }  
   
                       OPTIONAL { 
-                        ?state rdfs:label ?answer;
+                        ?capital rdfs:label ?answer;
                         filter(lang(?answer) = 'en').
-                        ?capital rdfs:label ?question;
+                        ?state rdfs:label ?question;
                         filter(lang(?question) = 'en').
                       }
                     } 

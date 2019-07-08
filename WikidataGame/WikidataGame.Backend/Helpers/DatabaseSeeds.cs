@@ -75,7 +75,7 @@ namespace WikidataGame.Backend.Helpers
                     CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "What is the name of the capital of {0}?",
-                    SparqlQuery = @"SELECT DISTINCT ?state ?capital ?answer ?question WHERE {
+                    SparqlQuery = @"SELECT DISTINCT ?answer ?question WHERE {
                       ?state wdt:P31/wdt:P279* wd:Q3624078;
                              p:P463 ?memberOfStatement.
                       ?memberOfStatement a wikibase:BestRank;
@@ -92,9 +92,9 @@ namespace WikidataGame.Backend.Helpers
                       #MINUS { ?capital wdt:P576|wdt:P582 ?end2. }  
   
                       OPTIONAL { 
-                        ?state rdfs:label ?answer;
+                        ?capital rdfs:label ?answer;
                         filter(lang(?answer) = 'en').
-                        ?capital rdfs:label ?question;
+                        ?state rdfs:label ?question;
                         filter(lang(?question) = 'en').
                       }
                     } 

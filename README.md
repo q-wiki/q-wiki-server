@@ -1,5 +1,5 @@
-# Qwiki - Wikidata Game (Back-End)
-Qwiki is a Wikidata based game (Unity front-end with ASP.NET Core back-end) developed by HTW Berlin students in cooperation with Wikimedia Germany.
+# Q-Wiki - Wikidata Game (Back-End)
+Q-Wiki is a Wikidata based game (Unity front-end with ASP.NET Core back-end) developed by HTW Berlin students in cooperation with Wikimedia Germany.
 ## Project Details/Usage
 Once you clone the repository you might want to use Visual Studio or VS Code depending on your OS.
 ### WikidataGame.Backend

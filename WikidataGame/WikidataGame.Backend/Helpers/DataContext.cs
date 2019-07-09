@@ -20,16 +20,9 @@ namespace WikidataGame.Backend.Helpers
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var cascadeFKs = modelBuilder.Model.GetEntityTypes()
-               .SelectMany(t => t.GetForeignKeys())
-               .Where(fk => !fk.IsOwnership && fk.DeleteBehavior != DeleteBehavior.Cascade);
-
-            foreach (var fk in cascadeFKs)
-                fk.DeleteBehavior = DeleteBehavior.Cascade;
+            modelBuilder.Entity<GameUser>().HasKey(gu => new { gu.GameId, gu.UserId });
 
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<GameUser>().HasKey(table => new { table.GameId, table.UserId });
 
             //Seed Database
             DatabaseSeeds.SeedCategories(modelBuilder);

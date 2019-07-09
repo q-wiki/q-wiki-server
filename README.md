@@ -8,6 +8,9 @@ By default Sqlite will be used as the database system, to switch to MSSQL just a
 #### REST
 Check out the swagger documentation that is automatically generated via [swashbuckle](https://github.com/domaindrivendev/Swashbuckle.AspNetCore) from code: https://wikidatagame.azurewebsites.net
 
+### WikidataGame.Backend.Webjob
+A simple Microsoft Azure Webjob which closes a game if a player is inactive for a certain amount of time and sends out push notifications to both players to notify them.
+
 ### WikidataGame.Backend.Tests
 The WikidataGame.Backend.Tests contains unit tests (XUnit) for the asp.net core project. Tests are mainly used to assure that map generation and sparql queries are working properly.
 

@@ -247,7 +247,7 @@ namespace WikidataGame.Backend.Tests
         [Fact]
         public void HasIslands_MapsWithIslands_IdentifiedCorrectly ()
         {
-            // "x" represents and accessible tile, "o" and inaccessible one
+            // "x" represents an accessible tile, "o" and inaccessible one
             var horizontalIsland = new [] {
                 "x", "x", "x", "x",
                 "o", "o", "o", "o",
@@ -261,8 +261,15 @@ namespace WikidataGame.Backend.Tests
                 "x", "o", "x"
             }.Select(x => new Models.Tile { IsAccessible = x == "x" });
 
+            var smallSeparatedPart = new [] {
+                "x", "o", "x",
+                "o", "o", "x",
+                "o", "x", "x"
+            }.Select(x => new Models.Tile { IsAccessible = x == "x" });
+
             Assert.True(Helpers.TileHelper.HasIslands(horizontalIsland, 4, 4));
             Assert.True(Helpers.TileHelper.HasIslands(verticalIsland, 3, 3));
+            Assert.True(Helpers.TileHelper.HasIslands(smallSeparatedPart, 3, 3));
         }
 
         [Fact]

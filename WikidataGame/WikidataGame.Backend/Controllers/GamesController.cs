@@ -102,6 +102,7 @@ namespace WikidataGame.Backend.Controllers
                 await _notificationService.SendNotification(opponent, "Congrats", "You won, because your opponent left the game!");
             }
             var game = _gameRepo.Get(gameId);
+            _dataContext.Set<Models.Tile>().RemoveRange(game.Tiles);
             _gameRepo.Remove(game);
             _dataContext.SaveChanges();
 

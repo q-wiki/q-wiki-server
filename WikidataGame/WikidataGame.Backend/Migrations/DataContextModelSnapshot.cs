@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WikidataGame.Backend.Helpers;
 
@@ -14,7 +15,9 @@ namespace WikidataGame.Backend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("WikidataGame.Backend.Models.Category", b =>
                 {
@@ -773,8 +776,7 @@ namespace WikidataGame.Backend.Migrations
                 {
                     b.HasOne("WikidataGame.Backend.Models.User", "NextMovePlayer")
                         .WithMany()
-                        .HasForeignKey("NextMovePlayerId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("NextMovePlayerId");
                 });
 
             modelBuilder.Entity("WikidataGame.Backend.Models.GameUser", b =>
@@ -825,18 +827,15 @@ namespace WikidataGame.Backend.Migrations
                 {
                     b.HasOne("WikidataGame.Backend.Models.Category", "ChosenCategory")
                         .WithMany()
-                        .HasForeignKey("ChosenCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("ChosenCategoryId");
 
                     b.HasOne("WikidataGame.Backend.Models.Game")
                         .WithMany("Tiles")
-                        .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("GameId");
 
                     b.HasOne("WikidataGame.Backend.Models.User", "Owner")
                         .WithMany()
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("OwnerId");
                 });
 #pragma warning restore 612, 618
         }

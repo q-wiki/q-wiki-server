@@ -48,6 +48,11 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
                             Title = "Chemistry"
+                        },
+                        new
+                        {
+                            Id = "f9c52d1a-9315-423d-a818-94c1769fffe5",
+                            Title = "History"
                         });
                 });
 
@@ -276,7 +281,7 @@ namespace WikidataGame.Backend.Migrations
                           }
                         }
                         ORDER BY DESC(?question)",
-                            TaskDescription = "Which country is a part of continent {0}?"
+                            TaskDescription = "Which country is a part of {0}?"
                         },
                         new
                         {
@@ -324,7 +329,7 @@ namespace WikidataGame.Backend.Migrations
                           }
                         }
                         order by DESC(?question)",
-                            TaskDescription = "Which country is no basin country of the Baltic Sea?"
+                            TaskDescription = "Which country is not a basin country of the Baltic Sea?"
                         },
                         new
                         {
@@ -387,7 +392,7 @@ namespace WikidataGame.Backend.Migrations
                           }
                         }
                         order by DESC(?noSea)",
-                            TaskDescription = "Which country is no basin country of the Caribbean Sea?"
+                            TaskDescription = "Which country is not a basin country of the Caribbean Sea?"
                         },
                         new
                         {
@@ -434,7 +439,7 @@ namespace WikidataGame.Backend.Migrations
                           }
                         }
                         order by DESC(?noSea)",
-                            TaskDescription = "Which country is no basin country of the Mediterranean Sea?"
+                            TaskDescription = "Which country is not a basin country of the Mediterranean Sea?"
                         },
                         new
                         {
@@ -519,7 +524,7 @@ namespace WikidataGame.Backend.Migrations
                           INCLUDE %states.
                           BIND('number of inhabitants' AS ?question).
                         } ORDER BY ?population",
-                            TaskDescription = "Sort countries by {0} (ascending)"
+                            TaskDescription = "Sort countries by {0} (ascending)."
                         },
                         new
                         {
@@ -547,7 +552,7 @@ namespace WikidataGame.Backend.Migrations
                           }
                           BIND('average distance to sun' as ?question)
                         } ORDER BY ?avgDistanceToSun",
-                            TaskDescription = "Sort planets by {0} (ascending)"
+                            TaskDescription = "Sort planets by {0} (ascending)."
                         },
                         new
                         {
@@ -569,7 +574,7 @@ namespace WikidataGame.Backend.Migrations
                           BIND ('radius' as ?question)
                         }
                         ORDER BY ?radius",
-                            TaskDescription = "Sort planets by {0} (ascending)"
+                            TaskDescription = "Sort planets by {0} (ascending)."
                         },
                         new
                         {
@@ -651,7 +656,7 @@ namespace WikidataGame.Backend.Migrations
                             ?moon rdfs:label ?answer.
                           }
                         } ORDER BY DESC(?question)",
-                            TaskDescription = "Which of these moons belongs to planet {0}?"
+                            TaskDescription = "Which of these moons belongs to {0}?"
                         },
                         new
                         {
@@ -720,6 +725,201 @@ namespace WikidataGame.Backend.Migrations
                           BIND (?element as ?answer).
                         } ORDER BY ASC(?number)",
                             TaskDescription = "Sort chemical elements by {0} (ascending)."
+                        },
+                        new
+                        {
+                            Id = "d9011896-04e5-4d32-8d3a-02a6d2b0bdb6",
+                            CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
+                            MiniGameType = 0,
+                            SparqlQuery = @"#English kings until 1707
+                        SELECT DISTINCT ?question ?answer WHERE {
+                          {SELECT DISTINCT ?human ?name ?reignstart ?reignend WHERE {
+                            ?human wdt:P31 wd:Q5.      #find humans
+                            ?human p:P39 ?memberOfStatement.
+                            ?memberOfStatement a wikibase:BestRank;
+                                                 ps:P39 wd:Q18810062. # position
+
+                            ?memberOfStatement pq:P580 ?reignstart;
+                                               pq:P582 ?reignend. 
+                            FILTER (?reignstart >= '1066-12-31T00:00:00Z'^^xsd:dateTime) . #start with William the Conquerer
+                            MINUS {?human wdt:P97 wd:Q719039.}
+
+                            SERVICE wikibase:label {
+                              bd:serviceParam wikibase:language 'en'.
+                              ?human  rdfs:label ?name.
+                            }
+                          } ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
+                          LIMIT 4}
+                                BIND (?name as ?answer).
+                                BIND ('the beginning of their reigning period' as ?question).
+                        } ORDER BY ?reignstart",
+                            TaskDescription = "Sort these English kings by {0} (ascending)."
+                        },
+                        new
+                        {
+                            Id = "909182d1-4ae6-46ea-bd9b-8c4323ea53fa",
+                            CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
+                            MiniGameType = 0,
+                            SparqlQuery = @"# sort EU countries by the date they joined
+                        SELECT ?date (SAMPLE(?answer) AS ?answer) (SAMPLE(?question) AS ?question) 
+                        WITH {
+                          SELECT DISTINCT (?memberOfEuSince as ?date) ?answer WHERE {
+                            {SELECT ?item ?memberOfEuSince
+                                          WHERE 
+                                          {
+                                            ?item p:P463 [ps:P463 wd:Q458;
+                                                                  pq:P580 ?memberOfEuSince].
+                                          }
+                            }
+                            SERVICE wikibase:label {
+                              bd:serviceParam wikibase:language 'en'.
+                              ?item  rdfs:label ?answer.
+                            }
+                          }
+                        } AS %dates
+                        WITH {
+                          SELECT DISTINCT ?date WHERE {
+                            INCLUDE %dates.
+                          }
+                          ORDER BY MD5(CONCAT(STR(?date), STR(NOW())))
+                          LIMIT 4
+                        } AS %fourDates
+                        WHERE {
+                          INCLUDE %fourDates.
+                          INCLUDE %dates.
+                          BIND('the date they joined the EU' as ?question).
+                        }
+                        GROUP BY ?date
+                        ORDER BY ?date",
+                            TaskDescription = "Sort the countries by {0} (ascending)."
+                        },
+                        new
+                        {
+                            Id = "86b64102-8074-4c4e-8f3e-71a0e52bb261",
+                            CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
+                            MiniGameType = 2,
+                            SparqlQuery = @"# German Chancellors
+                        SELECT ?answer (CONCAT(STR(?startYear), ' - ', STR(?endYear)) AS ?question) WHERE {
+                          ?person p:P39 ?Bundeskanzler.
+                          ?Bundeskanzler ps:P39 wd:Q4970706;
+                            pq:P580 ?start.
+                          OPTIONAL { ?Bundeskanzler pq:P582 ?end. }
+                          BIND(YEAR(?start) AS ?startYear)
+                          BIND(IF(!(BOUND(?end)), 'today', YEAR(?end)) AS ?endYear)
+                          SERVICE wikibase:label {
+                            bd:serviceParam wikibase:language 'en'.
+                            ?person rdfs:label ?answer.
+                          }
+                        }
+                        ORDER BY (MD5(CONCAT(STR(?person), STR(NOW()))))
+                        LIMIT 4",
+                            TaskDescription = "Who was Federal Chancellor of Germany in {0}?"
+                        },
+                        new
+                        {
+                            Id = "d135088c-e062-4016-8eb4-1d68c72915ea",
+                            CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
+                            MiniGameType = 2,
+                            SparqlQuery = @"# empires and colonies
+                        SELECT DISTINCT ?empire (?empireLabel as ?question) ?colony (?colonyLabel as ?answer)
+                        WITH {
+                            SELECT DISTINCT ?empire ?empireLabel ?colony ?colonyLabel WHERE {
+                            {
+                                SELECT ?empire ?empireLabel ?colony ?colonyLabel WHERE {
+                                ?empire (wdt:P31/(wdt:P279*)) wd:Q1790360.
+                                ?colony wdt:P361 ?empire;
+                                        wdt:P31 wd:Q133156;
+                                        wdt:P576 ?enddate.
+                                FILTER(?enddate >= '1790-01-01T00:00:00Z'^^xsd:dateTime)
+                                SERVICE wikibase:label {
+                                    bd:serviceParam wikibase:language 'en'.
+                                    ?empire rdfs:label ?empireLabel.
+                                    ?colony rdfs:label ?colonyLabel.
+                                }
+                                }
+                            }
+                            UNION
+                            {
+                                SELECT DISTINCT ?colony ?colonyLabel ?empire ?empireLabel WHERE {
+                                ?colony (wdt:P31/(wdt:P279*)) wd:Q133156;
+                                                                wdt:P576 ?enddate;
+                                                                wdt:P17 ?empire.
+                                VALUES ?empire {
+                                    wd:Q8680
+                                }
+                                SERVICE wikibase:label { 
+                                    bd:serviceParam wikibase:language 'en'. 
+                                    ?empire rdfs:label ?empireLabel.
+                                    ?colony rdfs:label ?colonyLabel.
+                                }
+                                FILTER(?enddate >= '1790-01-01T00:00:00Z'^^xsd:dateTime)
+                                }
+                            }
+                            FILTER(!(CONTAINS(?colonyLabel, 'Q')))
+                            }
+                        } as %colonies
+
+                        WITH {
+                            SELECT ?colony ?colonyLabel ?empire ?empireLabel WHERE {
+                            INCLUDE %colonies.
+                            {
+                                SELECT ?empire WHERE {
+                                INCLUDE %colonies.
+                                } GROUP BY ?empire 
+                                ORDER BY (MD5(CONCAT(STR(?empire), STR(NOW()))))
+                                LIMIT 1
+                            }
+                            }
+                        } as %selectedEmpire
+
+                        WITH {
+                            SELECT ?colony ?colonyLabel ?empire ?empireLabel WHERE {
+                            INCLUDE %selectedEmpire.
+                            } ORDER BY (MD5(CONCAT(STR(?colony), STR(NOW())))) LIMIT 1
+                        } as %selectedColony
+
+                        WITH {
+                            SELECT ?colony ?colonyLabel ?empty ?emptyLabel WHERE {
+                            INCLUDE %colonies.
+                            MINUS {INCLUDE %selectedEmpire.}.
+    
+                            } ORDER BY (MD5(CONCAT(STR(?colony), STR(NOW())))) LIMIT 3
+                        } as %threeOtherColonies
+
+                        WHERE {
+                            {INCLUDE %selectedColony.}
+                            UNION
+                            {INCLUDE %threeOtherColonies.}
+                        } ORDER BY DESC(?empire)",
+                            TaskDescription = "Which colony belonged to the {0}?"
+                        },
+                        new
+                        {
+                            Id = "0d218830-55d2-4d66-8d8f-d402514e9202",
+                            CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
+                            MiniGameType = 2,
+                            SparqlQuery = @"# wars of the 20th century
+                        SELECT (SAMPLE(?itemLabel) as ?answer)  (YEAR(SAMPLE(?startdate)) as ?question) 
+                        WHERE {
+                          {
+                            SELECT DISTINCT ?item ?itemLabel ?startdate ?enddate (CONCAT(STR(YEAR(?startdate)), ' - ', STR(YEAR(?enddate))) AS ?time)  WHERE {
+                              ?item (wdt:P31/(wdt:P279*)) wd:Q198;
+        
+                                p:P582 ?memberOfStatementEnd.
+                                      ?memberOfStatementEnd a wikibase:BestRank; ps:P582 ?enddate.                     
+    
+                              ?item p:P580 ?memberOfStatementStart.
+                             ?memberOfStatementStart a wikibase:BestRank; ps:P580 ?startdate.
+                              FILTER(?startdate >= '1900-01-01T00:00:00Z'^^xsd:dateTime)
+                              SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. }
+                            } 
+                          }
+                          FILTER(!(CONTAINS(?itemLabel, '1')))
+                          FILTER(!(CONTAINS(?itemLabel, '2')))
+                          FILTER(!(STRSTARTS(?itemLabel, 'Q')))
+                        } GROUP BY ?item ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                        LIMIT 4",
+                            TaskDescription = "Which of these wars started in {0}?"
                         });
                 });
 

@@ -19,6 +19,7 @@ namespace WikidataGame.Backend.Controllers
     public class MinigamesController : CustomControllerBase
     {
         private readonly IMinigameRepository _minigameRepo;
+        private readonly IQuestionRepository _questionRepo;
         private readonly CategoryCacheService _categoryCacheService;
 
         public MinigamesController(
@@ -27,10 +28,12 @@ namespace WikidataGame.Backend.Controllers
             IGameRepository gameRepo,
             IMinigameRepository minigameRepo,
             IRepository<Models.Category, string> categoryRepo,
+            IQuestionRepository questionRepo,
             INotificationService notificationService,
             CategoryCacheService categoryCacheService) : base(dataContext, userRepo, gameRepo, categoryRepo, notificationService)
         {
             _minigameRepo = minigameRepo;
+            _questionRepo = questionRepo;
             _categoryCacheService = categoryCacheService;
         }
 
@@ -52,10 +55,10 @@ namespace WikidataGame.Backend.Controllers
                     return Forbid();
 
             var minigameServices = ControllerContext.HttpContext.RequestServices.GetServices<IMinigameService>();
-            var random = new Random();
-            var randomService = minigameServices.ElementAt(random.Next(0, minigameServices.Count()));
+            var question = _questionRepo.GetRandomQuestionForCategory(minigameParams.CategoryId);
+            var service = minigameServices.SingleOrDefault(s => s.MiniGameType == question.MiniGameType);
 
-            var minigame = randomService.GenerateMiniGame(gameId, GetCurrentUser().Id, minigameParams.CategoryId, minigameParams.TileId);
+            var minigame = service.GenerateMiniGame(gameId, GetCurrentUser().Id, question, minigameParams.TileId);
 
             return Ok(minigame);
         }

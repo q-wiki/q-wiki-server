@@ -11,10 +11,10 @@ namespace WikidataGame.Backend.Repos
     {
         public QuestionRepository(DataContext context) : base(context){}
 
-        public Question GetRandomQuestionForMinigameType(MiniGameType type, string categoryId)
+        public Question GetRandomQuestionForCategory(string categoryId)
         {
             return (Context as DataContext)
-                .Questions.Where(q => q.MiniGameType == type && q.CategoryId == categoryId)
+                .Questions.Where(q => q.CategoryId == categoryId)
                 .OrderBy(q => Guid.NewGuid()).FirstOrDefault();
         }
     }

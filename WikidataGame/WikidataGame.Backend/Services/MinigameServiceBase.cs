@@ -14,18 +14,15 @@ namespace WikidataGame.Backend.Services
     public abstract class MinigameServiceBase
     {
         protected readonly IMinigameRepository _minigameRepo;
-        protected readonly IQuestionRepository _questionRepo;
         protected readonly DataContext _dataContext;
         protected SparqlRemoteEndpoint endpoint = new WikidataSparqlEndpoint();
 
 
         public MinigameServiceBase(
             IMinigameRepository minigameRepo,
-            IQuestionRepository questionRepo,
             DataContext dataContext)
         {
             _minigameRepo = minigameRepo;
-            _questionRepo = questionRepo;
             _dataContext = dataContext;
         }
 

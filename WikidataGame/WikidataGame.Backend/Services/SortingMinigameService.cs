@@ -12,8 +12,7 @@ namespace WikidataGame.Backend.Services
     {
         public SortingMinigameService(
             IMinigameRepository minigameRepo,
-            IQuestionRepository questionRepo,
-            DataContext dataContext) : base(minigameRepo, questionRepo, dataContext)
+            DataContext dataContext) : base(minigameRepo, dataContext)
         {
         }
 

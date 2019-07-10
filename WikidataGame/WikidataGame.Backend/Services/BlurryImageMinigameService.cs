@@ -12,21 +12,18 @@ namespace WikidataGame.Backend.Services
     {
         public BlurryImageMinigameService(
             IMinigameRepository minigameRepo,
-            IQuestionRepository questionRepo,
-            DataContext dataContext) : base(minigameRepo, questionRepo, dataContext)
+            DataContext dataContext) : base(minigameRepo, dataContext)
         {
         }
 
         public Models.MiniGameType MiniGameType => Models.MiniGameType.BlurryImage;
 
-        public MiniGame GenerateMiniGame(string gameId, string playerId, string categoryId, string tileId)
+        public MiniGame GenerateMiniGame(string gameId, string playerId, Models.Question question, string tileId)
         {
-            var question = _questionRepo.GetRandomQuestionForMinigameType(MiniGameType, categoryId);
-
             // use method in baseclass to query wikidata with question
             var data = QueryWikidata(question.SparqlQuery);
 
-            var minigame = _minigameRepo.CreateMiniGame(gameId, playerId, tileId, categoryId, MiniGameType);
+            var minigame = _minigameRepo.CreateMiniGame(gameId, playerId, tileId, question.CategoryId, MiniGameType);
 
             minigame.TaskDescription = string.Format(question.TaskDescription, data[0].Item1); // placeholder and answer in first tuple!
             minigame.CorrectAnswer = new List<string> { data[0].Item2 }; // placeholder and answer in first tuple!

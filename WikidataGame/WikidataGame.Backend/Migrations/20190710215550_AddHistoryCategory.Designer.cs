@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WikidataGame.Backend.Helpers;
@@ -9,14 +10,16 @@ using WikidataGame.Backend.Helpers;
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20190710200219_AddHistoryQuestions1")]
-    partial class AddHistoryQuestions1
+    [Migration("20190710215550_AddHistoryCategory")]
+    partial class AddHistoryCategory
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("WikidataGame.Backend.Models.Category", b =>
                 {
@@ -280,7 +283,7 @@ namespace WikidataGame.Backend.Migrations
                           }
                         }
                         ORDER BY DESC(?question)",
-                            TaskDescription = "Which country is a part of continent {0}?"
+                            TaskDescription = "Which country is a part of {0}?"
                         },
                         new
                         {
@@ -328,7 +331,7 @@ namespace WikidataGame.Backend.Migrations
                           }
                         }
                         order by DESC(?question)",
-                            TaskDescription = "Which country is no basin country of the Baltic Sea?"
+                            TaskDescription = "Which country is not a basin country of the Baltic Sea?"
                         },
                         new
                         {
@@ -391,7 +394,7 @@ namespace WikidataGame.Backend.Migrations
                           }
                         }
                         order by DESC(?noSea)",
-                            TaskDescription = "Which country is no basin country of the Caribbean Sea?"
+                            TaskDescription = "Which country is not a basin country of the Caribbean Sea?"
                         },
                         new
                         {
@@ -438,7 +441,7 @@ namespace WikidataGame.Backend.Migrations
                           }
                         }
                         order by DESC(?noSea)",
-                            TaskDescription = "Which country is no basin country of the Mediterranean Sea?"
+                            TaskDescription = "Which country is not a basin country of the Mediterranean Sea?"
                         },
                         new
                         {
@@ -523,7 +526,7 @@ namespace WikidataGame.Backend.Migrations
                           INCLUDE %states.
                           BIND('number of inhabitants' AS ?question).
                         } ORDER BY ?population",
-                            TaskDescription = "Sort countries by {0} (ascending)"
+                            TaskDescription = "Sort countries by {0} (ascending)."
                         },
                         new
                         {
@@ -551,7 +554,7 @@ namespace WikidataGame.Backend.Migrations
                           }
                           BIND('average distance to sun' as ?question)
                         } ORDER BY ?avgDistanceToSun",
-                            TaskDescription = "Sort planets by {0} (ascending)"
+                            TaskDescription = "Sort planets by {0} (ascending)."
                         },
                         new
                         {
@@ -573,7 +576,7 @@ namespace WikidataGame.Backend.Migrations
                           BIND ('radius' as ?question)
                         }
                         ORDER BY ?radius",
-                            TaskDescription = "Sort planets by {0} (ascending)"
+                            TaskDescription = "Sort planets by {0} (ascending)."
                         },
                         new
                         {
@@ -655,7 +658,7 @@ namespace WikidataGame.Backend.Migrations
                             ?moon rdfs:label ?answer.
                           }
                         } ORDER BY DESC(?question)",
-                            TaskDescription = "Which of these moons belongs to planet {0}?"
+                            TaskDescription = "Which of these moons belongs to {0}?"
                         },
                         new
                         {
@@ -757,7 +760,7 @@ namespace WikidataGame.Backend.Migrations
                         new
                         {
                             Id = "909182d1-4ae6-46ea-bd9b-8c4323ea53fa",
-                            CategoryId = "55a4622b-0fed-4284-af0b-3c7f4c3e88d0",
+                            CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
                             MiniGameType = 0,
                             SparqlQuery = @"# sort EU countries by the date they joined
                         SELECT ?date (SAMPLE(?answer) AS ?answer) (SAMPLE(?question) AS ?question) 
@@ -795,7 +798,7 @@ namespace WikidataGame.Backend.Migrations
                         new
                         {
                             Id = "86b64102-8074-4c4e-8f3e-71a0e52bb261",
-                            CategoryId = "55a4622b-0fed-4284-af0b-3c7f4c3e88d0",
+                            CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
                             MiniGameType = 2,
                             SparqlQuery = @"# German Chancellors
                         SELECT ?answer (CONCAT(STR(?startYear), ' - ', STR(?endYear)) AS ?question) WHERE {
@@ -817,7 +820,7 @@ namespace WikidataGame.Backend.Migrations
                         new
                         {
                             Id = "d135088c-e062-4016-8eb4-1d68c72915ea",
-                            CategoryId = "55a4622b-0fed-4284-af0b-3c7f4c3e88d0",
+                            CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
                             MiniGameType = 2,
                             SparqlQuery = @"# empires and colonies
                         SELECT DISTINCT ?empire (?empireLabel as ?question) ?colony (?colonyLabel as ?answer)
@@ -895,7 +898,7 @@ namespace WikidataGame.Backend.Migrations
                         new
                         {
                             Id = "0d218830-55d2-4d66-8d8f-d402514e9202",
-                            CategoryId = "55a4622b-0fed-4284-af0b-3c7f4c3e88d0",
+                            CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
                             MiniGameType = 2,
                             SparqlQuery = @"# wars of the 20th century
                         SELECT (SAMPLE(?itemLabel) as ?answer)  (YEAR(SAMPLE(?startdate)) as ?question) 

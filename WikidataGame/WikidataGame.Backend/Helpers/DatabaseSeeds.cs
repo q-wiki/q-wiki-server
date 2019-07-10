@@ -673,7 +673,7 @@ namespace WikidataGame.Backend.Helpers
                               bd:serviceParam wikibase:language 'en'.
                               ?human  rdfs:label ?name.
                             }
-                          } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW())))
+                          } ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
                           LIMIT 4}
                                 BIND (?name as ?answer).
                                 BIND ('the beginning of their reigning period' as ?question).

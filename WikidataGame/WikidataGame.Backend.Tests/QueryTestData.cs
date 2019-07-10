@@ -70,7 +70,7 @@ namespace WikidataGame.Backend.Tests
 
     public class TestMinigameService : MinigameServiceBase
     {
-        public TestMinigameService(IMinigameRepository minigameRepo, IQuestionRepository questionRepo, DataContext dataContext) : base(minigameRepo, questionRepo, dataContext)
+        public TestMinigameService(IMinigameRepository minigameRepo, DataContext dataContext) : base(minigameRepo, dataContext)
         {
         }
 

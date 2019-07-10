@@ -920,6 +920,54 @@ namespace WikidataGame.Backend.Migrations
                         } GROUP BY ?item ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
                         LIMIT 4",
                             TaskDescription = "Which of these wars started in {0}?"
+                        },
+                        new
+                        {
+                            Id = "8273acfe-c278-4cd4-92f5-07dd73a22577",
+                            CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
+                            MiniGameType = 2,
+                            SparqlQuery = @"# Which chemical compound has the formula {0}?
+                        SELECT DISTINCT ?chemicalCompound ?answer (?chemical_formula AS ?question) ?sitelinks WHERE {
+                          ?chemicalCompound wdt:P31 wd:Q11173;
+                            wdt:P274 ?chemical_formula;
+                            wikibase:sitelinks ?sitelinks.
+                          FILTER(?sitelinks >= 50 )
+                          ?chemicalCompound rdfs:label ?answer.
+                          FILTER((LANG(?answer)) = 'en')
+                        }
+                        ORDER BY (MD5(CONCAT(STR(?answer), STR(NOW()))))
+                        LIMIT 4",
+                            TaskDescription = "Which chemical compound has the formula {0}?"
+                        },
+                        new
+                        {
+                            Id = "bba18c92-47a6-4541-9305-d6453ad8477a",
+                            CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
+                            MiniGameType = 0,
+                            SparqlQuery = @"# Sort chemical compounds by melting point
+                        SELECT ?answer ?question ?melting WHERE {
+                          {
+                            SELECT DISTINCT ?answer (AVG(?melting) as ?melting) ?unitLabel WHERE {
+                              ?chemicalCompound wdt:P31 wd:Q11173;
+                                wikibase:sitelinks ?sitelinks;
+                                p:P2101/psv:P2101 [ 
+                                  wikibase:quantityUnit ?unit;
+                                  wikibase:quantityAmount ?melting;
+                                ]
+                              FILTER(?sitelinks >= 50 )
+                              BIND(wd:Q25267 AS ?unit)
+                              ?chemicalCompound rdfs:label ?answer.
+                              FILTER((LANG(?answer)) = 'en')
+                              ?unit rdfs:label ?unitLabel.
+                              FILTER((LANG(?unitLabel)) = 'en')
+                            }GROUP BY ?answer ?unitLabel
+                            ORDER BY (MD5(CONCAT(STR(?answer), STR(NOW()))))
+                            LIMIT 4
+                          }
+                          BIND('melting point' AS ?question)
+                        }
+                        ORDER BY (?melting)",
+                            TaskDescription = "Sort chemical compounds by {0} (ascending)."
                         });
                 });
 

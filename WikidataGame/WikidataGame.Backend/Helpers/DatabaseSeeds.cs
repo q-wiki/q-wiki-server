@@ -844,6 +844,24 @@ namespace WikidataGame.Backend.Helpers
                           FILTER(!(STRSTARTS(?itemLabel, 'Q')))
                         } GROUP BY ?item ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
                         LIMIT 4"
+                },
+                new Question
+                {
+                    Id = "8273acfe-c278-4cd4-92f5-07dd73a22577",
+                    CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5", // Chemistry
+                    MiniGameType = MiniGameType.MultipleChoice,
+                    TaskDescription = "Which chemical compound has the formula {0}?",
+                    SparqlQuery = @"# Which chemical compound has the formula {0}?
+                        SELECT DISTINCT ?chemicalCompound ?answer (?chemical_formula AS ?question) ?sitelinks WHERE {
+                          ?chemicalCompound wdt:P31 wd:Q11173;
+                            wdt:P274 ?chemical_formula;
+                            wikibase:sitelinks ?sitelinks.
+                          FILTER(?sitelinks >= 50 )
+                          ?chemicalCompound rdfs:label ?answer.
+                          FILTER((LANG(?answer)) = 'en')
+                        }
+                        ORDER BY (MD5(CONCAT(STR(?answer), STR(NOW()))))
+                        LIMIT 4"
                 }
                 );
         }

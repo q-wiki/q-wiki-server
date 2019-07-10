@@ -126,7 +126,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = "9a70639b-3447-475a-905a-e866a0c98a1c",
                     CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                     MiniGameType = MiniGameType.MultipleChoice,
-                    TaskDescription = "Which country is a part of continent {0}?",
+                    TaskDescription = "Which country is a part of {0}?",
                     SparqlQuery = @"SELECT ?answer ?question
                         WITH {
                           SELECT DISTINCT ?state ?continent ?stateLabel ?continentLabel WHERE {
@@ -183,7 +183,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = "46679c4f-ef97-445d-9a70-d95a5337720f",
                     CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                     MiniGameType = MiniGameType.MultipleChoice,
-                    TaskDescription = "Which country is no basin country of the Baltic Sea?",
+                    TaskDescription = "Which country is not a basin country of the Baltic Sea?",
                     SparqlQuery = @"SELECT DISTINCT ?question ?answer
                         WITH {
                           SELECT DISTINCT (?state as ?country) WHERE {
@@ -231,7 +231,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = "4f6c477e-7025-44b4-a3b0-f3ebd8902902",
                     CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                     MiniGameType = MiniGameType.MultipleChoice,
-                    TaskDescription = "Which country is no basin country of the Caribbean Sea?",
+                    TaskDescription = "Which country is not a basin country of the Caribbean Sea?",
                     SparqlQuery = @"# Which country is no basin country of the Caribbean Sea?
                         SELECT DISTINCT ?question ?answer
                         WITH {
@@ -294,7 +294,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = "a6a470de-9efb-4fde-9388-6eb20f2ff1f4",
                     CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                     MiniGameType = MiniGameType.MultipleChoice,
-                    TaskDescription = "Which country is no basin country of the Mediterranean Sea?",
+                    TaskDescription = "Which country is not a basin country of the Mediterranean Sea?",
                     SparqlQuery = @"# Which country is no basin country of the Mediterranean Sea?
                         SELECT DISTINCT ?question ?answer
                         WITH {
@@ -401,7 +401,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = "bc7a22ee-4985-44c3-9388-5c7dd6b8762e",
                     CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                     MiniGameType = MiniGameType.Sort,
-                    TaskDescription = "Sort countries by {0} (ascending)",
+                    TaskDescription = "Sort countries by {0} (ascending).",
                     SparqlQuery = @"# sort countries by number of inhabitants (ascending)
                         SELECT (?stateLabel AS ?answer) ?question
                         WITH {
@@ -453,7 +453,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = "a4a7289a-3053-4ad7-9c60-c75a18305243",
                     CategoryId = "1b9185c0-c46b-4abf-bf82-e464f5116c7d",
                     MiniGameType = MiniGameType.Sort,
-                    TaskDescription = "Sort planets by {0} (ascending)",
+                    TaskDescription = "Sort planets by {0} (ascending).",
                     SparqlQuery = @"# sort planets by average distance to sun
                         # NOTE: there are only three planets with apoapsis and periapsis in AU; 4 planets in total
                         SELECT ?answer ?question WHERE 
@@ -481,7 +481,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = "2ed01768-9ab6-4895-8cbf-09dbc6f957e0",
                     CategoryId = "1b9185c0-c46b-4abf-bf82-e464f5116c7d", // Space
                     MiniGameType = MiniGameType.Sort,
-                    TaskDescription = "Sort planets by {0} (ascending)",
+                    TaskDescription = "Sort planets by {0} (ascending).",
                     SparqlQuery = @"# sort planets by radius
                         SELECT ?answer ?question WHERE {
                           {SELECT ?planet ?answer ?radius WHERE {
@@ -503,7 +503,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = "14d93797-c61c-4415-b1ed-359d180237ff",
                     CategoryId = "1b9185c0-c46b-4abf-bf82-e464f5116c7d", // Space
                     MiniGameType = MiniGameType.MultipleChoice,
-                    TaskDescription = "Which of these moons belongs to planet {0}?",
+                    TaskDescription = "Which of these moons belongs to {0}?",
                     SparqlQuery = @"#Which of these moons belongs to the planet {0}?
                         SELECT ?question ?answer 
                         WITH {
@@ -682,7 +682,7 @@ namespace WikidataGame.Backend.Helpers
                 new Question
                 {
                     Id = "909182d1-4ae6-46ea-bd9b-8c4323ea53fa",
-                    CategoryId = "55a4622b-0fed-4284-af0b-3c7f4c3e88d0", // History
+                    CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5", // History
                     MiniGameType = MiniGameType.Sort,
                     TaskDescription = "Sort the countries by {0} (ascending).",
                     SparqlQuery = @"# sort EU countries by the date they joined
@@ -720,7 +720,7 @@ namespace WikidataGame.Backend.Helpers
                 new Question
                 {
                     Id = "86b64102-8074-4c4e-8f3e-71a0e52bb261",
-                    CategoryId = "55a4622b-0fed-4284-af0b-3c7f4c3e88d0", // History
+                    CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5", // History
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "Who was Federal Chancellor of Germany in {0}?",
                     SparqlQuery = @"# German Chancellors
@@ -742,7 +742,7 @@ namespace WikidataGame.Backend.Helpers
                 new Question
                 {
                     Id = "d135088c-e062-4016-8eb4-1d68c72915ea",
-                    CategoryId = "55a4622b-0fed-4284-af0b-3c7f4c3e88d0", // History
+                    CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5", // History
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "Which colony belonged to the {0}?",
                     SparqlQuery = @"# empires and colonies
@@ -820,7 +820,7 @@ namespace WikidataGame.Backend.Helpers
                 new Question
                 {
                     Id = "0d218830-55d2-4d66-8d8f-d402514e9202",
-                    CategoryId = "55a4622b-0fed-4284-af0b-3c7f4c3e88d0", // History
+                    CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5", // History
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "Which of these wars started in {0}?",
                     SparqlQuery = @"# wars of the 20th century

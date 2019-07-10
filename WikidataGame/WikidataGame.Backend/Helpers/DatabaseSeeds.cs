@@ -716,6 +716,28 @@ namespace WikidataGame.Backend.Helpers
                         }
                         GROUP BY ?date
                         ORDER BY ?date"
+                },
+                new Question
+                {
+                    Id = "86b64102-8074-4c4e-8f3e-71a0e52bb261",
+                    CategoryId = "55a4622b-0fed-4284-af0b-3c7f4c3e88d0", // History
+                    MiniGameType = MiniGameType.MultipleChoice,
+                    TaskDescription = "Who was Federal Chancellor of Germany in {0}?.",
+                    SparqlQuery = @"# German Chancellors
+                        SELECT ?answer (CONCAT(STR(?startYear), ' - ', STR(?endYear)) AS ?question) WHERE {
+                          ?person p:P39 ?Bundeskanzler.
+                          ?Bundeskanzler ps:P39 wd:Q4970706;
+                            pq:P580 ?start.
+                          OPTIONAL { ?Bundeskanzler pq:P582 ?end. }
+                          BIND(YEAR(?start) AS ?startYear)
+                          BIND(IF(!(BOUND(?end)), 'today', YEAR(?end)) AS ?endYear)
+                          SERVICE wikibase:label {
+                            bd:serviceParam wikibase:language 'en'.
+                            ?person rdfs:label ?answer.
+                          }
+                        }
+                        ORDER BY (MD5(CONCAT(STR(?person), STR(NOW()))))
+                        LIMIT 4"
                 }
                 );
         }

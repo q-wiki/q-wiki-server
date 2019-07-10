@@ -36,13 +36,13 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
                     Title = "Chemistry"
+                },
+                new Category
+                {
+                    Id = "f9c52d1a-9315-423d-a818-94c1769fffe5",
+                    Title = "History"
                 }
                 //,
-                //new Category
-                //{
-                //    Id = "f9c52d1a-9315-423d-a818-94c1769fffe5",
-                //    Title = "History"
-                //},
                 //new Category
                 //{
                 //    Id = "4941c348-b4c4-43b5-b3d4-85794c68eec4",
@@ -648,75 +648,75 @@ namespace WikidataGame.Backend.Helpers
                           }
                           BIND (?element as ?answer).
                         } ORDER BY ASC(?number)"
-                }//,
+                },
                 // History
-                //new Question
-                //{
-                //    Id = "d9011896-04e5-4d32-8d3a-02a6d2b0bdb6",
-                //    CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5", // History
-                //    MiniGameType = MiniGameType.Sort,
-                //    TaskDescription = "Sort these English kings by {0} (ascending).",
-                //    SparqlQuery = @"#English kings until 1707
-                //        SELECT DISTINCT ?question ?answer WHERE {
-                //          {SELECT DISTINCT ?human ?name ?reignstart ?reignend WHERE {
-                //            ?human wdt:P31 wd:Q5.      #find humans
-                //            ?human p:P39 ?memberOfStatement.
-                //            ?memberOfStatement a wikibase:BestRank;
-                //                                 ps:P39 wd:Q18810062. # position
+                new Question
+                {
+                    Id = "d9011896-04e5-4d32-8d3a-02a6d2b0bdb6",
+                    CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5", // History
+                    MiniGameType = MiniGameType.Sort,
+                    TaskDescription = "Sort these English kings by {0} (ascending).",
+                    SparqlQuery = @"#English kings until 1707
+                        SELECT DISTINCT ?question ?answer WHERE {
+                          {SELECT DISTINCT ?human ?name ?reignstart ?reignend WHERE {
+                            ?human wdt:P31 wd:Q5.      #find humans
+                            ?human p:P39 ?memberOfStatement.
+                            ?memberOfStatement a wikibase:BestRank;
+                                                 ps:P39 wd:Q18810062. # position
 
-                //            ?memberOfStatement pq:P580 ?reignstart;
-                //                               pq:P582 ?reignend. 
-                //            FILTER (?reignstart >= '1066-12-31T00:00:00Z'^^xsd:dateTime) . #start with William the Conquerer
-                //            MINUS {?human wdt:P97 wd:Q719039.}
+                            ?memberOfStatement pq:P580 ?reignstart;
+                                               pq:P582 ?reignend. 
+                            FILTER (?reignstart >= '1066-12-31T00:00:00Z'^^xsd:dateTime) . #start with William the Conquerer
+                            MINUS {?human wdt:P97 wd:Q719039.}
 
-                //            SERVICE wikibase:label {
-                //              bd:serviceParam wikibase:language 'en'.
-                //              ?human  rdfs:label ?name.
-                //            }
-                //          } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW())))
-                //          LIMIT 4}
-                //                BIND (?name as ?answer).
-                //                BIND ('the beginning of their reigning period' as ?question).
-                //        } ORDER BY ?reignstart"
-                //},
-                //new Question
-                //{
-                //    Id = "909182d1-4ae6-46ea-bd9b-8c4323ea53fa",
-                //    CategoryId = "55a4622b-0fed-4284-af0b-3c7f4c3e88d0", // History
-                //    MiniGameType = MiniGameType.Sort,
-                //    TaskDescription = "Sort the countries by {0} (ascending).",
-                //    SparqlQuery = @"# sort EU countries by the date they joined
-                //        SELECT ?date (SAMPLE(?answer) AS ?answer) (SAMPLE(?question) AS ?question) 
-                //        WITH {
-                //          SELECT DISTINCT (?memberOfEuSince as ?date) ?answer WHERE {
-                //            {SELECT ?item ?memberOfEuSince
-                //                          WHERE 
-                //                          {
-                //                            ?item p:P463 [ps:P463 wd:Q458;
-                //                                                  pq:P580 ?memberOfEuSince].
-                //                          }
-                //            }
-                //            SERVICE wikibase:label {
-                //              bd:serviceParam wikibase:language 'en'.
-                //              ?item  rdfs:label ?answer.
-                //            }
-                //          }
-                //        } AS %dates
-                //        WITH {
-                //          SELECT DISTINCT ?date WHERE {
-                //            INCLUDE %dates.
-                //          }
-                //          ORDER BY MD5(CONCAT(STR(?continent), STR(NOW())))
-                //          LIMIT 4
-                //        } AS %fourDates
-                //        WHERE {
-                //          INCLUDE %fourDates.
-                //          INCLUDE %dates.
-                //          BIND('the date they joined the EU' as ?question).
-                //        }
-                //        GROUP BY ?date
-                //        ORDER BY ?date"
-                //}
+                            SERVICE wikibase:label {
+                              bd:serviceParam wikibase:language 'en'.
+                              ?human  rdfs:label ?name.
+                            }
+                          } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW())))
+                          LIMIT 4}
+                                BIND (?name as ?answer).
+                                BIND ('the beginning of their reigning period' as ?question).
+                        } ORDER BY ?reignstart"
+                },
+                new Question
+                {
+                    Id = "909182d1-4ae6-46ea-bd9b-8c4323ea53fa",
+                    CategoryId = "55a4622b-0fed-4284-af0b-3c7f4c3e88d0", // History
+                    MiniGameType = MiniGameType.Sort,
+                    TaskDescription = "Sort the countries by {0} (ascending).",
+                    SparqlQuery = @"# sort EU countries by the date they joined
+                        SELECT ?date (SAMPLE(?answer) AS ?answer) (SAMPLE(?question) AS ?question) 
+                        WITH {
+                          SELECT DISTINCT (?memberOfEuSince as ?date) ?answer WHERE {
+                            {SELECT ?item ?memberOfEuSince
+                                          WHERE 
+                                          {
+                                            ?item p:P463 [ps:P463 wd:Q458;
+                                                                  pq:P580 ?memberOfEuSince].
+                                          }
+                            }
+                            SERVICE wikibase:label {
+                              bd:serviceParam wikibase:language 'en'.
+                              ?item  rdfs:label ?answer.
+                            }
+                          }
+                        } AS %dates
+                        WITH {
+                          SELECT DISTINCT ?date WHERE {
+                            INCLUDE %dates.
+                          }
+                          ORDER BY MD5(CONCAT(STR(?continent), STR(NOW())))
+                          LIMIT 4
+                        } AS %fourDates
+                        WHERE {
+                          INCLUDE %fourDates.
+                          INCLUDE %dates.
+                          BIND('the date they joined the EU' as ?question).
+                        }
+                        GROUP BY ?date
+                        ORDER BY ?date"
+                }
                 );
         }
     }

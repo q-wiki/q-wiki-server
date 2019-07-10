@@ -722,7 +722,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = "86b64102-8074-4c4e-8f3e-71a0e52bb261",
                     CategoryId = "55a4622b-0fed-4284-af0b-3c7f4c3e88d0", // History
                     MiniGameType = MiniGameType.MultipleChoice,
-                    TaskDescription = "Who was Federal Chancellor of Germany in {0}?.",
+                    TaskDescription = "Who was Federal Chancellor of Germany in {0}?",
                     SparqlQuery = @"# German Chancellors
                         SELECT ?answer (CONCAT(STR(?startYear), ' - ', STR(?endYear)) AS ?question) WHERE {
                           ?person p:P39 ?Bundeskanzler.
@@ -744,7 +744,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = "d135088c-e062-4016-8eb4-1d68c72915ea",
                     CategoryId = "55a4622b-0fed-4284-af0b-3c7f4c3e88d0", // History
                     MiniGameType = MiniGameType.MultipleChoice,
-                    TaskDescription = "Which colony belonged to the {0}?.",
+                    TaskDescription = "Which colony belonged to the {0}?",
                     SparqlQuery = @"# empires and colonies
                         SELECT DISTINCT ?empire (?empireLabel as ?question) ?colony (?colonyLabel as ?answer)
                         WITH {
@@ -816,6 +816,34 @@ namespace WikidataGame.Backend.Helpers
                             UNION
                             {INCLUDE %threeOtherColonies.}
                         } ORDER BY DESC(?empire)"
+                },
+                new Question
+                {
+                    Id = "0d218830-55d2-4d66-8d8f-d402514e9202",
+                    CategoryId = "55a4622b-0fed-4284-af0b-3c7f4c3e88d0", // History
+                    MiniGameType = MiniGameType.MultipleChoice,
+                    TaskDescription = "Which of these wars started in {0}?",
+                    SparqlQuery = @"# wars of the 20th century
+                        SELECT (SAMPLE(?itemLabel) as ?answer)  (YEAR(SAMPLE(?startdate)) as ?question) 
+                        WHERE {
+                          {
+                            SELECT DISTINCT ?item ?itemLabel ?startdate ?enddate (CONCAT(STR(YEAR(?startdate)), ' - ', STR(YEAR(?enddate))) AS ?time)  WHERE {
+                              ?item (wdt:P31/(wdt:P279*)) wd:Q198;
+        
+                                p:P582 ?memberOfStatementEnd.
+                                      ?memberOfStatementEnd a wikibase:BestRank; ps:P582 ?enddate.                     
+    
+                              ?item p:P580 ?memberOfStatementStart.
+                             ?memberOfStatementStart a wikibase:BestRank; ps:P580 ?startdate.
+                              FILTER(?startdate >= '1900-01-01T00:00:00Z'^^xsd:dateTime)
+                              SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. }
+                            } 
+                          }
+                          FILTER(!(CONTAINS(?itemLabel, '1')))
+                          FILTER(!(CONTAINS(?itemLabel, '2')))
+                          FILTER(!(STRSTARTS(?itemLabel, 'Q')))
+                        } GROUP BY ?item ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                        LIMIT 4"
                 }
                 );
         }

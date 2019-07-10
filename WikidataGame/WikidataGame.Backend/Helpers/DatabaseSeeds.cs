@@ -738,6 +738,84 @@ namespace WikidataGame.Backend.Helpers
                         }
                         ORDER BY (MD5(CONCAT(STR(?person), STR(NOW()))))
                         LIMIT 4"
+                },
+                new Question
+                {
+                    Id = "d135088c-e062-4016-8eb4-1d68c72915ea",
+                    CategoryId = "55a4622b-0fed-4284-af0b-3c7f4c3e88d0", // History
+                    MiniGameType = MiniGameType.MultipleChoice,
+                    TaskDescription = "Which colony belonged to the {0}?.",
+                    SparqlQuery = @"# empires and colonies
+                        SELECT DISTINCT ?empire (?empireLabel as ?question) ?colony (?colonyLabel as ?answer)
+                        WITH {
+                            SELECT DISTINCT ?empire ?empireLabel ?colony ?colonyLabel WHERE {
+                            {
+                                SELECT ?empire ?empireLabel ?colony ?colonyLabel WHERE {
+                                ?empire (wdt:P31/(wdt:P279*)) wd:Q1790360.
+                                ?colony wdt:P361 ?empire;
+                                        wdt:P31 wd:Q133156;
+                                        wdt:P576 ?enddate.
+                                FILTER(?enddate >= '1790-01-01T00:00:00Z'^^xsd:dateTime)
+                                SERVICE wikibase:label {
+                                    bd:serviceParam wikibase:language 'en'.
+                                    ?empire rdfs:label ?empireLabel.
+                                    ?colony rdfs:label ?colonyLabel.
+                                }
+                                }
+                            }
+                            UNION
+                            {
+                                SELECT DISTINCT ?colony ?colonyLabel ?empire ?empireLabel WHERE {
+                                ?colony (wdt:P31/(wdt:P279*)) wd:Q133156;
+                                                                wdt:P576 ?enddate;
+                                                                wdt:P17 ?empire.
+                                VALUES ?empire {
+                                    wd:Q8680
+                                }
+                                SERVICE wikibase:label { 
+                                    bd:serviceParam wikibase:language 'en'. 
+                                    ?empire rdfs:label ?empireLabel.
+                                    ?colony rdfs:label ?colonyLabel.
+                                }
+                                FILTER(?enddate >= '1790-01-01T00:00:00Z'^^xsd:dateTime)
+                                }
+                            }
+                            FILTER(!(CONTAINS(?colonyLabel, 'Q')))
+                            }
+                        } as %colonies
+
+                        WITH {
+                            SELECT ?colony ?colonyLabel ?empire ?empireLabel WHERE {
+                            INCLUDE %colonies.
+                            {
+                                SELECT ?empire WHERE {
+                                INCLUDE %colonies.
+                                } GROUP BY ?empire 
+                                ORDER BY (MD5(CONCAT(STR(?empire), STR(NOW()))))
+                                LIMIT 1
+                            }
+                            }
+                        } as %selectedEmpire
+
+                        WITH {
+                            SELECT ?colony ?colonyLabel ?empire ?empireLabel WHERE {
+                            INCLUDE %selectedEmpire.
+                            } ORDER BY (MD5(CONCAT(STR(?colony), STR(NOW())))) LIMIT 1
+                        } as %selectedColony
+
+                        WITH {
+                            SELECT ?colony ?colonyLabel ?empty ?emptyLabel WHERE {
+                            INCLUDE %colonies.
+                            MINUS {INCLUDE %selectedEmpire.}.
+    
+                            } ORDER BY (MD5(CONCAT(STR(?colony), STR(NOW())))) LIMIT 3
+                        } as %threeOtherColonies
+
+                        WHERE {
+                            {INCLUDE %selectedColony.}
+                            UNION
+                            {INCLUDE %threeOtherColonies.}
+                        } ORDER BY DESC(?empire)"
                 }
                 );
         }

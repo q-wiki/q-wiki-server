@@ -706,7 +706,7 @@ namespace WikidataGame.Backend.Helpers
                           SELECT DISTINCT ?date WHERE {
                             INCLUDE %dates.
                           }
-                          ORDER BY MD5(CONCAT(STR(?continent), STR(NOW())))
+                          ORDER BY MD5(CONCAT(STR(?date), STR(NOW())))
                           LIMIT 4
                         } AS %fourDates
                         WHERE {

@@ -862,6 +862,36 @@ namespace WikidataGame.Backend.Helpers
                         }
                         ORDER BY (MD5(CONCAT(STR(?answer), STR(NOW()))))
                         LIMIT 4"
+                },
+                new Question
+                {
+                    Id = "bba18c92-47a6-4541-9305-d6453ad8477a",
+                    CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5", // Chemistry
+                    MiniGameType = MiniGameType.Sort,
+                    TaskDescription = "Sort chemical compounds by {0} (ascending).",
+                    SparqlQuery = @"# Sort chemical compounds by melting point
+                        SELECT ?answer ?question ?melting WHERE {
+                          {
+                            SELECT DISTINCT ?answer (AVG(?melting) as ?melting) ?unitLabel WHERE {
+                              ?chemicalCompound wdt:P31 wd:Q11173;
+                                wikibase:sitelinks ?sitelinks;
+                                p:P2101/psv:P2101 [ 
+                                  wikibase:quantityUnit ?unit;
+                                  wikibase:quantityAmount ?melting;
+                                ]
+                              FILTER(?sitelinks >= 50 )
+                              BIND(wd:Q25267 AS ?unit)
+                              ?chemicalCompound rdfs:label ?answer.
+                              FILTER((LANG(?answer)) = 'en')
+                              ?unit rdfs:label ?unitLabel.
+                              FILTER((LANG(?unitLabel)) = 'en')
+                            }GROUP BY ?answer ?unitLabel
+                            ORDER BY (MD5(CONCAT(STR(?answer), STR(NOW()))))
+                            LIMIT 4
+                          }
+                          BIND('melting point' AS ?question)
+                        }
+                        ORDER BY (?melting)"
                 }
                 );
         }

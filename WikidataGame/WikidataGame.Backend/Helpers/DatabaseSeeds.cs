@@ -826,25 +826,21 @@ namespace WikidataGame.Backend.Helpers
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "Which of these wars started in {0}?",
                     SparqlQuery = @"# wars of the 20th century
-                        SELECT (SAMPLE(?itemLabel) as ?answer)  (YEAR(SAMPLE(?startdate)) as ?question) 
-                        WHERE {
+                        SELECT (SAMPLE(?itemLabel) AS ?answer) (YEAR(MAX(?startdate)) AS ?question) WHERE {
                           {
-                            SELECT DISTINCT ?item ?itemLabel ?startdate ?enddate (CONCAT(STR(YEAR(?startdate)), ' - ', STR(YEAR(?enddate))) AS ?time)  WHERE {
-                              ?item (wdt:P31/(wdt:P279*)) wd:Q198;
-        
-                                p:P582 ?memberOfStatementEnd.
-                                      ?memberOfStatementEnd a wikibase:BestRank; ps:P582 ?enddate.                     
-    
-                              ?item p:P580 ?memberOfStatementStart.
-                             ?memberOfStatementStart a wikibase:BestRank; ps:P580 ?startdate.
+                            SELECT ?item ?itemLabel ?startdate WHERE {
+                              ?item (wdt:P31/(wdt:P279*)) wd:Q198.
+                              ?item wdt:P580 ?startdate.
                               FILTER(?startdate >= '1900-01-01T00:00:00Z'^^xsd:dateTime)
                               SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. }
-                            } 
+                            }
                           }
                           FILTER(!(CONTAINS(?itemLabel, '1')))
                           FILTER(!(CONTAINS(?itemLabel, '2')))
                           FILTER(!(STRSTARTS(?itemLabel, 'Q')))
-                        } GROUP BY ?item ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                        }
+                        GROUP BY ?itemLabel
+                        ORDER BY (MD5(CONCAT(STR(?item), STR(NOW()))))
                         LIMIT 4"
                 },
                 new Question

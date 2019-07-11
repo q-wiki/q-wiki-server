@@ -156,14 +156,14 @@ namespace WikidataGame.Backend.Helpers
                         WITH {
                           SELECT DISTINCT ?state ?continent WHERE {
                             INCLUDE %selectedContinent.
-                          } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW()))) # order by random
+                          } ORDER BY MD5(CONCAT(STR(?state), STR(NOW()))) # order by random
                           LIMIT 1
                         } AS %oneState
                         WITH {
                           SELECT ?state ?empty WHERE {
                             INCLUDE %states.
                             FILTER NOT EXISTS { INCLUDE %selectedContinent. }
-                          } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW()))) # order by random
+                          } ORDER BY MD5(CONCAT(STR(?state), STR(NOW()))) # order by random
                           LIMIT 3
                         } AS %threeStates
                         WHERE {

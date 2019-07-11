@@ -41,10 +41,10 @@ namespace WikidataGame.Backend.Tests
         {
             _output.WriteLine($"Question Info: Id({q.Id}), Type({q.MiniGameType.ToString()}), Description({q.TaskDescription})");
             TestMinigameService service = new TestMinigameService(Db.Instance.MinigameRepo, Db.Instance.Context);
-            var result = service.QueryWikidata(q.SparqlQuery);
+            var result = service.QueryWikidata($"{q.SparqlQuery}{Environment.NewLine}#{Guid.NewGuid().ToString()}");
 
             TestMinigameService service2 = new TestMinigameService(Db.Instance.MinigameRepo, Db.Instance.Context);
-            var result2 = service2.QueryWikidata(q.SparqlQuery);
+            var result2 = service2.QueryWikidata($"{q.SparqlQuery}{Environment.NewLine}#{Guid.NewGuid().ToString()}");
             Assert.NotEqual(result, result2);
         }
     }

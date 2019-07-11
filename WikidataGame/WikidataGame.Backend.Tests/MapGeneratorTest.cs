@@ -46,6 +46,7 @@ namespace WikidataGame.Backend.Tests
             Assert.True(mapCandidate.Count(t => t.IsAccessible && t.Difficulty == 0) >= 1);
             Assert.True(mapCandidate.Count(t => t.IsAccessible && t.Difficulty == 1) >= 1);
             Assert.True(mapCandidate.Count(t => t.IsAccessible && t.Difficulty == 2) >= 1);
+            Assert.All(mapCandidate, t => Assert.True(!t.IsAccessible || t.Difficulty >= 0 && t.Difficulty <= 2));
         }
 
         [Fact]

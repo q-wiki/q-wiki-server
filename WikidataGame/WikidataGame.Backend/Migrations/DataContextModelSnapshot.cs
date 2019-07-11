@@ -260,14 +260,14 @@ namespace WikidataGame.Backend.Migrations
                         WITH {
                           SELECT DISTINCT ?state ?continent WHERE {
                             INCLUDE %selectedContinent.
-                          } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW()))) # order by random
+                          } ORDER BY MD5(CONCAT(STR(?state), STR(NOW()))) # order by random
                           LIMIT 1
                         } AS %oneState
                         WITH {
                           SELECT ?state ?empty WHERE {
                             INCLUDE %states.
                             FILTER NOT EXISTS { INCLUDE %selectedContinent. }
-                          } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW()))) # order by random
+                          } ORDER BY MD5(CONCAT(STR(?state), STR(NOW()))) # order by random
                           LIMIT 3
                         } AS %threeStates
                         WHERE {
@@ -732,27 +732,29 @@ namespace WikidataGame.Backend.Migrations
                             CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
                             MiniGameType = 0,
                             SparqlQuery = @"#English kings until 1707
-                        SELECT DISTINCT ?question ?answer WHERE {
-                          {SELECT DISTINCT ?human ?name ?reignstart ?reignend WHERE {
-                            ?human wdt:P31 wd:Q5.      #find humans
-                            ?human p:P39 ?memberOfStatement.
-                            ?memberOfStatement a wikibase:BestRank;
-                                                 ps:P39 wd:Q18810062. # position
-
-                            ?memberOfStatement pq:P580 ?reignstart;
-                                               pq:P582 ?reignend. 
-                            FILTER (?reignstart >= '1066-12-31T00:00:00Z'^^xsd:dateTime) . #start with William the Conquerer
-                            MINUS {?human wdt:P97 wd:Q719039.}
-
-                            SERVICE wikibase:label {
-                              bd:serviceParam wikibase:language 'en'.
-                              ?human  rdfs:label ?name.
-                            }
-                          } ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
-                          LIMIT 4}
-                                BIND (?name as ?answer).
-                                BIND ('the beginning of their reigning period' as ?question).
-                        } ORDER BY ?reignstart",
+                        SELECT DISTINCT ?question ?answer ?reignstart ?reignend WHERE {
+                          {
+                            SELECT DISTINCT ?human ?name (MIN(?reignstart) as ?reignstart) (MIN(?reignend) as ?reignend) WHERE {
+                              ?human wdt:P31 wd:Q5;
+                                p:P39 ?memberOfStatement.
+                              ?memberOfStatement rdf:type wikibase:BestRank;
+                                ps:P39 wd:Q18810062;
+                                pq:P580 ?reignstart;
+                                pq:P582 ?reignend.
+                              FILTER(?reignstart >= '1066-12-31T00:00:00Z'^^xsd:dateTime)
+                              MINUS { ?human wdt:P97 wd:Q719039. }
+                              SERVICE wikibase:label {
+                                bd:serviceParam wikibase:language 'en'.
+                                ?human rdfs:label ?name.
+                              }
+                            } GROUP BY ?human ?name
+                            ORDER BY (MD5(CONCAT(STR(?name), STR(NOW()))))
+                            LIMIT 4
+                          }
+                          BIND(?name AS ?answer)
+                          BIND('the beginning of their reigning period' AS ?question)
+                        }
+                        ORDER BY (?reignstart)",
                             TaskDescription = "Sort these English kings by {0} (ascending)."
                         },
                         new
@@ -899,25 +901,21 @@ namespace WikidataGame.Backend.Migrations
                             CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
                             MiniGameType = 2,
                             SparqlQuery = @"# wars of the 20th century
-                        SELECT (SAMPLE(?itemLabel) as ?answer)  (YEAR(SAMPLE(?startdate)) as ?question) 
-                        WHERE {
+                        SELECT (SAMPLE(?itemLabel) AS ?answer) (YEAR(MAX(?startdate)) AS ?question) WHERE {
                           {
-                            SELECT DISTINCT ?item ?itemLabel ?startdate ?enddate (CONCAT(STR(YEAR(?startdate)), ' - ', STR(YEAR(?enddate))) AS ?time)  WHERE {
-                              ?item (wdt:P31/(wdt:P279*)) wd:Q198;
-        
-                                p:P582 ?memberOfStatementEnd.
-                                      ?memberOfStatementEnd a wikibase:BestRank; ps:P582 ?enddate.                     
-    
-                              ?item p:P580 ?memberOfStatementStart.
-                             ?memberOfStatementStart a wikibase:BestRank; ps:P580 ?startdate.
+                            SELECT ?item ?itemLabel ?startdate WHERE {
+                              ?item (wdt:P31/(wdt:P279*)) wd:Q198.
+                              ?item wdt:P580 ?startdate.
                               FILTER(?startdate >= '1900-01-01T00:00:00Z'^^xsd:dateTime)
                               SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. }
-                            } 
+                            }
                           }
                           FILTER(!(CONTAINS(?itemLabel, '1')))
                           FILTER(!(CONTAINS(?itemLabel, '2')))
                           FILTER(!(STRSTARTS(?itemLabel, 'Q')))
-                        } GROUP BY ?item ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                        }
+                        GROUP BY ?itemLabel
+                        ORDER BY (MD5(CONCAT(STR(?item), STR(NOW()))))
                         LIMIT 4",
                             TaskDescription = "Which of these wars started in {0}?"
                         },

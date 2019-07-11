@@ -193,7 +193,7 @@ namespace WikidataGame.Backend.Controllers
             {
                 if (!string.IsNullOrEmpty(tile.OwnerId))
                 {
-                    result[tile.OwnerId] += ++tile.Difficulty;
+                    result[tile.OwnerId] += tile.Difficulty + 1;
                 }
             }
             var rankedPlayers = result.OrderByDescending(r => r.Value);

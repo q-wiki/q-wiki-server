@@ -142,7 +142,7 @@ namespace WikidataGame.Backend.Controllers
                     game.NextMovePlayerId = nextPlayer.UserId;
                     game.MoveStartedAt = DateTime.UtcNow;
                     game.StepsLeftWithinMove = Models.Game.StepsPerPlayer;
-                    await _notificationService.SendNotification(nextPlayer.User, "Your turn", "It's your turn!");
+                    await _notificationService.SendNotification(nextPlayer.User, "It's your turn!", "You have 12 hours left to play your round.");
                 }
             }
             _dataContext.SaveChanges();
@@ -218,7 +218,7 @@ namespace WikidataGame.Backend.Controllers
             }
             foreach (var looser in game.GameUsers.Where(gu => !winningPlayerIds.Contains(gu.UserId)))
             {
-                await _notificationService.SendNotification(looser.User, "Too bad.", "You lost the game!");
+                await _notificationService.SendNotification(looser.User, "Too bad.", "You lost the game! Start a new game for another chance.");
             }
         }
     }

@@ -316,5 +316,23 @@ namespace WikidataGame.Backend.Tests
             Assert.False(Helpers.TileHelper.HasIslands(completelyAccessible, 3, 3));
             Assert.False(Helpers.TileHelper.HasIslands(completelyInaccessible, 3, 3));
         }
+
+        [Fact]
+        public void HasIslands_AdvancedCasesFromRealUsage_IdentifiedCorrectly ()
+        {
+            var example = new [] {
+                "x", "x", "x", "x", "x", "x", "x", "x",
+                "o", "x", "x", "x", "x", "x", "o", "o",
+                "x", "x", "x", "x", "x", "x", "o", "o",
+                "x", "x", "x", "x", "x", "x", "o", "x", // <- the last x here is the island
+                "x", "o", "x", "x", "x", "o", "x", "o",
+                "x", "x", "x", "x", "x", "x", "x", "x",
+                "x", "x", "o", "x", "x", "x", "o", "x",
+                "x", "x", "x", "o", "x", "x", "o", "x",
+                "o", "o", "o", "o", "o", "o", "o", "x"
+            }.Select(x => new Models.Tile { IsAccessible = x == "x" });
+
+            Assert.True(Helpers.TileHelper.HasIslands(example, 8, 8));
+        }
     }
 }

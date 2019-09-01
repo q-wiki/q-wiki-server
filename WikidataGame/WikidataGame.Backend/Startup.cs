@@ -36,7 +36,7 @@ namespace WikidataGame.Backend
             Configuration = builder.Build();
         }
 
-        public IConfiguration Configuration { get; }
+        public static IConfiguration Configuration { get; private set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -73,14 +73,9 @@ namespace WikidataGame.Backend
                 //services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("TestDb").UseLazyLoadingProxies());
                 services.AddDbContext<DataContext>(x => x.UseSqlite("Filename=qwiki.db").UseLazyLoadingProxies());
             }
-
-            // configure strongly typed settings objects
-            var appSettingsSection = Configuration.GetSection("AppSettings");
-            services.Configure<AppSettings>(appSettingsSection);
-
+            
             // configure jwt authentication
-            var appSettings = appSettingsSection.Get<AppSettings>();
-            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+            var key = Encoding.ASCII.GetBytes(Configuration.GetValue<string>("AuthSecret"));
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

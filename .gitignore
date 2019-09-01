@@ -332,3 +332,7 @@ ASALocalRun/
 
 #Test Database
 qwiki.db
+
+#appsettings.json
+appsettings\.json
+appsettings\.Development\.json

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -13,10 +14,10 @@ namespace WikidataGame.Backend.Helpers
 {
     public class JwtTokenHelper
     {
-        public static AuthInfo CreateJwtToken(string deviceId, AppSettings appSettings)
+        public static AuthInfo CreateJwtToken(string deviceId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+            var key = Encoding.ASCII.GetBytes(Startup.Configuration.GetValue<string>("AuthSecret"));
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]

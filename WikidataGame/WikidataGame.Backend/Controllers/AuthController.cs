@@ -16,17 +16,13 @@ namespace WikidataGame.Backend.Controllers
     [ApiController]
     public class AuthController : CustomControllerBase
     {
-        private readonly AppSettings _appSettings;
         public AuthController(
             DataContext dataContext,
             IUserRepository userRepo,
             IGameRepository gameRepo,
-            IOptions<AppSettings> appSettings,
             IRepository<Models.Category, string> categoryRepo,
             INotificationService notificationService) : base(dataContext, userRepo, gameRepo, categoryRepo, notificationService)
-        {
-            _appSettings = appSettings.Value;
-        }
+        {}
 
         /// <summary>
         /// Authenticates a player 
@@ -66,7 +62,7 @@ namespace WikidataGame.Backend.Controllers
 
             _dataContext.SaveChanges();
 
-            var authInfo = JwtTokenHelper.CreateJwtToken(deviceId, _appSettings);
+            var authInfo = JwtTokenHelper.CreateJwtToken(deviceId);
             Response.Headers.Add("WWW-Authenticate", $"Bearer {authInfo.Bearer}");
             return Ok(authInfo);
         }

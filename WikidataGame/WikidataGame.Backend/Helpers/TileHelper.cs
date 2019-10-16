@@ -90,7 +90,7 @@ namespace WikidataGame.Backend.Helpers
 
         public static bool HasIslands (IEnumerable<Tile> tiles, int width, int height)
         {
-            var colors = new Dictionary<(int, int), int>(); // maps a tuple of (x, y) to chosen colors
+            var colors = new Dictionary<(int, int), int?>(); // maps a tuple of (x, y) to chosen colors
             var color = -1;
             var synonymousColors = new Dictionary<int, int>();
 
@@ -107,14 +107,15 @@ namespace WikidataGame.Backend.Helpers
                             .ToList();
 
                         // try to find a neighbor that has a color and use that
-                        try
+                        var neighborColor = neighborCoords
+                            .Select(neighbor => colors.GetValueOrDefault(neighbor, null))
+                            .FirstOrDefault(c => c != null);
+
+                        if(neighborColor != null)
                         {
-                            var neighborColor = neighborCoords
-                                .Select(neighbor => colors.GetValueOrDefault(neighbor, -2))
-                                .First(c => c != -2);
                             colors[(x,y)] = neighborColor;
                         }
-                        catch (Exception ex) when (ex is ArgumentNullException || ex is InvalidOperationException)
+                        else
                         {
                             colors[(x, y)] = ++color;
                         }
@@ -125,7 +126,7 @@ namespace WikidataGame.Backend.Helpers
                             .Where(coord => colors.ContainsKey(coord) && colors[coord] != colors[(x, y)])
                             .Select(coord => colors[coord])
                             .ToList()
-                            .ForEach(neighborsColor => synonymousColors[neighborsColor] = color);
+                            .ForEach(neighborsColor => synonymousColors[neighborsColor.Value] = color);
                     }
                 }
             }

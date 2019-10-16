@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using WikidataGame.Backend.Models;
 using WikidataGame.Backend.Helpers;
+using System.Text;
 
 namespace WikidataGame.Backend.Services
 {
@@ -133,14 +134,22 @@ namespace WikidataGame.Backend.Services
 
         public static void Debug (int mapWidth, IEnumerable<Tile> tiles)
         {
+            Console.WriteLine(MapToString(mapWidth, tiles));
+        }
+
+        public static string MapToString(int mapWidth, IEnumerable<Tile> tiles)
+        {
+            var sb = new StringBuilder();
             for (int i = 0; i < tiles.Count(); i++)
             {
-                Console.Write(tiles.ElementAt(i));
-                if (i % mapWidth == 0) System.Console.WriteLine();
+                if (i > 0 && i % mapWidth == 0) sb.AppendLine();
+                sb.Append(tiles.ElementAt(i).IsAccessible ? "x" : " ");
             }
-            Console.WriteLine();
-            Console.WriteLine($"Accessible tiles: {tiles.Count(x => x.IsAccessible)}");
-            Console.WriteLine();
+            sb.AppendLine();
+            sb.AppendLine($"Accessible tiles: {tiles.Count(x => x.IsAccessible)}");
+            sb.AppendLine();
+
+            return sb.ToString();
         }
     }
 }

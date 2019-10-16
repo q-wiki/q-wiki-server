@@ -3,12 +3,20 @@ using System.Linq;
 using System.Collections.Generic;
 using Xunit;
 using WikidataGame.Backend;
+using WikidataGame.Backend.Services;
+using Xunit.Abstractions;
 
 namespace WikidataGame.Backend.Tests
 {
     public class MapGeneratorTest
     {
         //Getting started: https://xunit.net/docs/getting-started/netcore/cmdline
+        private readonly ITestOutputHelper _output;
+
+        public MapGeneratorTest(ITestOutputHelper output)
+        {
+            _output = output;
+        }
 
         [Fact]
         public void GenerateMapCandidate_10x10Map_SizeAndAmountOfAccessibleTilesAreCorrect ()
@@ -71,6 +79,7 @@ namespace WikidataGame.Backend.Tests
             var map = Services.MapGeneratorService.GenerateMap(
                 mapWidth, mapHeight, accessibleTiles
             );
+            _output.WriteLine(MapGeneratorService.MapToString(10, map));
 
             Assert.False(Helpers.TileHelper.HasIslands(map, mapWidth, mapHeight));
         }
@@ -80,6 +89,7 @@ namespace WikidataGame.Backend.Tests
         {
             // no tiles should have an owner before two players joined
             var finalMapCandidate = Services.MapGeneratorService.GenerateMap(10, 10, 5);
+
             Assert.All(finalMapCandidate, tile => Assert.Null(tile.Owner));
             
             var p1 = new Models.User { Id="user-a" };

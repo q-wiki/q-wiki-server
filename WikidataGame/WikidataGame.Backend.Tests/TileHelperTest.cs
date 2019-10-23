@@ -14,7 +14,6 @@ namespace WikidataGame.Backend.Tests
 {
     public class TileHelperTest
     {
-
         private IRepository<Category, string> CategoryRepo()
         {
             var Builderoptions = new DbContextOptionsBuilder<Helpers.DataContext>();
@@ -321,15 +320,16 @@ namespace WikidataGame.Backend.Tests
         public void HasIslands_AdvancedCasesFromRealUsage_IdentifiedCorrectly ()
         {
             var example = new [] {
-                "x", "x", "x", "x", "x", "x", "x", "x",
-                "o", "x", "x", "x", "x", "x", "o", "o",
-                "x", "x", "x", "x", "x", "x", "o", "o",
-                "x", "x", "x", "x", "x", "x", "o", "x", // <- the last x here is the island
-                "x", "o", "x", "x", "x", "o", "x", "o",
-                "x", "x", "x", "x", "x", "x", "x", "x",
-                "x", "x", "o", "x", "x", "x", "o", "x",
-                "x", "x", "x", "o", "x", "x", "o", "x",
-                "o", "o", "o", "o", "o", "o", "o", "x"
+                "x", "o", "o", "x", "x", "x", "x", "o", "x", "x",
+                "o", "x", "x", "o", "x", "o", "o", "x", "o", "x",
+                "x", "x", "o", "x", "x", "x", "o", "x", "x", "x",
+                "x", "o", "x", "o", "x", "o", "x", "x", "x", "x",
+                "x", "x", "o", "x", "o", "x", "x", "x", "x", "x",
+                "x", "x", "x", "x", "o", "x", "x", "x", "o", "x",
+                "x", "x", "x", "o", "x", "x", "x", "x", "x", "o",
+                "x", "x", "x", "x", "o", "x", "x", "x", "o", "x",
+                "o", "o", "o", "x", "o", "x", "o", "x", "o", "o",
+                "x", "o", "x", "x", "x", "o", "x", "x", "x", "x"
             }.Select(x => new Models.Tile { IsAccessible = x == "x" });
 
             Assert.True(Helpers.TileHelper.HasIslands(example, 8, 8));

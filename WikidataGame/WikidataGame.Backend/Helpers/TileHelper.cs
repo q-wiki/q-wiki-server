@@ -90,7 +90,7 @@ namespace WikidataGame.Backend.Helpers
 
         public static bool HasIslands (IEnumerable<Tile> tiles, int width, int height)
         {
-            var colors = new Dictionary<(int, int), int>(); // maps a tuple of (x, y) to chosen colors
+            var colors = new Dictionary<(int, int), int?>(); // maps a tuple of (x, y) to chosen colors
             var color = -1;
             var synonymousColors = new Dictionary<int, int>();
 
@@ -103,18 +103,19 @@ namespace WikidataGame.Backend.Helpers
                     {
                         var neighborCoords = GetNeighbors(tiles, x, y, width, height)
                             .Keys
-                            .Where(((int x, int y) coord) => coord.x <= x && coord.y <= y)
+                            .Where(((int _x, int _y) coord) => coord._x <= x && coord._y <= y)
                             .ToList();
 
                         // try to find a neighbor that has a color and use that
-                        try
+                        var neighborColor = neighborCoords
+                            .Select(neighbor => colors.GetValueOrDefault(neighbor, null))
+                            .FirstOrDefault(c => c != null);
+
+                        if(neighborColor != null)
                         {
-                            var neighborColor = neighborCoords
-                                .Select(neighbor => colors.GetValueOrDefault(neighbor, -2))
-                                .First(c => c != -2);
-                            colors[(x,y)] = neighborColor;
+                            colors[(x, y)] = neighborColor;
                         }
-                        catch (Exception ex) when (ex is ArgumentNullException || ex is InvalidOperationException)
+                        else
                         {
                             colors[(x, y)] = ++color;
                         }
@@ -122,10 +123,10 @@ namespace WikidataGame.Backend.Helpers
                         // if neighboring fields use a different color,
                         // the colors are equivalent
                         neighborCoords
-                            .Where(coord => colors.ContainsKey(coord) && colors[coord] != colors[(x, y)])
-                            .Select(coord => colors[coord])
+                            .Select(coord => colors.GetValueOrDefault(coord, color))
+                            .Where(neighboringColor => neighboringColor != color)
                             .ToList()
-                            .ForEach(neighborsColor => synonymousColors[neighborsColor] = color);
+                            .ForEach(neighboringColor => synonymousColors[neighboringColor.Value] = color);
                     }
                 }
             }

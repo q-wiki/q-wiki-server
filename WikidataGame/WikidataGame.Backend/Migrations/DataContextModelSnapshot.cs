@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WikidataGame.Backend.Helpers;
 
@@ -15,9 +14,7 @@ namespace WikidataGame.Backend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity("WikidataGame.Backend.Models.Category", b =>
                 {
@@ -801,13 +798,15 @@ namespace WikidataGame.Backend.Migrations
                             CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
                             MiniGameType = 2,
                             SparqlQuery = @"# German Chancellors
-                        SELECT ?answer (CONCAT(STR(?startYear), ' - ', STR(?endYear)) AS ?question) WHERE {
+                        SELECT ?answer (CONCAT(STR(?startYear), ' to ', STR(?endYear)) AS ?question) WHERE {
                           ?person p:P39 ?Bundeskanzler.
                           ?Bundeskanzler ps:P39 wd:Q4970706;
-                            pq:P580 ?start.
-                          OPTIONAL { ?Bundeskanzler pq:P582 ?end. }
+                                         pq:P580 ?start;
+                                         pq:P582 ?end. # <- note the mandatory end date
+
                           BIND(YEAR(?start) AS ?startYear)
-                          BIND(IF(!(BOUND(?end)), 'today', YEAR(?end)) AS ?endYear)
+                          BIND(YEAR(?end) AS ?endYear)
+
                           SERVICE wikibase:label {
                             bd:serviceParam wikibase:language 'en'.
                             ?person rdfs:label ?answer.
@@ -815,7 +814,7 @@ namespace WikidataGame.Backend.Migrations
                         }
                         ORDER BY (MD5(CONCAT(STR(?person), STR(NOW()))))
                         LIMIT 4",
-                            TaskDescription = "Who was Federal Chancellor of Germany in {0}?"
+                            TaskDescription = "Who was Federal Chancellor of Germany from {0}?"
                         },
                         new
                         {

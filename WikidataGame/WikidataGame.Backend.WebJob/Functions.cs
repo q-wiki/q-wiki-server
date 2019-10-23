@@ -34,8 +34,8 @@ namespace WikidataGame.Backend.WebJob
                 var expiringPlayer = game.GameUsers.SingleOrDefault(gu => gu.UserId == game.NextMovePlayerId);
                 var winningPlayer = game.GameUsers.SingleOrDefault(gu => gu.UserId != game.NextMovePlayerId);
                 winningPlayer.IsWinner = true;
-                await _notificationService.SendNotification(winningPlayer.User, "Congrats", "You won this game due to your opponent being inactive!");
-                await _notificationService.SendNotification(expiringPlayer.User, "Too bad.", "You lost the game due to inactivity!");
+                await _notificationService.SendNotificationAsync(winningPlayer.User, "Congrats", "You won this game due to your opponent being inactive!");
+                await _notificationService.SendNotificationAsync(expiringPlayer.User, "Too bad.", "You lost the game due to inactivity!");
             }
             await _dataContext.SaveChangesAsync();
         }

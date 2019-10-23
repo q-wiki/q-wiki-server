@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.NotificationHubs;
 using Microsoft.Azure.NotificationHubs.Messaging;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Services
@@ -27,7 +28,25 @@ namespace WikidataGame.Backend.Services
             }
         }
 
-        public async Task SendNotification(User receiver, string title, string body)
+        public async Task SendNotificationAsync(User receiver, string title, string body)
+        {
+            await SendNotificationAsync(receiver,
+                 $"{{ \"notification\": {{ \"title\": \"{title}\", \"body\": \"{body}\" }} }}");
+        }
+
+        public async Task SendNotificationWithDataAsync(User receiver, string title, string body, object data)
+        {
+            await SendNotificationAsync(receiver,
+                 $"{{ \"notification\": {{ \"title\": \"{title}\", \"body\": \"{body}\" }}, \"data\": {JsonConvert.SerializeObject(data)} }}");
+        }
+
+        public async Task SendSilentNotificationAsync(User receiver, object data)
+        {
+            await SendNotificationAsync(receiver,
+                 $"{{ \"data\": {JsonConvert.SerializeObject(data)} }}");
+        }
+
+        private async Task SendNotificationAsync(User receiver, string content)
         {
             if (_hub == null || string.IsNullOrEmpty(receiver.PushRegistrationId))
                 return;
@@ -36,7 +55,7 @@ namespace WikidataGame.Backend.Services
             switch (receiver.Platform)
             {
                 case GamePlatform.Android:
-                    notification = new FcmNotification($"{{ \"notification\": {{ \"title\": \"{title}\", \"body\": \"{body}\" }} }}");
+                    notification = new FcmNotification(content);
                     break;
                 default:
                     throw new NotImplementedException();
@@ -45,7 +64,8 @@ namespace WikidataGame.Backend.Services
             await _hub.SendNotificationAsync(notification, $"{UserIdTag}:{receiver.Id}");
         }
 
-        public async Task<string> RegisterOrUpdatePushChannel(User user, DeviceRegistration deviceRegistration)
+
+        public async Task<string> RegisterOrUpdatePushChannelAsync(User user, DeviceRegistration deviceRegistration)
         {
             if (_hub == null)
                 return string.Empty;
@@ -94,7 +114,7 @@ namespace WikidataGame.Backend.Services
 
         }
 
-        public async Task DeleteUser(User user)
+        public async Task DeleteUserAsync(User user)
         {
             await _hub.DeleteRegistrationsByChannelAsync(user.PushRegistrationId);
         }

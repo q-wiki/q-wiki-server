@@ -45,13 +45,13 @@ namespace WikidataGame.Backend.Controllers
             {
                 if (!string.IsNullOrEmpty(user.PushRegistrationId))
                 {
-                    await _notificationService.DeleteUser(user);
+                    await _notificationService.DeleteUserAsync(user);
                     user.PushRegistrationId = string.Empty;
                 }
             }
             else
             {
-                var registrationId = await _notificationService.RegisterOrUpdatePushChannel(user, new DeviceRegistration
+                var registrationId = await _notificationService.RegisterOrUpdatePushChannelAsync(user, new DeviceRegistration
                 {
                     Handle = pushToken,
                     Platform = "fcm",

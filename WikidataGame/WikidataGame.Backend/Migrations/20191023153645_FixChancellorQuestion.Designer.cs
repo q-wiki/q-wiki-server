@@ -9,7 +9,7 @@ using WikidataGame.Backend.Helpers;
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20191023151515_FixChancellorQuestion")]
+    [Migration("20191023153645_FixChancellorQuestion")]
     partial class FixChancellorQuestion
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -803,10 +803,12 @@ namespace WikidataGame.Backend.Migrations
                         SELECT ?answer (CONCAT(STR(?startYear), ' to ', STR(?endYear)) AS ?question) WHERE {
                           ?person p:P39 ?Bundeskanzler.
                           ?Bundeskanzler ps:P39 wd:Q4970706;
-                            pq:P580 ?start.
-                          ?Bundeskanzler pq:P582 ?end. # <- make end mandatory
+                                         pq:P580 ?start;
+                                         pq:P582 ?end. # <- note the mandatory end date
+
                           BIND(YEAR(?start) AS ?startYear)
-                          BIND(IF(!(BOUND(?end)), 'today', YEAR(?end)) AS ?endYear)
+                          BIND(YEAR(?end) AS ?endYear)
+
                           SERVICE wikibase:label {
                             bd:serviceParam wikibase:language 'en'.
                             ?person rdfs:label ?answer.

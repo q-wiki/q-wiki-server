@@ -9,11 +9,19 @@ using WikidataGame.Backend.Models;
 using WikidataGame.Backend.Repos;
 using Microsoft.EntityFrameworkCore;
 using WikidataGame.Backend.Services;
+using Xunit.Abstractions;
 
 namespace WikidataGame.Backend.Tests
 {
     public class TileHelperTest
     {
+        private readonly ITestOutputHelper _output;
+
+        public TileHelperTest(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+        
         private IRepository<Category, string> CategoryRepo()
         {
             var Builderoptions = new DbContextOptionsBuilder<Helpers.DataContext>();
@@ -319,7 +327,7 @@ namespace WikidataGame.Backend.Tests
         [Fact]
         public void HasIslands_AdvancedCasesFromRealUsage_IdentifiedCorrectly ()
         {
-            var example = new [] {
+            var ex1 = new [] {
                 "x", "o", "o", "x", "x", "x", "x", "o", "x", "x",
                 "o", "x", "x", "o", "x", "o", "o", "x", "o", "x",
                 "x", "x", "o", "x", "x", "x", "o", "x", "x", "x",
@@ -331,8 +339,21 @@ namespace WikidataGame.Backend.Tests
                 "o", "o", "o", "x", "o", "x", "o", "x", "o", "o",
                 "x", "o", "x", "x", "x", "o", "x", "x", "x", "x"
             }.Select(x => new Models.Tile { IsAccessible = x == "x" });
+            
+            var ex2 = new [] {
+                "x", "x", "x", "x", "x", "x", "x", "x",
+                "o", "x", "x", "x", "x", "x", "o", "o",
+                "x", "x", "x", "x", "x", "x", "o", "o",
+                "x", "x", "x", "x", "x", "x", "o", "x", // <- the last x here is the island
+                "x", "o", "x", "x", "x", "o", "x", "o",
+                "x", "x", "x", "x", "x", "x", "x", "x",
+                "x", "x", "o", "x", "x", "x", "o", "x",
+                "x", "x", "x", "o", "x", "x", "o", "x",
+                "o", "o", "o", "o", "o", "o", "o", "x" 
+            }.Select(x => new Models.Tile { IsAccessible = x == "x" });
 
-            Assert.True(Helpers.TileHelper.HasIslands(example, 8, 8));
+            Assert.True(Helpers.TileHelper.HasIslands(ex1, 10, 10));
+            Assert.True(Helpers.TileHelper.HasIslands(ex2, 8, 8));
         }
     }
 }

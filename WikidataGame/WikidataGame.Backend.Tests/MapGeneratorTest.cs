@@ -27,6 +27,7 @@ namespace WikidataGame.Backend.Tests
             Assert.Equal(10 * 10, mapCandidate.ToList().Count());
             Assert.Equal(5, mapCandidate.Where(t => t.IsAccessible).Count());
         }
+        
 
         [Fact]
         public void GenerateMapCandidate_Odd19x19Map_SizeAndAmountOfAccessibleTilesAreCorrect ()
@@ -42,7 +43,7 @@ namespace WikidataGame.Backend.Tests
         }
 
         [Fact]
-        public void GenerateMapCandidate_10x0Map_AllAccessibleTilesHaveADifficulyIn ()
+        public void GenerateMapCandidate_10x0Map_AllAccessibleTilesHaveADifficulyInRange ()
         {
             var mapWidth = 10;
             var mapHeight = 10;
@@ -79,7 +80,6 @@ namespace WikidataGame.Backend.Tests
             var map = Services.MapGeneratorService.GenerateMap(
                 mapWidth, mapHeight, accessibleTiles
             );
-            _output.WriteLine(MapGeneratorService.MapToString(10, map));
 
             Assert.False(Helpers.TileHelper.HasIslands(map, mapWidth, mapHeight));
         }

@@ -103,7 +103,7 @@ namespace WikidataGame.Backend.Helpers
                     {
                         var neighborCoords = GetNeighbors(tiles, x, y, width, height)
                             .Keys
-                            .Where(((int x, int y) coord) => coord.x <= x && coord.y <= y)
+                            .Where(((int _x, int _y) coord) => coord._x <= x && coord._y <= y)
                             .ToList();
 
                         // try to find a neighbor that has a color and use that
@@ -113,7 +113,7 @@ namespace WikidataGame.Backend.Helpers
 
                         if(neighborColor != null)
                         {
-                            colors[(x,y)] = neighborColor;
+                            colors[(x, y)] = neighborColor;
                         }
                         else
                         {
@@ -123,10 +123,10 @@ namespace WikidataGame.Backend.Helpers
                         // if neighboring fields use a different color,
                         // the colors are equivalent
                         neighborCoords
-                            .Where(coord => colors.ContainsKey(coord) && colors[coord] != colors[(x, y)])
-                            .Select(coord => colors[coord])
+                            .Select(coord => colors.GetValueOrDefault(coord, color))
+                            .Where(neighboringColor => neighboringColor != color)
                             .ToList()
-                            .ForEach(neighborsColor => synonymousColors[neighborsColor.Value] = color);
+                            .ForEach(neighboringColor => synonymousColors[neighboringColor.Value] = color);
                     }
                 }
             }

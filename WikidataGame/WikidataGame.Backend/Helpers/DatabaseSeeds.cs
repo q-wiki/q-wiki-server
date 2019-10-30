@@ -26,7 +26,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                     Title = "Geography"
-                }, 
+                },
                 new Category
                 {
                     Id = "1b9185c0-c46b-4abf-bf82-e464f5116c7d",
@@ -41,7 +41,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = "f9c52d1a-9315-423d-a818-94c1769fffe5",
                     Title = "History"
-                }
+                },
                 //,
                 //new Category
                 //{
@@ -58,11 +58,11 @@ namespace WikidataGame.Backend.Helpers
                 //    Id = "7f2baca7-cdf4-4e24-855b-c868d9030ba4",
                 //    Title = "Politics"
                 //},
-                //new Category
-                //{
-                //    Id = "3d6c54d3-0fda-4923-a00e-e930640430b3",
-                //    Title = "Sports"
-                //}
+                new Category
+                {
+                    Id = "3d6c54d3-0fda-4923-a00e-e930640430b3",
+                    Title = "Sports"
+                }
                 );
         }
 
@@ -892,6 +892,41 @@ namespace WikidataGame.Backend.Helpers
                           BIND('melting point' AS ?question)
                         }
                         ORDER BY (?melting)"
+                },
+                new Question
+                {
+                    Id = "2bcedb7d-7df7-4bb3-a15a-cd94f65d41bf",
+                    CategoryId = "3d6c54d3-0fda-4923-a00e-e930640430b3",
+                    MiniGameType = MiniGameType.Sort,
+                    TaskDescription = "Sort Sports by {0} (ascending)",
+                    SparqlQuery = @"# Sort Sports by participating players
+                     SELECT (SAMPLE(?answer) AS ?answer) (SAMPLE(?question) AS ?question) ?playerCount
+                        WITH {
+                          SELECT ?sport ?playerCount ?sportLabel ?answer
+                            WHERE {
+	                                ?sport wdt:P31 wd:Q31629.
+                                    ?sport wdt:P1873 ?playerCount.
+                                  SERVICE wikibase:label {
+                                     bd:serviceParam wikibase:language 'en'.
+                                     ?sport rdfs:label ?answer.
+                                    }
+                            }
+                              ORDER BY MD5(CONCAT(STR(?answer), STR(NOW())))
+                            } as %sports
+                        WITH{
+                            SELECT DISTINCT ?playerCount WHERE {
+                                INCLUDE %sports.
+                            }
+                            ORDER BY MD5(CONCAT(STR(?answer), STR(NOW())))
+                            LIMIT 4
+                        } AS %fourSports
+                        WHERE {
+                            INCLUDE %fourSports.
+                            INCLUDE %sports.
+                            BIND('participating players' as ?question)
+                        }
+                        GROUP BY ?playerCount
+                        ORDER BY ?playerCount"
                 }
                 );
         }

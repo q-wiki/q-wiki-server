@@ -908,7 +908,7 @@ namespace WikidataGame.Backend.Helpers
                             ?element rdfs:label ?answer.
                             FILTER((LANG(?answer)) = 'en')
                           }
-                          ORDER BY MD5(CONCAT(?answer, NOW()))
+                          ORDER BY MD5(CONCAT(STR(?answer), STR(NOW())))
                           LIMIT 4
                         } AS %items
                         

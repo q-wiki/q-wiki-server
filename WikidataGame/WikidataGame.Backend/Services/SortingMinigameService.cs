@@ -25,9 +25,14 @@ namespace WikidataGame.Backend.Services
 
             var minigame = _minigameRepo.CreateMiniGame(gameId, playerId, tileId, question.CategoryId, MiniGameType);
 
+            // each row looks like this: (placeholderValue, label) where placeholderValue is the value
+            // that gets used in the template string, value is the actual value to sort on and label is the
+            // option label presented to the user.
+            //
+            // NOTE: The actual value can be present in the result but will be ignored!
             minigame.TaskDescription = string.Format(question.TaskDescription, data[0].Item1); // placeholder and answer in first tuple!
             minigame.CorrectAnswer = data.Select(d => d.Item2).ToList(); // placeholder and answer in first tuple!
-            minigame.AnswerOptions = data.Select(item => item.Item2).OrderBy(a => Guid.NewGuid()).ToList(); // shuffle answer options
+            minigame.AnswerOptions = data.Select(d => d.Item2).OrderBy(_ => Guid.NewGuid()).ToList(); // shuffle answer options
 
             _dataContext.SaveChanges();
 

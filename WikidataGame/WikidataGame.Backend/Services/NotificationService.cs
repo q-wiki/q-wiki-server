@@ -37,13 +37,13 @@ namespace WikidataGame.Backend.Services
         public async Task SendNotificationWithDataAsync(User receiver, string title, string body, object data)
         {
             await SendNotificationAsync(receiver,
-                 $"{{ \"notification\": {{ \"title\": \"{title}\", \"body\": \"{body}\" }}, \"data\": {JsonConvert.SerializeObject(data)} }}");
+                 $"{{ \"notification\": {{ \"title\": \"{title}\", \"body\": \"{body}\" }}, \"data\": {{ \"game\": \"{JsonConvert.ToString(JsonConvert.SerializeObject(data))}\" }} }}");
         }
 
         public async Task SendSilentNotificationAsync(User receiver, object data)
         {
             await SendNotificationAsync(receiver,
-                 $"{{ \"data\": {JsonConvert.SerializeObject(data)} }}");
+                 $"{{ \"data\": {{ \"game\": {JsonConvert.ToString(JsonConvert.SerializeObject(data))} }} }}");
         }
 
         private async Task SendNotificationAsync(User receiver, string content)

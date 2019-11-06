@@ -30,23 +30,47 @@ namespace WikidataGame.Backend.Services
 
         public async Task SendNotificationAsync(User receiver, string title, string body)
         {
-            await SendNotificationAsync(receiver,
-                 $"{{ \"notification\": {{ \"title\": \"{title}\", \"body\": \"{body}\" }} }}");
+            var notificationObject = new
+            {
+                notification = new
+                {
+                    title = title,
+                    body = body
+                }
+            };
+            await SendNotificationAsync(receiver, notificationObject);
         }
 
         public async Task SendNotificationWithDataAsync(User receiver, string title, string body, object data)
         {
-            await SendNotificationAsync(receiver,
-                 $"{{ \"notification\": {{ \"title\": \"{title}\", \"body\": \"{body}\" }}, \"data\": {{ \"game\": \"{JsonConvert.ToString(JsonConvert.SerializeObject(data))}\" }} }}");
+            var notificationObject = new
+            {
+                notification = new
+                {
+                    title = title,
+                    body = body
+                },
+                data = new
+                {
+                    game = JsonConvert.SerializeObject(data)
+                }
+            };
+            await SendNotificationAsync(receiver, notificationObject);
         }
 
         public async Task SendSilentNotificationAsync(User receiver, object data)
         {
-            await SendNotificationAsync(receiver,
-                 $"{{ \"data\": {{ \"game\": {JsonConvert.ToString(JsonConvert.SerializeObject(data))} }} }}");
+            var notificationObject = new
+            {
+                data = new
+                {
+                    game = JsonConvert.SerializeObject(data)
+                }
+            };
+            await SendNotificationAsync(receiver, notificationObject);
         }
 
-        private async Task SendNotificationAsync(User receiver, string content)
+        private async Task SendNotificationAsync(User receiver, object content)
         {
             if (_hub == null || string.IsNullOrEmpty(receiver.PushRegistrationId))
                 return;
@@ -55,7 +79,7 @@ namespace WikidataGame.Backend.Services
             switch (receiver.Platform)
             {
                 case GamePlatform.Android:
-                    notification = new FcmNotification(content);
+                    notification = new FcmNotification(JsonConvert.SerializeObject(content));
                     break;
                 default:
                     throw new NotImplementedException();

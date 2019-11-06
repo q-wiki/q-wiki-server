@@ -142,11 +142,10 @@ namespace WikidataGame.Backend.Controllers
                     game.NextMovePlayerId = nextPlayer.UserId;
                     game.MoveStartedAt = DateTime.UtcNow;
                     game.StepsLeftWithinMove = Models.Game.StepsPerPlayer;
-                    await _notificationService.SendNotificationWithDataAsync(
+                    await _notificationService.SendNotificationWithRefreshAsync(
                         nextPlayer.User,
                         "It's your turn!",
-                        "You have 12 hours left to play your round.",
-                        Game.FromModel(game, GetCurrentUser().Id, _categoryCacheService));
+                        "You have 12 hours left to play your round.");
                 }
             }
             _dataContext.SaveChanges();

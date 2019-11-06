@@ -8,7 +8,7 @@ namespace WikidataGame.Backend.Services
         Task DeleteUserAsync(User user);
         Task<string> RegisterOrUpdatePushChannelAsync(User user, DeviceRegistration deviceRegistration);
         Task SendNotificationAsync(User receiver, string title, string body);
-        Task SendNotificationWithDataAsync(User receiver, string title, string body, object data);
-        Task SendSilentNotificationAsync(User receiver, object data);
+        Task SendNotificationWithRefreshAsync(User receiver, string title, string body);
+        Task SendRefreshNotificationAsync(User receiver);
     }
 }

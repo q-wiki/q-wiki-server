@@ -41,7 +41,7 @@ namespace WikidataGame.Backend.Services
             await SendNotificationAsync(receiver, notificationObject);
         }
 
-        public async Task SendNotificationWithDataAsync(User receiver, string title, string body, object data)
+        public async Task SendNotificationWithRefreshAsync(User receiver, string title, string body)
         {
             var notificationObject = new
             {
@@ -52,19 +52,19 @@ namespace WikidataGame.Backend.Services
                 },
                 data = new
                 {
-                    game = JsonConvert.SerializeObject(data)
+                    refresh = true
                 }
             };
             await SendNotificationAsync(receiver, notificationObject);
         }
 
-        public async Task SendSilentNotificationAsync(User receiver, object data)
+        public async Task SendRefreshNotificationAsync(User receiver)
         {
             var notificationObject = new
             {
                 data = new
                 {
-                    game = JsonConvert.SerializeObject(data)
+                    refresh = true
                 }
             };
             await SendNotificationAsync(receiver, notificationObject);

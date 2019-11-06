@@ -5,8 +5,10 @@ namespace WikidataGame.Backend.Services
 {
     public interface INotificationService
     {
-        Task DeleteUser(User user);
-        Task<string> RegisterOrUpdatePushChannel(User user, DeviceRegistration deviceRegistration);
-        Task SendNotification(User receiver, string title, string body);
+        Task DeleteUserAsync(User user);
+        Task<string> RegisterOrUpdatePushChannelAsync(User user, DeviceRegistration deviceRegistration);
+        Task SendNotificationAsync(User receiver, string title, string body);
+        Task SendNotificationWithDataAsync(User receiver, string title, string body, object data);
+        Task SendSilentNotificationAsync(User receiver, object data);
     }
 }

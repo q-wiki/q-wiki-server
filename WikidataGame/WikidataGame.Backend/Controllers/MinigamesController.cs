@@ -142,11 +142,14 @@ namespace WikidataGame.Backend.Controllers
                     game.NextMovePlayerId = nextPlayer.UserId;
                     game.MoveStartedAt = DateTime.UtcNow;
                     game.StepsLeftWithinMove = Models.Game.StepsPerPlayer;
-                    await _notificationService.SendNotification(nextPlayer.User, "It's your turn!", "You have 12 hours left to play your round.");
+                    await _notificationService.SendNotificationWithDataAsync(
+                        nextPlayer.User,
+                        "It's your turn!",
+                        "You have 12 hours left to play your round.",
+                        Game.FromModel(game, GetCurrentUser().Id, _categoryCacheService));
                 }
             }
             _dataContext.SaveChanges();
-
 
             return Ok(MiniGameResult.FromModel(minigame, game, _categoryCacheService));
         }
@@ -214,11 +217,11 @@ namespace WikidataGame.Backend.Controllers
             {
                 var user = game.GameUsers.SingleOrDefault(gu => gu.UserId == winnerId);
                 user.IsWinner = true;
-                await _notificationService.SendNotification(user.User, "Congrats", "You won this game on points!");
+                await _notificationService.SendNotificationAsync(user.User, "Congrats", "You won this game on points!");
             }
             foreach (var looser in game.GameUsers.Where(gu => !winningPlayerIds.Contains(gu.UserId)))
             {
-                await _notificationService.SendNotification(looser.User, "Too bad.", "You lost the game! Start a new game for another chance.");
+                await _notificationService.SendNotificationAsync(looser.User, "Too bad.", "You lost the game! Start a new game for another chance.");
             }
         }
     }

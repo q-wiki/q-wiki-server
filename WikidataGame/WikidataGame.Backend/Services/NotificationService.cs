@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.NotificationHubs;
 using Microsoft.Azure.NotificationHubs.Messaging;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Services
@@ -27,7 +28,49 @@ namespace WikidataGame.Backend.Services
             }
         }
 
-        public async Task SendNotification(User receiver, string title, string body)
+        public async Task SendNotificationAsync(User receiver, string title, string body)
+        {
+            var notificationObject = new
+            {
+                notification = new
+                {
+                    title = title,
+                    body = body
+                }
+            };
+            await SendNotificationAsync(receiver, notificationObject);
+        }
+
+        public async Task SendNotificationWithDataAsync(User receiver, string title, string body, object data)
+        {
+            var notificationObject = new
+            {
+                notification = new
+                {
+                    title = title,
+                    body = body
+                },
+                data = new
+                {
+                    game = JsonConvert.SerializeObject(data)
+                }
+            };
+            await SendNotificationAsync(receiver, notificationObject);
+        }
+
+        public async Task SendSilentNotificationAsync(User receiver, object data)
+        {
+            var notificationObject = new
+            {
+                data = new
+                {
+                    game = JsonConvert.SerializeObject(data)
+                }
+            };
+            await SendNotificationAsync(receiver, notificationObject);
+        }
+
+        private async Task SendNotificationAsync(User receiver, object content)
         {
             if (_hub == null || string.IsNullOrEmpty(receiver.PushRegistrationId))
                 return;
@@ -36,7 +79,7 @@ namespace WikidataGame.Backend.Services
             switch (receiver.Platform)
             {
                 case GamePlatform.Android:
-                    notification = new FcmNotification($"{{ \"notification\": {{ \"title\": \"{title}\", \"body\": \"{body}\" }} }}");
+                    notification = new FcmNotification(JsonConvert.SerializeObject(content));
                     break;
                 default:
                     throw new NotImplementedException();
@@ -45,7 +88,8 @@ namespace WikidataGame.Backend.Services
             await _hub.SendNotificationAsync(notification, $"{UserIdTag}:{receiver.Id}");
         }
 
-        public async Task<string> RegisterOrUpdatePushChannel(User user, DeviceRegistration deviceRegistration)
+
+        public async Task<string> RegisterOrUpdatePushChannelAsync(User user, DeviceRegistration deviceRegistration)
         {
             if (_hub == null)
                 return string.Empty;
@@ -94,7 +138,7 @@ namespace WikidataGame.Backend.Services
 
         }
 
-        public async Task DeleteUser(User user)
+        public async Task DeleteUserAsync(User user)
         {
             await _hub.DeleteRegistrationsByChannelAsync(user.PushRegistrationId);
         }

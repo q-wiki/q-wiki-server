@@ -326,14 +326,14 @@ namespace WikidataGame.Backend.Migrations
                           }
                         }
                         order by DESC(?question)",
-                            TaskDescription = "Which country is not a basin country of the Baltic Sea?"
+                            TaskDescription = "Which country does not border the Baltic Sea?"
                         },
                         new
                         {
                             Id = "4f6c477e-7025-44b4-a3b0-f3ebd8902902",
                             CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                             MiniGameType = 2,
-                            SparqlQuery = @"# Which country is no basin country of the Caribbean Sea?
+                            SparqlQuery = @"# Which country does not border the Caribbean Sea?
                         SELECT DISTINCT ?question ?answer
                         WITH {
                           SELECT DISTINCT (?state as ?country) WHERE {
@@ -389,14 +389,14 @@ namespace WikidataGame.Backend.Migrations
                           }
                         }
                         order by DESC(?noSea)",
-                            TaskDescription = "Which country is not a basin country of the Caribbean Sea?"
+                            TaskDescription = "Which country does not border the Caribbean Sea?"
                         },
                         new
                         {
                             Id = "a6a470de-9efb-4fde-9388-6eb20f2ff1f4",
                             CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                             MiniGameType = 2,
-                            SparqlQuery = @"# Which country is no basin country of the Mediterranean Sea?
+                            SparqlQuery = @"# Which country does not border the Mediterranean Sea?
                         SELECT DISTINCT ?question ?answer
                         WITH {
                           SELECT DISTINCT (?state as ?country) WHERE {
@@ -436,7 +436,7 @@ namespace WikidataGame.Backend.Migrations
                           }
                         }
                         order by DESC(?noSea)",
-                            TaskDescription = "Which country is not a basin country of the Mediterranean Sea?"
+                            TaskDescription = "Which country does not border the Mediterranean Sea?"
                         },
                         new
                         {

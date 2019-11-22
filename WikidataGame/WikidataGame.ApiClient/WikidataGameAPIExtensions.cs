@@ -23,15 +23,18 @@ namespace WikidataGame
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='xDeviceID'>
-            /// device identifier
+            /// <param name='xUsername'>
+            /// Username
+            /// </param>
+            /// <param name='xAuthToken'>
+            /// firebase authentication token
             /// </param>
             /// <param name='xPushToken'>
             /// push token generated through firebase/apns
             /// </param>
-            public static AuthInfo Authenticate(this IWikidataGameAPI operations, string xDeviceID = default(string), string xPushToken = default(string))
+            public static AuthInfo Authenticate(this IWikidataGameAPI operations, string xUsername = default(string), string xAuthToken = default(string), string xPushToken = default(string))
             {
-                return operations.AuthenticateAsync(xDeviceID, xPushToken).GetAwaiter().GetResult();
+                return operations.AuthenticateAsync(xUsername, xAuthToken, xPushToken).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -40,8 +43,11 @@ namespace WikidataGame
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='xDeviceID'>
-            /// device identifier
+            /// <param name='xUsername'>
+            /// Username
+            /// </param>
+            /// <param name='xAuthToken'>
+            /// firebase authentication token
             /// </param>
             /// <param name='xPushToken'>
             /// push token generated through firebase/apns
@@ -49,9 +55,9 @@ namespace WikidataGame
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<AuthInfo> AuthenticateAsync(this IWikidataGameAPI operations, string xDeviceID = default(string), string xPushToken = default(string), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<AuthInfo> AuthenticateAsync(this IWikidataGameAPI operations, string xUsername = default(string), string xAuthToken = default(string), string xPushToken = default(string), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.AuthenticateWithHttpMessagesAsync(xDeviceID, xPushToken, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.AuthenticateWithHttpMessagesAsync(xUsername, xAuthToken, xPushToken, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,8 +11,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="config.json" />
-    <EmbeddedResource Include="q-wiki-57251382-firebase-adminsdk-8whmj-64e446ddda.json" />
+    <EmbeddedResource Include="config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="q-wiki-57251382-firebase-adminsdk-8whmj-64e446ddda.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

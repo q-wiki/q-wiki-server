@@ -96,7 +96,7 @@ namespace WikidataGame.Backend.Controllers
             if (!IsUserGameParticipant(gameId))
                 return Forbid();
 
-            var opponents = _gameRepo.Get(gameId).GameUsers.Select(gu => gu.User).Where(u => u.DeviceId != User.Identity.Name).ToList();
+            var opponents = _gameRepo.Get(gameId).GameUsers.Select(gu => gu.User).Where(u => u.Id != User.Identity.Name).ToList();
             foreach(var opponent in opponents)
             {
                 await _notificationService.SendNotificationAsync(opponent, "Congrats", "You won because your opponent left the game!");

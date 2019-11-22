@@ -9,6 +9,7 @@ using WikidataGame.Backend.Dto;
 using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Repos;
 using WikidataGame.Backend.Services;
+using static WikidataGame.Backend.Repos.UserRepository;
 
 namespace WikidataGame.Backend.Controllers
 {
@@ -16,55 +17,75 @@ namespace WikidataGame.Backend.Controllers
     [ApiController]
     public class AuthController : CustomControllerBase
     {
+        private readonly AuthService _authService;
+
         public AuthController(
             DataContext dataContext,
             IUserRepository userRepo,
             IGameRepository gameRepo,
             IRepository<Models.Category, string> categoryRepo,
-            INotificationService notificationService) : base(dataContext, userRepo, gameRepo, categoryRepo, notificationService)
-        {}
+            INotificationService notificationService,
+            AuthService authService) : base(dataContext, userRepo, gameRepo, categoryRepo, notificationService)
+        {
+            _authService = authService;
+        }
 
         /// <summary>
         /// Authenticates a player 
         /// </summary>
-        /// <param name="deviceId">device identifier</param>
+        /// <param name="username">Username</param>
+        /// <param name="authToken">firebase authentication token</param>
         /// <param name="pushToken">push token generated through firebase/apns</param>
         /// <returns>Information on how to authenticate</returns>
         [HttpGet]
         [ProducesResponseType(typeof(AuthInfo), StatusCodes.Status200OK)]
         public async Task<IActionResult> Authenticate(
-            [FromHeader(Name = "X-Device-ID")] string deviceId,
+            [FromHeader(Name = "X-Username")] string username,
+            [FromHeader(Name = "X-Auth-Token")] string authToken,
             [FromHeader(Name = "X-Push-Token")] string pushToken)
         {
-            if (string.IsNullOrWhiteSpace(deviceId))
-                return BadRequest(new { message = "DeviceId needs to be supplied" });
+            if (string.IsNullOrWhiteSpace(authToken))
+                return BadRequest(new { message = "Authentication token needs to be supplied" });
 
-            var user = _userRepo.CreateOrUpdateUser(deviceId, pushToken);
-
-            if (string.IsNullOrWhiteSpace(pushToken))
+            var firebaseUidFromToken = await _authService.VerifyTokenAsync(authToken);
+            if (string.IsNullOrWhiteSpace(firebaseUidFromToken))
             {
-                if (!string.IsNullOrEmpty(user.PushRegistrationId))
+                return Unauthorized();
+            }
+
+            try
+            {
+                var user = _userRepo.CreateOrUpdateUser(firebaseUidFromToken, pushToken, username);
+
+                if (string.IsNullOrWhiteSpace(pushToken))
                 {
-                    await _notificationService.DeleteUserAsync(user);
-                    user.PushRegistrationId = string.Empty;
+                    if (!string.IsNullOrEmpty(user.PushRegistrationId))
+                    {
+                        await _notificationService.DeleteUserAsync(user);
+                        user.PushRegistrationId = string.Empty;
+                    }
                 }
-            }
-            else
-            {
-                var registrationId = await _notificationService.RegisterOrUpdatePushChannelAsync(user, new DeviceRegistration
+                else
                 {
-                    Handle = pushToken,
-                    Platform = "fcm",
-                    Tags = new string[0] 
-                });
-                user.PushRegistrationId = registrationId;
+                    var registrationId = await _notificationService.RegisterOrUpdatePushChannelAsync(user, new DeviceRegistration
+                    {
+                        Handle = pushToken,
+                        Platform = "fcm",
+                        Tags = new string[0] 
+                    });
+                    user.PushRegistrationId = registrationId;
+                }
+
+                _dataContext.SaveChanges();
+
+                var authInfo = JwtTokenHelper.CreateJwtToken(user.Id);
+                Response.Headers.Add("WWW-Authenticate", $"Bearer {authInfo.Bearer}");
+                return Ok(authInfo);
             }
-
-            _dataContext.SaveChanges();
-
-            var authInfo = JwtTokenHelper.CreateJwtToken(deviceId);
-            Response.Headers.Add("WWW-Authenticate", $"Bearer {authInfo.Bearer}");
-            return Ok(authInfo);
+            catch (UsernameTakenException)
+            {
+                return Conflict("Username already taken - please choose another one.");
+            }
         }
     }
 }

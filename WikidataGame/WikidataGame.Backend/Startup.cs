@@ -88,7 +88,7 @@ namespace WikidataGame.Backend
                     OnTokenValidated = context =>
                     {
                         var userRepo = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
-                        var user = userRepo.SingleOrDefault(u => u.DeviceId == context.Principal.Identity.Name);
+                        var user = userRepo.SingleOrDefault(u => u.Id == context.Principal.Identity.Name);
                         if (user == null)
                         {
                             // return unauthorized if user no longer exists
@@ -110,6 +110,7 @@ namespace WikidataGame.Backend
 
             services.AddSingleton<INotificationService>(new NotificationService(Configuration.GetConnectionString("NotificationHub")));
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddSingleton(new AuthService(Configuration.GetConnectionString("FirebaseAuth")));
             services.AddScoped<IGameRepository, GameRepository>();
             services.AddScoped<IMinigameRepository, MinigameRepository>();
             services.AddScoped<IQuestionRepository, QuestionRepository>();
@@ -142,7 +143,7 @@ namespace WikidataGame.Backend
 
             app.Run(async (context) => await Task.Run(() => context.Response.Redirect("/swagger")));
 
-            app.ApplicationServices.GetService<DataContext>().Database.EnsureCreated();
+            app.ApplicationServices.GetService<DataContext>().Database.Migrate();
         }
     }
 }

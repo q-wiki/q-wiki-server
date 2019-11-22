@@ -13,7 +13,10 @@ namespace WikidataGame.Backend.Models
         public string Id { get; set; }
 
         [Required]
-        public string DeviceId { get; set; }
+        public string FirebaseUserId { get; set; }
+
+        [Required]
+        public string Username { get; set; }
 
         [Required]
         public GamePlatform Platform { get; set; } = GamePlatform.Android;

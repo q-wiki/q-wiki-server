@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WikidataGame.Backend.Helpers;
@@ -10,16 +9,14 @@ using WikidataGame.Backend.Helpers;
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20190710215550_AddHistoryCategory")]
-    partial class AddHistoryCategory
+    [Migration("20191120134930_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity("WikidataGame.Backend.Models.Category", b =>
                 {
@@ -262,14 +259,14 @@ namespace WikidataGame.Backend.Migrations
                         WITH {
                           SELECT DISTINCT ?state ?continent WHERE {
                             INCLUDE %selectedContinent.
-                          } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW()))) # order by random
+                          } ORDER BY MD5(CONCAT(STR(?state), STR(NOW()))) # order by random
                           LIMIT 1
                         } AS %oneState
                         WITH {
                           SELECT ?state ?empty WHERE {
                             INCLUDE %states.
                             FILTER NOT EXISTS { INCLUDE %selectedContinent. }
-                          } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW()))) # order by random
+                          } ORDER BY MD5(CONCAT(STR(?state), STR(NOW()))) # order by random
                           LIMIT 3
                         } AS %threeStates
                         WHERE {
@@ -734,27 +731,29 @@ namespace WikidataGame.Backend.Migrations
                             CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
                             MiniGameType = 0,
                             SparqlQuery = @"#English kings until 1707
-                        SELECT DISTINCT ?question ?answer WHERE {
-                          {SELECT DISTINCT ?human ?name ?reignstart ?reignend WHERE {
-                            ?human wdt:P31 wd:Q5.      #find humans
-                            ?human p:P39 ?memberOfStatement.
-                            ?memberOfStatement a wikibase:BestRank;
-                                                 ps:P39 wd:Q18810062. # position
-
-                            ?memberOfStatement pq:P580 ?reignstart;
-                                               pq:P582 ?reignend. 
-                            FILTER (?reignstart >= '1066-12-31T00:00:00Z'^^xsd:dateTime) . #start with William the Conquerer
-                            MINUS {?human wdt:P97 wd:Q719039.}
-
-                            SERVICE wikibase:label {
-                              bd:serviceParam wikibase:language 'en'.
-                              ?human  rdfs:label ?name.
-                            }
-                          } ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
-                          LIMIT 4}
-                                BIND (?name as ?answer).
-                                BIND ('the beginning of their reigning period' as ?question).
-                        } ORDER BY ?reignstart",
+                        SELECT DISTINCT ?question ?answer ?reignstart ?reignend WHERE {
+                          {
+                            SELECT DISTINCT ?human ?name (MIN(?reignstart) as ?reignstart) (MIN(?reignend) as ?reignend) WHERE {
+                              ?human wdt:P31 wd:Q5;
+                                p:P39 ?memberOfStatement.
+                              ?memberOfStatement rdf:type wikibase:BestRank;
+                                ps:P39 wd:Q18810062;
+                                pq:P580 ?reignstart;
+                                pq:P582 ?reignend.
+                              FILTER(?reignstart >= '1066-12-31T00:00:00Z'^^xsd:dateTime)
+                              MINUS { ?human wdt:P97 wd:Q719039. }
+                              SERVICE wikibase:label {
+                                bd:serviceParam wikibase:language 'en'.
+                                ?human rdfs:label ?name.
+                              }
+                            } GROUP BY ?human ?name
+                            ORDER BY (MD5(CONCAT(STR(?name), STR(NOW()))))
+                            LIMIT 4
+                          }
+                          BIND(?name AS ?answer)
+                          BIND('the beginning of their reigning period' AS ?question)
+                        }
+                        ORDER BY (?reignstart)",
                             TaskDescription = "Sort these English kings by {0} (ascending)."
                         },
                         new
@@ -801,13 +800,15 @@ namespace WikidataGame.Backend.Migrations
                             CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
                             MiniGameType = 2,
                             SparqlQuery = @"# German Chancellors
-                        SELECT ?answer (CONCAT(STR(?startYear), ' - ', STR(?endYear)) AS ?question) WHERE {
+                        SELECT ?answer (CONCAT(STR(?startYear), ' to ', STR(?endYear)) AS ?question) WHERE {
                           ?person p:P39 ?Bundeskanzler.
                           ?Bundeskanzler ps:P39 wd:Q4970706;
-                            pq:P580 ?start.
-                          OPTIONAL { ?Bundeskanzler pq:P582 ?end. }
+                                         pq:P580 ?start;
+                                         pq:P582 ?end. # <- note the mandatory end date
+
                           BIND(YEAR(?start) AS ?startYear)
-                          BIND(IF(!(BOUND(?end)), 'today', YEAR(?end)) AS ?endYear)
+                          BIND(YEAR(?end) AS ?endYear)
+
                           SERVICE wikibase:label {
                             bd:serviceParam wikibase:language 'en'.
                             ?person rdfs:label ?answer.
@@ -815,7 +816,7 @@ namespace WikidataGame.Backend.Migrations
                         }
                         ORDER BY (MD5(CONCAT(STR(?person), STR(NOW()))))
                         LIMIT 4",
-                            TaskDescription = "Who was Federal Chancellor of Germany in {0}?"
+                            TaskDescription = "Who was Federal Chancellor of Germany from {0}?"
                         },
                         new
                         {
@@ -901,27 +902,71 @@ namespace WikidataGame.Backend.Migrations
                             CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
                             MiniGameType = 2,
                             SparqlQuery = @"# wars of the 20th century
-                        SELECT (SAMPLE(?itemLabel) as ?answer)  (YEAR(SAMPLE(?startdate)) as ?question) 
-                        WHERE {
+                        SELECT (SAMPLE(?itemLabel) AS ?answer) (YEAR(MAX(?startdate)) AS ?question) WHERE {
                           {
-                            SELECT DISTINCT ?item ?itemLabel ?startdate ?enddate (CONCAT(STR(YEAR(?startdate)), ' - ', STR(YEAR(?enddate))) AS ?time)  WHERE {
-                              ?item (wdt:P31/(wdt:P279*)) wd:Q198;
-        
-                                p:P582 ?memberOfStatementEnd.
-                                      ?memberOfStatementEnd a wikibase:BestRank; ps:P582 ?enddate.                     
-    
-                              ?item p:P580 ?memberOfStatementStart.
-                             ?memberOfStatementStart a wikibase:BestRank; ps:P580 ?startdate.
+                            SELECT ?item ?itemLabel ?startdate WHERE {
+                              ?item (wdt:P31/(wdt:P279*)) wd:Q198.
+                              ?item wdt:P580 ?startdate.
                               FILTER(?startdate >= '1900-01-01T00:00:00Z'^^xsd:dateTime)
                               SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. }
-                            } 
+                            }
                           }
                           FILTER(!(CONTAINS(?itemLabel, '1')))
                           FILTER(!(CONTAINS(?itemLabel, '2')))
                           FILTER(!(STRSTARTS(?itemLabel, 'Q')))
-                        } GROUP BY ?item ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                        }
+                        GROUP BY ?itemLabel
+                        ORDER BY (MD5(CONCAT(STR(?item), STR(NOW()))))
                         LIMIT 4",
                             TaskDescription = "Which of these wars started in {0}?"
+                        },
+                        new
+                        {
+                            Id = "8273acfe-c278-4cd4-92f5-07dd73a22577",
+                            CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
+                            MiniGameType = 2,
+                            SparqlQuery = @"# Which chemical compound has the formula {0}?
+                        SELECT DISTINCT ?chemicalCompound ?answer (?chemical_formula AS ?question) ?sitelinks WHERE {
+                          ?chemicalCompound wdt:P31 wd:Q11173;
+                            wdt:P274 ?chemical_formula;
+                            wikibase:sitelinks ?sitelinks.
+                          FILTER(?sitelinks >= 50 )
+                          ?chemicalCompound rdfs:label ?answer.
+                          FILTER((LANG(?answer)) = 'en')
+                        }
+                        ORDER BY (MD5(CONCAT(STR(?answer), STR(NOW()))))
+                        LIMIT 4",
+                            TaskDescription = "Which chemical compound has the formula {0}?"
+                        },
+                        new
+                        {
+                            Id = "bba18c92-47a6-4541-9305-d6453ad8477a",
+                            CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
+                            MiniGameType = 0,
+                            SparqlQuery = @"# Sort chemical compounds by melting point
+                        SELECT ?answer ?question ?melting WHERE {
+                          {
+                            SELECT DISTINCT ?answer (AVG(?melting) as ?melting) ?unitLabel WHERE {
+                              ?chemicalCompound wdt:P31 wd:Q11173;
+                                wikibase:sitelinks ?sitelinks;
+                                p:P2101/psv:P2101 [ 
+                                  wikibase:quantityUnit ?unit;
+                                  wikibase:quantityAmount ?melting;
+                                ]
+                              FILTER(?sitelinks >= 50 )
+                              BIND(wd:Q25267 AS ?unit)
+                              ?chemicalCompound rdfs:label ?answer.
+                              FILTER((LANG(?answer)) = 'en')
+                              ?unit rdfs:label ?unitLabel.
+                              FILTER((LANG(?unitLabel)) = 'en')
+                            }GROUP BY ?answer ?unitLabel
+                            ORDER BY (MD5(CONCAT(STR(?answer), STR(NOW()))))
+                            LIMIT 4
+                          }
+                          BIND('melting point' AS ?question)
+                        }
+                        ORDER BY (?melting)",
+                            TaskDescription = "Sort chemical compounds by {0} (ascending)."
                         });
                 });
 
@@ -960,7 +1005,7 @@ namespace WikidataGame.Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(36);
 
-                    b.Property<string>("DeviceId")
+                    b.Property<string>("FirebaseUserId")
                         .IsRequired();
 
                     b.Property<int>("Platform");
@@ -969,7 +1014,16 @@ namespace WikidataGame.Backend.Migrations
 
                     b.Property<string>("PushToken");
 
+                    b.Property<string>("Username")
+                        .IsRequired();
+
                     b.HasKey("Id");
+
+                    b.HasIndex("FirebaseUserId")
+                        .IsUnique();
+
+                    b.HasIndex("Username")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });

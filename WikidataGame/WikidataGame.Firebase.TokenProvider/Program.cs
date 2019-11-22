@@ -13,22 +13,28 @@ namespace WikidataGame.Firebase.TokenProvider
 {
     public class Program
     {
-        private static readonly string Uid = "REeguvVom5bfEjwTfVlLiuyTmv33";
-        private static readonly string FilePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName, "q-wiki-57251382-firebase-adminsdk-8whmj-64e446ddda.json");
-        private static readonly string FirebaseApiKey = "AIzaSyCHEZfGA1-3U70XF-xUqZb36XtEM1M2_jk"; //not security relevant
+        private static readonly string ProjectFolder = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
+        private static readonly string ConfigFilePath = Path.Combine(ProjectFolder, "config.json");
+        private static readonly string FirebaseFilePath = Path.Combine(ProjectFolder, "q-wiki-57251382-firebase-adminsdk-8whmj-64e446ddda.json");
+
         static async Task Main(string[] args)
         {
-            Console.WriteLine($"Requesting an id token for user {Uid}...");
-            var idToken = await RequestIdTokenAsync(Uid);
-            Console.WriteLine(idToken);
-            Console.ReadLine();
+            using (StreamReader r = new StreamReader(ConfigFilePath))
+            {
+                string json = r.ReadToEnd();
+                JObject config = JObject.Parse(json);
+                Console.WriteLine($"Requesting an id token for user {config["uid"].ToString()}...");
+                var idToken = await RequestIdTokenAsync(config["uid"].ToString(), config["firebase_api_key"].ToString());
+                Console.WriteLine(idToken);
+                Console.ReadLine();
+            }
         }
 
-        public static async Task<string> RequestIdTokenAsync(string uid)
+        public static async Task<string> RequestIdTokenAsync(string uid, string firebaseApiKey)
         {
             FirebaseApp.Create(new AppOptions()
             {
-                Credential = GoogleCredential.FromFile(FilePath)
+                Credential = GoogleCredential.FromFile(FirebaseFilePath)
             });
 
             var customToken = await FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(uid);
@@ -37,7 +43,7 @@ namespace WikidataGame.Firebase.TokenProvider
             var httpRequestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key={FirebaseApiKey}"),
+                RequestUri = new Uri($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key={firebaseApiKey}"),
                 Headers = {
                     { HttpRequestHeader.ContentType.ToString(), "application/json" }
                 },

@@ -2,19 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WikidataGame.Backend.Helpers;
 
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20191030133926_RemoveUKThroneSuccessionQuestion")]
+    partial class RemoveUKThroneSuccessionQuestion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity("WikidataGame.Backend.Models.Category", b =>
                 {
@@ -980,7 +982,7 @@ namespace WikidataGame.Backend.Migrations
                             ?element rdfs:label ?answer.
                             FILTER((LANG(?answer)) = 'en')
                           }
-                          ORDER BY MD5(CONCAT(STR(?answer), STR(NOW())))
+                          ORDER BY MD5(CONCAT(?answer, NOW()))
                           LIMIT 4
                         } AS %items
                         
@@ -1029,7 +1031,7 @@ namespace WikidataGame.Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(36);
 
-                    b.Property<string>("FirebaseUserId")
+                    b.Property<string>("DeviceId")
                         .IsRequired();
 
                     b.Property<int>("Platform");
@@ -1038,16 +1040,7 @@ namespace WikidataGame.Backend.Migrations
 
                     b.Property<string>("PushToken");
 
-                    b.Property<string>("Username")
-                        .IsRequired();
-
                     b.HasKey("Id");
-
-                    b.HasIndex("FirebaseUserId")
-                        .IsUnique();
-
-                    b.HasIndex("Username")
-                        .IsUnique();
 
                     b.ToTable("Users");
                 });

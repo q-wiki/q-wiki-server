@@ -11,13 +11,14 @@ namespace WikidataGame.ApiClient.Tests
 {
     public abstract class ClientTestBase
     {
-        public const string BaseUrl = "http://localhost:54264/"; //"https://wikidatagame.azurewebsites.net";
+        public const string BaseUrl = "http://localhost:57635/"; //"https://wikidatagame.azurewebsites.net";
 
 
         protected async Task<AuthInfo> RetrieveBearerAsync()
         {
+            var token = await Firebase.TokenProvider.Program.RequestIdTokenAsync();
             var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials("auth"));
-            return await apiClient.AuthenticateAsync(Guid.NewGuid().ToString(), string.Empty);
+            return await apiClient.AuthenticateAsync("test12345", token, string.Empty);
         }
     }
 }

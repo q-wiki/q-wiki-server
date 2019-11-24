@@ -14,7 +14,7 @@ namespace WikidataGame.Backend.Helpers
 {
     public class JwtTokenHelper
     {
-        public static AuthInfo CreateJwtToken(string deviceId)
+        public static AuthInfo CreateJwtToken(string userId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(Startup.Configuration.GetValue<string>("AuthSecret"));
@@ -22,7 +22,7 @@ namespace WikidataGame.Backend.Helpers
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, deviceId)
+                    new Claim(ClaimTypes.Name, userId)
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

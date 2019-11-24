@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WikidataGame.ApiClient\WikidataGame.ApiClient.csproj" />
+    <ProjectReference Include="..\WikidataGame.Firebase.TokenProvider\WikidataGame.Firebase.TokenProvider.csproj" />
   </ItemGroup>
 
 </Project>

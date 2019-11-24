@@ -34,7 +34,7 @@ namespace WikidataGame.Backend.Controllers
 
         protected User GetCurrentUser()
         {
-            return _userRepo.SingleOrDefault(u => u.DeviceId == User.Identity.Name);
+            return _userRepo.SingleOrDefault(u => u.Id == User.Identity.Name);
         }
 
         protected bool IsUserGameParticipant(string gameId)

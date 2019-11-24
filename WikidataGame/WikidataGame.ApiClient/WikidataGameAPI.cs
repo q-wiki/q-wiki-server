@@ -311,8 +311,11 @@ namespace WikidataGame
         /// <summary>
         /// Authenticates a player
         /// </summary>
-        /// <param name='xDeviceID'>
-        /// device identifier
+        /// <param name='xUsername'>
+        /// Username
+        /// </param>
+        /// <param name='xAuthToken'>
+        /// firebase authentication token
         /// </param>
         /// <param name='xPushToken'>
         /// push token generated through firebase/apns
@@ -332,7 +335,7 @@ namespace WikidataGame
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<AuthInfo>> AuthenticateWithHttpMessagesAsync(string xDeviceID = default(string), string xPushToken = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<AuthInfo>> AuthenticateWithHttpMessagesAsync(string xUsername = default(string), string xAuthToken = default(string), string xPushToken = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -341,7 +344,8 @@ namespace WikidataGame
             {
                 _invocationId = ServiceClientTracing.NextInvocationId.ToString();
                 Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
-                tracingParameters.Add("xDeviceID", xDeviceID);
+                tracingParameters.Add("xUsername", xUsername);
+                tracingParameters.Add("xAuthToken", xAuthToken);
                 tracingParameters.Add("xPushToken", xPushToken);
                 tracingParameters.Add("cancellationToken", cancellationToken);
                 ServiceClientTracing.Enter(_invocationId, this, "Authenticate", tracingParameters);
@@ -355,13 +359,21 @@ namespace WikidataGame
             _httpRequest.Method = new HttpMethod("GET");
             _httpRequest.RequestUri = new System.Uri(_url);
             // Set Headers
-            if (xDeviceID != null)
+            if (xUsername != null)
             {
-                if (_httpRequest.Headers.Contains("X-Device-ID"))
+                if (_httpRequest.Headers.Contains("X-Username"))
                 {
-                    _httpRequest.Headers.Remove("X-Device-ID");
+                    _httpRequest.Headers.Remove("X-Username");
                 }
-                _httpRequest.Headers.TryAddWithoutValidation("X-Device-ID", xDeviceID);
+                _httpRequest.Headers.TryAddWithoutValidation("X-Username", xUsername);
+            }
+            if (xAuthToken != null)
+            {
+                if (_httpRequest.Headers.Contains("X-Auth-Token"))
+                {
+                    _httpRequest.Headers.Remove("X-Auth-Token");
+                }
+                _httpRequest.Headers.TryAddWithoutValidation("X-Auth-Token", xAuthToken);
             }
             if (xPushToken != null)
             {

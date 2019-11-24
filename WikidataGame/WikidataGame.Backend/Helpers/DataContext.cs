@@ -21,6 +21,8 @@ namespace WikidataGame.Backend.Helpers
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GameUser>().HasKey(gu => new { gu.GameId, gu.UserId });
+            modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
+            modelBuilder.Entity<User>().HasIndex(u => u.FirebaseUserId).IsUnique();
 
             base.OnModelCreating(modelBuilder);
 

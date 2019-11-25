@@ -12,12 +12,12 @@ namespace WikidataGame.Backend.Repos
     {
         public UserRepository(DataContext context) : base(context) { }
 
-        public User CreateOrUpdateUser(string firebaseUserId, string pushToken, string username)
+        public async Task<User> CreateOrUpdateUserAsync(string firebaseUserId, string pushToken, string username)
         {
-            User user = SingleOrDefault(u => u.FirebaseUserId == firebaseUserId);
+            User user = await SingleOrDefaultAsync(u => u.FirebaseUserId == firebaseUserId);
             if(user == null || user.Username != username)
             {
-                if(SingleOrDefault(u => u.Username == username) != null)
+                if((await SingleOrDefaultAsync(u => u.Username == username)) != null)
                 {
                     throw new UsernameTakenException();
                 }
@@ -26,12 +26,11 @@ namespace WikidataGame.Backend.Repos
             {
                 user = new User
                 {
-                    Id = Guid.NewGuid().ToString(),
                     FirebaseUserId = firebaseUserId,
                     PushToken = pushToken,
                     Username = username
                 };
-                Add(user);
+                await AddAsync(user);
             }
             else
             {

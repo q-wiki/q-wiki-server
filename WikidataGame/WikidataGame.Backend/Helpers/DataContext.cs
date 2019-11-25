@@ -12,6 +12,7 @@ namespace WikidataGame.Backend.Helpers
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Friend> Friends { get; set; }
         public DbSet<Game> Games { get; set; }
         public DbSet<MiniGame> MiniGames { get; set; }
         public DbSet<Tile> Tiles { get; set; }
@@ -23,6 +24,7 @@ namespace WikidataGame.Backend.Helpers
             modelBuilder.Entity<GameUser>().HasKey(gu => new { gu.GameId, gu.UserId });
             modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
             modelBuilder.Entity<User>().HasIndex(u => u.FirebaseUserId).IsUnique();
+            modelBuilder.Entity<Friend>().HasIndex(f => new { f.UserId, f.FriendId}).IsUnique();
 
             base.OnModelCreating(modelBuilder);
 

@@ -20,7 +20,7 @@ namespace WikidataGame.Backend.Models
         public static readonly TimeSpan MaxMoveDuration = TimeSpan.FromHours(12);
 
         [Key]
-        [StringLength(36)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
 
         public virtual ICollection<Tile> Tiles { get; set; } = new List<Tile>();
@@ -32,7 +32,6 @@ namespace WikidataGame.Backend.Models
         public virtual ICollection<GameUser> GameUsers { get; set; } = new List<GameUser>();
 
         [ForeignKey(nameof(User))]
-        [StringLength(36)]
         public string NextMovePlayerId { get; set; }
         public virtual User NextMovePlayer { get; set; }
 

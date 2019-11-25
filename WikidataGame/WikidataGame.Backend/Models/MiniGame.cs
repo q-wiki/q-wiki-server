@@ -11,12 +11,11 @@ namespace WikidataGame.Backend.Models
     public class MiniGame
     {
         [Key]
-        [StringLength(36)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
 
         [ForeignKey(nameof(Game))]
         [Required]
-        [StringLength(36)]
         public string GameId { get; set; }
         public virtual Game Game { get; set; }
 
@@ -61,19 +60,16 @@ namespace WikidataGame.Backend.Models
         public MiniGameStatus Status { get; set; } = MiniGameStatus.Unknown;
 
         [ForeignKey(nameof(User))]
-        [StringLength(36)]
         [Required]
         public string PlayerId { get; set; }
         public virtual User Player { get; set; }
 
         [ForeignKey(nameof(Tile))]
-        [StringLength(36)]
         [Required]
         public string TileId { get; set; }
         public virtual Tile Tile { get; set; }
 
         [ForeignKey(nameof(Category))]
-        [StringLength(36)]
         [Required]
         public string CategoryId { get; set; }
         public virtual Category Category { get; set; }

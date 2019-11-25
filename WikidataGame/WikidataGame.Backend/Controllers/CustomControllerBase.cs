@@ -32,15 +32,15 @@ namespace WikidataGame.Backend.Controllers
             _notificationService = notificationService;
         }
 
-        protected User GetCurrentUser()
+        protected async Task<User> GetCurrentUserAsync()
         {
-            return _userRepo.SingleOrDefault(u => u.Id == User.Identity.Name);
+            return await _userRepo.SingleOrDefaultAsync(u => u.Id == User.Identity.Name);
         }
 
-        protected bool IsUserGameParticipant(string gameId)
+        protected async Task<bool> IsUserGameParticipantAsync(string gameId)
         {
-            var user = GetCurrentUser();
-            var game = _gameRepo.Get(gameId);
+            var user = await GetCurrentUserAsync();
+            var game = await _gameRepo.GetAsync(gameId);
             return game != null && game.GameUsers.SingleOrDefault(gu => gu.UserId == user.Id) != null;
         }
     }

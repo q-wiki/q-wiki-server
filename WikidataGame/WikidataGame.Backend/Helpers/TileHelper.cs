@@ -17,7 +17,8 @@ namespace WikidataGame.Backend.Helpers
                     game.Tiles.Skip(yCoord * game.MapWidth)
                         .Take(game.MapWidth)
                         // inaccessible tiles are represented as `null`
-                        .Select(t => t.IsAccessible ? Dto.Tile.FromModel(t, categoryCacheService) : null)
+                        .Select(async t => t.IsAccessible ? await Dto.Tile.FromModelAsync(t, categoryCacheService) : null)
+                        .Select(t => t.Result)
                 );
         }
 
@@ -28,13 +29,13 @@ namespace WikidataGame.Backend.Helpers
         /// <param name="categoryService"></param>
         /// <param name="tileId"></param>
         /// <returns></returns>
-        public static IEnumerable<Category> GetCategoriesForTile(CategoryCacheService categoryService, string tileId)
+        public static async Task<IEnumerable<Category>> GetCategoriesForTileAsync(CategoryCacheService categoryService, string tileId)
         {
             // we get all categories, draw 3 distinct random ints in
             // [i, categories.Count()[ and return the categories for
             // these draws
             var rnd = new Random(tileId.GetHashCode());
-            var categories = categoryService.Categories;
+            var categories = await categoryService.GetCategoriesAsync();
 
             var draws = new HashSet<Category>();
             while (draws.Count() < 3)

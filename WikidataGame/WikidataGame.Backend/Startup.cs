@@ -85,16 +85,15 @@ namespace WikidataGame.Backend
             {
                 x.Events = new JwtBearerEvents
                 {
-                    OnTokenValidated = context =>
+                    OnTokenValidated = async context =>
                     {
                         var userRepo = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
-                        var user = userRepo.SingleOrDefault(u => u.Id == context.Principal.Identity.Name);
+                        var user = await userRepo.SingleOrDefaultAsync(u => u.Id == context.Principal.Identity.Name);
                         if (user == null)
                         {
                             // return unauthorized if user no longer exists
                             context.Fail("Unauthorized");
                         }
-                        return Task.CompletedTask;
                     }
                 };
                 x.RequireHttpsMetadata = false;
@@ -115,6 +114,7 @@ namespace WikidataGame.Backend
             services.AddScoped<IMinigameRepository, MinigameRepository>();
             services.AddScoped<IQuestionRepository, QuestionRepository>();
             services.AddSingleton<IRepository<Category, string>, Repository<Category, string>>();
+            services.AddScoped<IRepository<Friend, string>, Repository<Friend, string>>();
             services.AddScoped<IMinigameService, MultipleChoiceMinigameService>();
             services.AddScoped<IMinigameService, SortingMinigameService>();
             services.AddSingleton<CategoryCacheService, CategoryCacheService>();
@@ -132,7 +132,8 @@ namespace WikidataGame.Backend
             {
                 app.UseHsts();
             }
-
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
             app.UseAuthentication();
             app.UseMvc();
             app.UseSwagger();

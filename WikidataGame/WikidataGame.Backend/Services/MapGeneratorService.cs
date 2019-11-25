@@ -86,8 +86,7 @@ namespace WikidataGame.Backend.Services
 
             return noiseField.Select(n => new Tile {
                 IsAccessible = n > threshold,
-                Difficulty = Convert.ToInt32(Math.Round((n - threshold) / difficultyGap)),
-                Id = Guid.NewGuid().ToString()
+                Difficulty = Convert.ToInt32(Math.Round((n - threshold) / difficultyGap))
             }).ToList();
         }
 

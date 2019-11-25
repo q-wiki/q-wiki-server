@@ -18,12 +18,12 @@ namespace WikidataGame.Backend.Services
 
         public Models.MiniGameType MiniGameType => Models.MiniGameType.Sort;
 
-        public MiniGame GenerateMiniGame(string gameId, string playerId, Models.Question question, string tileId)
+        public async Task<MiniGame> GenerateMiniGameAsync(string gameId, string playerId, Models.Question question, string tileId)
         {
             // use method in baseclass to query wikidata with question
             var data = QueryWikidata(question.SparqlQuery);
 
-            var minigame = _minigameRepo.CreateMiniGame(gameId, playerId, tileId, question.CategoryId, MiniGameType);
+            var minigame = await _minigameRepo.CreateMiniGameAsync(gameId, playerId, tileId, question.CategoryId, MiniGameType);
 
             // each row looks like this: (placeholderValue, label) where placeholderValue is the value
             // that gets used in the template string, value is the actual value to sort on and label is the
@@ -34,7 +34,7 @@ namespace WikidataGame.Backend.Services
             minigame.CorrectAnswer = data.Select(d => d.Item2).ToList(); // placeholder and answer in first tuple!
             minigame.AnswerOptions = data.Select(d => d.Item2).OrderBy(_ => Guid.NewGuid()).ToList(); // shuffle answer options
 
-            _dataContext.SaveChanges();
+            await _dataContext.SaveChangesAsync();
 
             return MiniGame.FromModel(minigame);
         }

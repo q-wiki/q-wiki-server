@@ -21,7 +21,7 @@ namespace WikidataGame.Backend.Dto
 
         public string OwnerId { get; set; }
 
-        public static Tile FromModel(Models.Tile tile, CategoryCacheService categoryService)
+        public static async Task<Tile> FromModelAsync(Models.Tile tile, CategoryCacheService categoryService)
         {
             if (tile == null)
                 return null;
@@ -30,7 +30,7 @@ namespace WikidataGame.Backend.Dto
             {
                 Id = tile.Id,
                 ChosenCategoryId = tile.ChosenCategoryId,
-                AvailableCategories = TileHelper.GetCategoriesForTile(categoryService, tile.Id).Select(c => Category.FromModel(c)).ToList(),
+                AvailableCategories = (await TileHelper.GetCategoriesForTileAsync(categoryService, tile.Id)).Select(c => Category.FromModel(c)).ToList(),
                 Difficulty = tile.Difficulty,
                 OwnerId = tile.OwnerId
             };

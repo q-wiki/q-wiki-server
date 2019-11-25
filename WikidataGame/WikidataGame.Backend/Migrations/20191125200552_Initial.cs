@@ -11,7 +11,7 @@ namespace WikidataGame.Backend.Migrations
                 name: "Categories",
                 columns: table => new
                 {
-                    Id = table.Column<string>(maxLength: 36, nullable: false),
+                    Id = table.Column<string>(nullable: false),
                     Title = table.Column<string>(maxLength: 100, nullable: false)
                 },
                 constraints: table =>
@@ -23,7 +23,7 @@ namespace WikidataGame.Backend.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<string>(maxLength: 36, nullable: false),
+                    Id = table.Column<string>(nullable: false),
                     FirebaseUserId = table.Column<string>(nullable: false),
                     Username = table.Column<string>(nullable: false),
                     Platform = table.Column<int>(nullable: false),
@@ -39,10 +39,10 @@ namespace WikidataGame.Backend.Migrations
                 name: "Questions",
                 columns: table => new
                 {
-                    Id = table.Column<string>(maxLength: 36, nullable: false),
+                    Id = table.Column<string>(nullable: false),
                     SparqlQuery = table.Column<string>(nullable: false),
                     TaskDescription = table.Column<string>(nullable: false),
-                    CategoryId = table.Column<string>(maxLength: 36, nullable: false),
+                    CategoryId = table.Column<string>(nullable: false),
                     MiniGameType = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -60,11 +60,11 @@ namespace WikidataGame.Backend.Migrations
                 name: "Games",
                 columns: table => new
                 {
-                    Id = table.Column<string>(maxLength: 36, nullable: false),
+                    Id = table.Column<string>(nullable: false),
                     MapWidth = table.Column<int>(nullable: false),
                     MapHeight = table.Column<int>(nullable: false),
                     AccessibleTilesCount = table.Column<int>(nullable: false),
-                    NextMovePlayerId = table.Column<string>(maxLength: 36, nullable: true),
+                    NextMovePlayerId = table.Column<string>(nullable: true),
                     StepsLeftWithinMove = table.Column<int>(nullable: false),
                     MoveCount = table.Column<int>(nullable: false),
                     MoveStartedAt = table.Column<DateTime>(nullable: true)
@@ -84,8 +84,8 @@ namespace WikidataGame.Backend.Migrations
                 name: "GameUser",
                 columns: table => new
                 {
-                    GameId = table.Column<string>(maxLength: 36, nullable: false),
-                    UserId = table.Column<string>(maxLength: 36, nullable: false),
+                    GameId = table.Column<string>(nullable: false),
+                    UserId = table.Column<string>(nullable: false),
                     IsWinner = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
@@ -109,10 +109,10 @@ namespace WikidataGame.Backend.Migrations
                 name: "Tiles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(maxLength: 36, nullable: false),
-                    ChosenCategoryId = table.Column<string>(maxLength: 36, nullable: true),
+                    Id = table.Column<string>(nullable: false),
+                    ChosenCategoryId = table.Column<string>(nullable: true),
                     Difficulty = table.Column<int>(nullable: false),
-                    OwnerId = table.Column<string>(maxLength: 36, nullable: true),
+                    OwnerId = table.Column<string>(nullable: true),
                     IsAccessible = table.Column<bool>(nullable: false),
                     GameId = table.Column<string>(nullable: true)
                 },
@@ -143,16 +143,16 @@ namespace WikidataGame.Backend.Migrations
                 name: "MiniGames",
                 columns: table => new
                 {
-                    Id = table.Column<string>(maxLength: 36, nullable: false),
-                    GameId = table.Column<string>(maxLength: 36, nullable: false),
+                    Id = table.Column<string>(nullable: false),
+                    GameId = table.Column<string>(nullable: false),
                     Type = table.Column<int>(nullable: false),
                     TaskDescription = table.Column<string>(nullable: false),
                     AnswerOptionsString = table.Column<string>(nullable: false),
                     CorrectAnswerString = table.Column<string>(nullable: false),
                     Status = table.Column<int>(nullable: false),
-                    PlayerId = table.Column<string>(maxLength: 36, nullable: false),
-                    TileId = table.Column<string>(maxLength: 36, nullable: false),
-                    CategoryId = table.Column<string>(maxLength: 36, nullable: false)
+                    PlayerId = table.Column<string>(nullable: false),
+                    TileId = table.Column<string>(nullable: false),
+                    CategoryId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {

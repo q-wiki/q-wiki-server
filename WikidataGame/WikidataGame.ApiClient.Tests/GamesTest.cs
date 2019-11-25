@@ -7,7 +7,7 @@ namespace WikidataGame.ApiClient.Tests
     public class GameTest : ClientTestBase
     {
         [Fact]
-        public async void RequestAuth_WithRandomGuid_ReturnsBearer()
+        public async void RequestAuth_ForTestUser_ReturnsBearer()
         {
             var authInfo = await RetrieveBearerAsync();
             Assert.False(string.IsNullOrWhiteSpace(authInfo.Bearer));

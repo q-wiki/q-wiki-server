@@ -9,10 +9,18 @@ namespace WikidataGame.Backend.Services
 {
     public class CategoryCacheService
     {
-        public IEnumerable<Category> Categories { get; private set; }
+        private readonly IRepository<Category, string> _categoryRepo;
+        private IEnumerable<Category> _categories;
         public CategoryCacheService(IRepository<Category, string> categoryRepo)
         {
-            Categories = categoryRepo.GetAll();
+            _categoryRepo = categoryRepo;
+        }
+
+        public async Task<IEnumerable<Category>> GetCategoriesAsync()
+        {
+            if (_categories == null)
+                _categories = await _categoryRepo.GetAllAsync();
+            return _categories;
         }
     }
 }

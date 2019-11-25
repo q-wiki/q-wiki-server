@@ -27,8 +27,8 @@ namespace WikidataGame.Backend.WebJob
         public async Task ExpiryCleanup([TimerTrigger("0 */5 * * * *", RunOnStartup = true, UseMonitor = true)]TimerInfo timerInfo)
         {
             Console.WriteLine("Executing web job ....");
-            var expiredGames = _gameRepo.Find(x => x.GameUsers.Count(gu => gu.IsWinner) <= 0 &&
-                x.MoveStartedAt.HasValue && x.MoveStartedAt.Value.Add(Game.MaxMoveDuration) < DateTime.UtcNow).ToList();
+            var expiredGames = (await _gameRepo.FindAsync(x => x.GameUsers.Count(gu => gu.IsWinner) <= 0 &&
+                x.MoveStartedAt.HasValue && x.MoveStartedAt.Value.Add(Game.MaxMoveDuration) < DateTime.UtcNow)).ToList();
             foreach(var game in expiredGames)
             {
                 var expiringPlayer = game.GameUsers.SingleOrDefault(gu => gu.UserId == game.NextMovePlayerId);

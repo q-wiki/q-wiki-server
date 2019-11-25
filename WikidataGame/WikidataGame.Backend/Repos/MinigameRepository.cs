@@ -13,18 +13,17 @@ namespace WikidataGame.Backend.Repos
         {
         }
 
-        public MiniGame CreateMiniGame(string gameId, string playerId, string tileId, string categoryId, MiniGameType type)
+        public async Task<MiniGame> CreateMiniGameAsync(string gameId, string playerId, string tileId, string categoryId, MiniGameType type)
         {
             var minigame = new MiniGame
             {
-                Id = Guid.NewGuid().ToString(),
                 GameId = gameId,
                 PlayerId = playerId,
                 TileId = tileId,
                 CategoryId = categoryId,
                 Type = type,
             };
-            Add(minigame);
+            await AddAsync(minigame);
             return minigame;
         }
     }

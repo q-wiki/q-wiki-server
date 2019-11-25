@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,11 +12,10 @@ namespace WikidataGame.Backend.Repos
     {
         public QuestionRepository(DataContext context) : base(context){}
 
-        public Question GetRandomQuestionForCategory(string categoryId)
+        public async Task<Question> GetRandomQuestionForCategoryAsync(string categoryId)
         {
-            return (Context as DataContext)
-                .Questions.Where(q => q.CategoryId == categoryId)
-                .OrderBy(q => Guid.NewGuid()).FirstOrDefault();
+            return await Context.Set<Question>().Where(q => q.CategoryId == categoryId)
+                .OrderBy(q => Guid.NewGuid()).FirstOrDefaultAsync();
         }
     }
 }

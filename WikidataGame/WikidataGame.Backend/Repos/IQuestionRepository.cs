@@ -8,6 +8,6 @@ namespace WikidataGame.Backend.Repos
 {
     public interface IQuestionRepository : IRepository<Question, string>
     {
-        Question GetRandomQuestionForCategory(string categoryId);
+        Task<Question> GetRandomQuestionForCategoryAsync(string categoryId);
     }
 }

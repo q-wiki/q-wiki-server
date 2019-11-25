@@ -10,7 +10,7 @@ namespace WikidataGame.Backend.Models
     public class Question
     {
         [Key]
-        [StringLength(36)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
 
         [Required]
@@ -20,7 +20,6 @@ namespace WikidataGame.Backend.Models
         public string TaskDescription { get; set; }
 
         [ForeignKey(nameof(Category))]
-        [StringLength(36)]
         [Required]
         public string CategoryId { get; set; }
         public virtual Category Category { get; set; }

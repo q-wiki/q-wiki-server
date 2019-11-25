@@ -45,20 +45,20 @@ namespace WikidataGame.Backend.Controllers
         /// <returns>The created minigame</returns>
         [HttpPost]
         [ProducesResponseType(typeof(MiniGame), StatusCodes.Status200OK)]
-        public IActionResult InitalizeMinigame(string gameId, MiniGameInit minigameParams)
+        public async Task<ActionResult<MiniGame>> InitalizeMinigame(string gameId, MiniGameInit minigameParams)
         {
-            if (!IsUserGameParticipant(gameId) || minigameParams == null ||
-                !IsTileInGame(gameId, minigameParams.TileId) ||
-                !IsCategoryAllowedForTile(gameId, minigameParams.TileId, minigameParams.CategoryId) ||
-                !IsItPlayersTurn(gameId) ||
-                HasPlayerAnOpenMinigame(gameId))
+            if (!await IsUserGameParticipantAsync(gameId) || minigameParams == null ||
+                !await IsTileInGameAsync(gameId, minigameParams.TileId) ||
+                !await IsCategoryAllowedForTileAsync(gameId, minigameParams.TileId, minigameParams.CategoryId) ||
+                !await IsItPlayersTurnAsync(gameId) ||
+                await HasPlayerAnOpenMinigameAsync(gameId))
                     return Forbid();
 
             var minigameServices = ControllerContext.HttpContext.RequestServices.GetServices<IMinigameService>();
-            var question = _questionRepo.GetRandomQuestionForCategory(minigameParams.CategoryId);
+            var question = await _questionRepo.GetRandomQuestionForCategoryAsync(minigameParams.CategoryId);
             var service = minigameServices.SingleOrDefault(s => s.MiniGameType == question.MiniGameType);
 
-            var minigame = service.GenerateMiniGame(gameId, GetCurrentUser().Id, question, minigameParams.TileId);
+            var minigame = await service.GenerateMiniGameAsync(gameId, (await GetCurrentUserAsync()).Id, question, minigameParams.TileId);
 
             return Ok(minigame);
         }
@@ -71,12 +71,12 @@ namespace WikidataGame.Backend.Controllers
         /// <returns>The request minigame</returns>
         [HttpGet("{minigameId}")]
         [ProducesResponseType(typeof(MiniGame), StatusCodes.Status200OK)]
-        public IActionResult RetrieveMinigameInfo(string gameId, string minigameId)
+        public async Task<ActionResult<MiniGame>> RetrieveMinigameInfo(string gameId, string minigameId)
         {
-            if (!IsUserGameParticipant(gameId) || !IsUserMinigamePlayer(gameId, minigameId))
+            if (!await IsUserGameParticipantAsync(gameId) || !await IsUserMinigamePlayerAsync(gameId, minigameId))
                 return Forbid();
 
-            var minigame = _minigameRepo.Get(minigameId);
+            var minigame = await _minigameRepo.GetAsync(minigameId);
 
             return Ok(MiniGame.FromModel(minigame));
         }
@@ -90,12 +90,12 @@ namespace WikidataGame.Backend.Controllers
         /// <returns></returns>
         [HttpPost("{minigameId}")]
         [ProducesResponseType(typeof(MiniGameResult), StatusCodes.Status200OK)]
-        public async Task<IActionResult> AnswerMinigame(string gameId, string minigameId, IEnumerable<string> answers)
+        public async Task<ActionResult<MiniGameResult>> AnswerMinigame(string gameId, string minigameId, IEnumerable<string> answers)
         {
-            if (!IsUserGameParticipant(gameId) || !IsUserMinigamePlayer(gameId, minigameId))
+            if (!await IsUserGameParticipantAsync(gameId) || !await IsUserMinigamePlayerAsync(gameId, minigameId))
                 return Forbid();
 
-            var minigame = _minigameRepo.Get(minigameId);
+            var minigame = await _minigameRepo.GetAsync(minigameId);
             if (minigame.Status !=  Models.MiniGameStatus.Unknown)
                 return Forbid();
 
@@ -121,9 +121,9 @@ namespace WikidataGame.Backend.Controllers
                 }
             }
 
-            var game = _gameRepo.Get(gameId);
+            var game = await _gameRepo.GetAsync(gameId);
             game.StepsLeftWithinMove--;
-            if(AllTilesConquered(gameId))
+            if(await AllTilesConqueredAsync(gameId))
             {
                 await SetGameWonAsync(game);
             }
@@ -148,47 +148,47 @@ namespace WikidataGame.Backend.Controllers
                         "You have 12 hours left to play your round.");
                 }
             }
-            _dataContext.SaveChanges();
+            await _dataContext.SaveChangesAsync();
 
             return Ok(MiniGameResult.FromModel(minigame, game, _categoryCacheService));
         }
 
-        private bool IsItPlayersTurn(string gameId)
+        private async Task<bool> IsItPlayersTurnAsync(string gameId)
         {
-            var game = _gameRepo.Get(gameId);
-            return game.NextMovePlayerId == GetCurrentUser().Id;
+            var game = await _gameRepo.GetAsync(gameId);
+            return game.NextMovePlayerId == (await GetCurrentUserAsync()).Id;
         }
 
-        private bool IsUserMinigamePlayer(string gameId, string minigameId)
+        private async Task<bool> IsUserMinigamePlayerAsync(string gameId, string minigameId)
         {
-            var user = GetCurrentUser();
-            var minigame = _minigameRepo.Get(minigameId);
+            var user = await GetCurrentUserAsync();
+            var minigame = await _minigameRepo.GetAsync(minigameId);
             return minigame != null && minigame.GameId == gameId && minigame.Player == user;
         }
 
-        private bool HasPlayerAnOpenMinigame(string gameId)
+        private async Task<bool> HasPlayerAnOpenMinigameAsync(string gameId)
         {
-            var user = GetCurrentUser();
-            return _minigameRepo.SingleOrDefault(m => m.PlayerId == user.Id && m.GameId == gameId && m.Status == Models.MiniGameStatus.Unknown) != null;
+            var user = await GetCurrentUserAsync();
+            return await _minigameRepo.SingleOrDefaultAsync(m => m.PlayerId == user.Id && m.GameId == gameId && m.Status == Models.MiniGameStatus.Unknown) != null;
         }
 
-        private bool IsTileInGame(string gameId, string tileId)
+        private async Task<bool> IsTileInGameAsync(string gameId, string tileId)
         {
-            var game = _gameRepo.Get(gameId);
+            var game = await _gameRepo.GetAsync(gameId);
             return game.Tiles.SingleOrDefault(t => t.Id == tileId) != null;
         }
 
-        private bool IsCategoryAllowedForTile(string gameId, string tileId, string categoryId)
+        private async Task<bool> IsCategoryAllowedForTileAsync(string gameId, string tileId, string categoryId)
         {
-            var game = _gameRepo.Get(gameId);
+            var game = await _gameRepo.GetAsync(gameId);
             var tile = game.Tiles.SingleOrDefault(t => t.Id == tileId);
             return (string.IsNullOrWhiteSpace(tile.ChosenCategoryId) || tile.ChosenCategoryId == categoryId) && 
-                TileHelper.GetCategoriesForTile(_categoryCacheService, tileId).SingleOrDefault(c => c.Id == categoryId) != null;
+                (await TileHelper.GetCategoriesForTileAsync(_categoryCacheService, tileId)).SingleOrDefault(c => c.Id == categoryId) != null;
         }
 
-        private IEnumerable<string> WinningPlayerIds(string gameId)
+        private async Task<IEnumerable<string>> WinningPlayerIdsAsync(string gameId)
         {
-            var game = _gameRepo.Get(gameId);
+            var game = await _gameRepo.GetAsync(gameId);
             var result = game.GameUsers.ToDictionary(gu => gu.UserId, gu => 0);
             var tiles = game.Tiles.ToList();
             foreach (var tile in tiles)
@@ -202,16 +202,17 @@ namespace WikidataGame.Backend.Controllers
             return rankedPlayers.Where(p => p.Value >= rankedPlayers.First().Value).Select(p => p.Key).ToList();
         }
 
-        private bool AllTilesConquered(string gameId)
+        private async Task<bool> AllTilesConqueredAsync(string gameId)
         {
-            var game = _gameRepo.Get(gameId);
-            var opponentId = game.GameUsers.SingleOrDefault(gu => gu.UserId != GetCurrentUser().Id).UserId;
+            var game = await _gameRepo.GetAsync(gameId);
+            var currentUserId = (await GetCurrentUserAsync()).Id;
+            var opponentId = game.GameUsers.SingleOrDefault(gu => gu.UserId != currentUserId).UserId;
             return game.Tiles.Count(t => t.OwnerId == opponentId) < 1;
         }
 
         private async Task SetGameWonAsync(Models.Game game)
         {
-            var winningPlayerIds = WinningPlayerIds(game.Id);
+            var winningPlayerIds = await WinningPlayerIdsAsync(game.Id);
             foreach (var winnerId in winningPlayerIds)
             {
                 var user = game.GameUsers.SingleOrDefault(gu => gu.UserId == winnerId);

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using WikidataGame.Backend.Helpers;
 
 namespace WikidataGame.Backend.Repos
@@ -20,39 +21,39 @@ namespace WikidataGame.Backend.Repos
         /// </summary>
         /// <param name="id">Id/primary key</param>
         /// <returns>The entity</returns>
-        public TEntity Get(TIdEntity id) => Context.Set<TEntity>().Find(id);
+        public async Task<TEntity> GetAsync(TIdEntity id) => await Context.Set<TEntity>().FindAsync(id);
 
         /// <summary>
         /// Retrieves all entities
         /// </summary>
         /// <returns>An enumerable of entites</returns>
-        public IEnumerable<TEntity> GetAll() => Context.Set<TEntity>().ToList();
+        public async Task<IEnumerable<TEntity>> GetAllAsync() => await Context.Set<TEntity>().ToListAsync();
 
         /// <summary>
         /// Retrieves all entities that match the given filter
         /// </summary>
         /// <param name="predicate">filter to apply</param>
         /// <returns>An enumerable of entites</returns>
-        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate) => Context.Set<TEntity>().Where(predicate).ToList();
+        public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate) => await Context.Set<TEntity>().Where(predicate).ToListAsync();
 
         /// <summary>
         /// Returns a single entity thats matches the supplied filter or default(Entity) if there is no matching element
         /// </summary>
         /// <param name="predicate">filter to apply</param>
         /// <returns>An entity or default(Entity) if there is no matching element</returns>
-        public TEntity SingleOrDefault(Expression<Func<TEntity, bool>> predicate) => Context.Set<TEntity>().SingleOrDefault(predicate);
+        public async Task<TEntity> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate) => await Context.Set<TEntity>().SingleOrDefaultAsync(predicate);
 
         /// <summary>
         /// Adds the given entity
         /// </summary>
         /// <param name="entity">Entity to store</param>
-        public void Add(TEntity entity) => Context.Set<TEntity>().Add(entity);
+        public async Task AddAsync(TEntity entity) => await Context.Set<TEntity>().AddAsync(entity);
 
         /// <summary>
         /// Adds a range of entities
         /// </summary>
         /// <param name="entities">Enumerable of entities to store</param>
-        public void AddRange(IEnumerable<TEntity> entities) => Context.Set<TEntity>().AddRange(entities);
+        public async Task AddRangeAsync(IEnumerable<TEntity> entities) => await Context.Set<TEntity>().AddRangeAsync(entities);
 
         /// <summary>
         /// Removes the given entity

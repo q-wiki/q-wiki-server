@@ -39,7 +39,7 @@ namespace WikidataGame.Backend.Controllers
         /// <returns>Information on how to authenticate</returns>
         [HttpGet]
         [ProducesResponseType(typeof(AuthInfo), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Authenticate(
+        public async Task<ActionResult<AuthInfo>> Authenticate(
             [FromHeader(Name = "X-Username")] string username,
             [FromHeader(Name = "X-Auth-Token")] string authToken,
             [FromHeader(Name = "X-Push-Token")] string pushToken)
@@ -55,7 +55,7 @@ namespace WikidataGame.Backend.Controllers
 
             try
             {
-                var user = _userRepo.CreateOrUpdateUser(firebaseUidFromToken, pushToken, username);
+                var user = await _userRepo.CreateOrUpdateUserAsync(firebaseUidFromToken, pushToken, username);
 
                 if (string.IsNullOrWhiteSpace(pushToken))
                 {
@@ -76,7 +76,7 @@ namespace WikidataGame.Backend.Controllers
                     user.PushRegistrationId = registrationId;
                 }
 
-                _dataContext.SaveChanges();
+                await _dataContext.SaveChangesAsync();
 
                 var authInfo = JwtTokenHelper.CreateJwtToken(user.Id);
                 Response.Headers.Add("WWW-Authenticate", $"Bearer {authInfo.Bearer}");

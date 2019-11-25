@@ -12,11 +12,10 @@ namespace WikidataGame.Backend.Repos
     {
         public GameRepository(DataContext context) : base(context) { }
 
-        public Game CreateNewGame(User player, int mapWidth, int mapHeight, int accessibleTiles)
+        public async Task<Game> CreateNewGameAsync(User player, int mapWidth, int mapHeight, int accessibleTiles)
         {
             var game = new Game
             {
-                Id = Guid.NewGuid().ToString(),
                 Tiles = MapGeneratorService.GenerateMap(mapWidth, mapHeight, accessibleTiles).ToList(),
                 MapWidth = mapWidth,
                 MapHeight = mapHeight,
@@ -31,13 +30,13 @@ namespace WikidataGame.Backend.Repos
             };
 
             game.GameUsers.Add(gameUser);
-            Add(game);
-            return Get(game.Id);
+            await AddAsync(game);
+            return await GetAsync(game.Id);
         }
 
-        public Game GetOpenGame()
+        public async Task<Game> GetOpenGameAsync()
         {
-            var games = Find(g => g.GameUsers.Count() < 2);
+            var games = await FindAsync(g => g.GameUsers.Count() < 2);
             if (games.Count() < 1) return null;
             return games.First();
         }
@@ -55,9 +54,9 @@ namespace WikidataGame.Backend.Repos
             return game;
         }
 
-        public Game RunningGameForPlayer(User player)
+        public async Task<Game> RunningGameForPlayerAsync(User player)
         {
-            return SingleOrDefault(g => g.GameUsers.Select(gu => gu.UserId).Contains(player.Id) && g.GameUsers.Count(gu => gu.IsWinner) <= 0);
+            return await SingleOrDefaultAsync(g => g.GameUsers.Select(gu => gu.UserId).Contains(player.Id) && g.GameUsers.Count(gu => gu.IsWinner) <= 0);
         }
     }
 }

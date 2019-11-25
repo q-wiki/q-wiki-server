@@ -21,7 +21,7 @@ namespace WikidataGame.Backend.Models
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         public virtual ICollection<Tile> Tiles { get; set; } = new List<Tile>();
 
@@ -32,7 +32,7 @@ namespace WikidataGame.Backend.Models
         public virtual ICollection<GameUser> GameUsers { get; set; } = new List<GameUser>();
 
         [ForeignKey(nameof(User))]
-        public string NextMovePlayerId { get; set; }
+        public Guid? NextMovePlayerId { get; set; }
         public virtual User NextMovePlayer { get; set; }
 
         public int StepsLeftWithinMove { get; set; }

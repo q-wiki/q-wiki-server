@@ -88,7 +88,7 @@ namespace WikidataGame.Backend
                     OnTokenValidated = async context =>
                     {
                         var userRepo = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
-                        var user = await userRepo.SingleOrDefaultAsync(u => u.Id == context.Principal.Identity.Name);
+                        var user = await userRepo.SingleOrDefaultAsync(u => u.Id == new Guid(context.Principal.Identity.Name));
                         if (user == null)
                         {
                             // return unauthorized if user no longer exists
@@ -113,8 +113,8 @@ namespace WikidataGame.Backend
             services.AddScoped<IGameRepository, GameRepository>();
             services.AddScoped<IMinigameRepository, MinigameRepository>();
             services.AddScoped<IQuestionRepository, QuestionRepository>();
-            services.AddSingleton<IRepository<Category, string>, Repository<Category, string>>();
-            services.AddScoped<IRepository<Friend, string>, Repository<Friend, string>>();
+            services.AddSingleton<IRepository<Category, Guid>, Repository<Category, Guid>>();
+            services.AddScoped<IRepository<Friend, Guid>, Repository<Friend, Guid>>();
             services.AddScoped<IMinigameService, MultipleChoiceMinigameService>();
             services.AddScoped<IMinigameService, SortingMinigameService>();
             services.AddSingleton<CategoryCacheService, CategoryCacheService>();

@@ -8,11 +8,11 @@ using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Repos
 {
-    public class QuestionRepository : Repository<Question, string>, IQuestionRepository
+    public class QuestionRepository : Repository<Question, Guid>, IQuestionRepository
     {
         public QuestionRepository(DataContext context) : base(context){}
 
-        public async Task<Question> GetRandomQuestionForCategoryAsync(string categoryId)
+        public async Task<Question> GetRandomQuestionForCategoryAsync(Guid categoryId)
         {
             return await Context.Set<Question>().Where(q => q.CategoryId == categoryId)
                 .OrderBy(q => Guid.NewGuid()).FirstOrDefaultAsync();

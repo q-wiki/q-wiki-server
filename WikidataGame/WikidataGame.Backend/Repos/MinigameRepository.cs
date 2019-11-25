@@ -7,13 +7,13 @@ using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Repos
 {
-    public class MinigameRepository : Repository<MiniGame, string>, IMinigameRepository
+    public class MinigameRepository : Repository<MiniGame, Guid>, IMinigameRepository
     {
         public MinigameRepository(DataContext context) : base(context)
         {
         }
 
-        public async Task<MiniGame> CreateMiniGameAsync(string gameId, string playerId, string tileId, string categoryId, MiniGameType type)
+        public async Task<MiniGame> CreateMiniGameAsync(Guid gameId, Guid playerId, Guid tileId, Guid categoryId, MiniGameType type)
         {
             var minigame = new MiniGame
             {

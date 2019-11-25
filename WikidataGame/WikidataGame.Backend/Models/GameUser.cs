@@ -11,11 +11,11 @@ namespace WikidataGame.Backend.Models
     {
         //Has composed primary key of GameId and UserId (see DataContext)
         [ForeignKey(nameof(Game))]
-        public string GameId { get; set; }
+        public Guid GameId { get; set; }
         public virtual Game Game { get; set; }
 
         [ForeignKey(nameof(User))]
-        public string UserId { get; set; }
+        public Guid UserId { get; set; }
         public virtual User User { get; set; }
 
         public bool IsWinner { get; set; } = false;

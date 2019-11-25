@@ -36,7 +36,7 @@ namespace WikidataGame.Backend.Tests
         public async Task GetCategoriesForTile_SingleTile_GeneratesSameCategoriesWhenAskedRepeatedly()
         {
             // we should get stable categories for a tile
-            var tile = new Models.Tile { Id = Guid.NewGuid().ToString() };
+            var tile = new Models.Tile { Id = Guid.NewGuid() };
             var categoryRepo = CategoryRepo();
             var categoryService = new CategoryCacheService(categoryRepo);
             var categoriesForFirstDraw = await Helpers.TileHelper.GetCategoriesForTileAsync(categoryService, tile.Id);
@@ -48,8 +48,8 @@ namespace WikidataGame.Backend.Tests
         [Fact]
         public async Task GetCategoriesForTile_SingleTile_GeneratesDifferentCategoriesForDifferentTiles()
         {
-            var tileOne = new Models.Tile { Id = "b32b5e31-20f7-4c5d-971b-c7b558049e03" };
-            var tileTwo = new Models.Tile { Id = "d3d4e3eb-a90c-4dde-96c9-870f19547529" };
+            var tileOne = new Models.Tile { Id = new Guid("b32b5e31-20f7-4c5d-971b-c7b558049e03") };
+            var tileTwo = new Models.Tile { Id = new Guid("d3d4e3eb-a90c-4dde-96c9-870f19547529") };
             var categoryRepo = CategoryRepo();
 
             var categoryService = new CategoryCacheService(categoryRepo);

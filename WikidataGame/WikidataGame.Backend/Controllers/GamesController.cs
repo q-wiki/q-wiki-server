@@ -75,7 +75,7 @@ namespace WikidataGame.Backend.Controllers
         /// <returns>Info about the specified game</returns>
         [HttpGet("{gameId}")]
         [ProducesResponseType(typeof(Game), StatusCodes.Status200OK)]
-        public async Task<ActionResult<Game>> RetrieveGameState(string gameId)
+        public async Task<ActionResult<Game>> RetrieveGameState(Guid gameId)
         {
             if (!await IsUserGameParticipantAsync(gameId))
                 return Forbid();
@@ -91,13 +91,13 @@ namespace WikidataGame.Backend.Controllers
         /// <returns>204 status code</returns>
         [HttpDelete("{gameId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> DeleteGame(string gameId)
+        public async Task<IActionResult> DeleteGame(Guid gameId)
         {
             if (!await IsUserGameParticipantAsync(gameId))
                 return Forbid();
 
             var game = await _gameRepo.GetAsync(gameId);
-            var opponents = game.GameUsers.Select(gu => gu.User).Where(u => u.Id != User.Identity.Name).ToList();
+            var opponents = game.GameUsers.Select(gu => gu.User).Where(u => u.Id != new Guid(User.Identity.Name)).ToList();
             foreach(var opponent in opponents)
             {
                 await _notificationService.SendNotificationAsync(opponent, "Congrats", "You won because your opponent left the game!");

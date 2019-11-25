@@ -29,7 +29,7 @@ namespace WikidataGame.Backend.Helpers
         /// <param name="categoryService"></param>
         /// <param name="tileId"></param>
         /// <returns></returns>
-        public static async Task<IEnumerable<Category>> GetCategoriesForTileAsync(CategoryCacheService categoryService, string tileId)
+        public static async Task<IEnumerable<Category>> GetCategoriesForTileAsync(CategoryCacheService categoryService, Guid tileId)
         {
             // we get all categories, draw 3 distinct random ints in
             // [i, categories.Count()[ and return the categories for

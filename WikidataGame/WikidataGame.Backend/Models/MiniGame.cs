@@ -12,11 +12,11 @@ namespace WikidataGame.Backend.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         [ForeignKey(nameof(Game))]
         [Required]
-        public string GameId { get; set; }
+        public Guid GameId { get; set; }
         public virtual Game Game { get; set; }
 
         [Required]
@@ -61,17 +61,17 @@ namespace WikidataGame.Backend.Models
 
         [ForeignKey(nameof(User))]
         [Required]
-        public string PlayerId { get; set; }
+        public Guid PlayerId { get; set; }
         public virtual User Player { get; set; }
 
         [ForeignKey(nameof(Tile))]
         [Required]
-        public string TileId { get; set; }
+        public Guid TileId { get; set; }
         public virtual Tile Tile { get; set; }
 
         [ForeignKey(nameof(Category))]
         [Required]
-        public string CategoryId { get; set; }
+        public Guid CategoryId { get; set; }
         public virtual Category Category { get; set; }
 
     }

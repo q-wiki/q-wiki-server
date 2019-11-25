@@ -8,7 +8,7 @@ namespace WikidataGame.Backend.Dto
 {
     public class GameInfo
     {
-        public string GameId { get; set; }
+        public Guid GameId { get; set; }
         public bool IsAwaitingOpponentToJoin { get; set; }
         public string Message { get; set; }
 

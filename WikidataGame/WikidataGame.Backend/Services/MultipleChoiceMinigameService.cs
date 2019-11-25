@@ -18,7 +18,7 @@ namespace WikidataGame.Backend.Services
 
         public Models.MiniGameType MiniGameType => Models.MiniGameType.MultipleChoice;
 
-        public async Task<MiniGame> GenerateMiniGameAsync(string gameId, string playerId, Models.Question question, string tileId)
+        public async Task<MiniGame> GenerateMiniGameAsync(Guid gameId, Guid playerId, Models.Question question, Guid tileId)
         {
             // use method in baseclass to query wikidata with question
             var data = QueryWikidata(question.SparqlQuery); 

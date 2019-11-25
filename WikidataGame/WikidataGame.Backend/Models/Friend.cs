@@ -11,15 +11,17 @@ namespace WikidataGame.Backend.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string RelationId { get; set; }
+        public Guid RelationId { get; set; }
 
+        [Required]
         [ForeignKey(nameof(User))]
-        public string UserId { get; set; }
+        public Guid UserId { get; set; }
 
         public virtual User User { get; set; }
 
+        [Required]
         [ForeignKey(nameof(Friend))]
-        public int FriendId { get; set; }
+        public Guid FriendId { get; set; }
 
         public virtual User FriendUser { get; set; }
     }

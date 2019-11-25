@@ -11,7 +11,7 @@ namespace WikidataGame.Backend.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         public string SparqlQuery { get; set; }
@@ -21,7 +21,7 @@ namespace WikidataGame.Backend.Models
 
         [ForeignKey(nameof(Category))]
         [Required]
-        public string CategoryId { get; set; }
+        public Guid CategoryId { get; set; }
         public virtual Category Category { get; set; }
 
         [Required]

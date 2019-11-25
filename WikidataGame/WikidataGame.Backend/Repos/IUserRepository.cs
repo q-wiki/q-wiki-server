@@ -6,8 +6,8 @@ using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Repos
 {
-    public interface IUserRepository : IRepository<User, string>
+    public interface IUserRepository : IRepository<User, Guid>
     {
-        Task<User> CreateOrUpdateUserAsync(string deviceId, string pushToken, string username);
+        Task<User> CreateOrUpdateUserAsync(string firebaseUid, string pushToken, string username);
     }
 }

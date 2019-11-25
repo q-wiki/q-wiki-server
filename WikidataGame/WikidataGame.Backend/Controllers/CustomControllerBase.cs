@@ -34,10 +34,10 @@ namespace WikidataGame.Backend.Controllers
 
         protected async Task<User> GetCurrentUserAsync()
         {
-            return await _userRepo.SingleOrDefaultAsync(u => u.Id == User.Identity.Name);
+            return await _userRepo.SingleOrDefaultAsync(u => u.Id == new Guid(User.Identity.Name));
         }
 
-        protected async Task<bool> IsUserGameParticipantAsync(string gameId)
+        protected async Task<bool> IsUserGameParticipantAsync(Guid gameId)
         {
             var user = await GetCurrentUserAsync();
             var game = await _gameRepo.GetAsync(gameId);

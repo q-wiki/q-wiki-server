@@ -78,7 +78,7 @@ namespace WikidataGame.Backend.Controllers
 
                 await _dataContext.SaveChangesAsync();
 
-                var authInfo = JwtTokenHelper.CreateJwtToken(user.Id);
+                var authInfo = JwtTokenHelper.CreateJwtToken(user);
                 Response.Headers.Add("WWW-Authenticate", $"Bearer {authInfo.Bearer}");
                 return Ok(authInfo);
             }

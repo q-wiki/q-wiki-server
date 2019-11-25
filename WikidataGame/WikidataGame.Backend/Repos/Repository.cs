@@ -8,7 +8,7 @@ using WikidataGame.Backend.Helpers;
 
 namespace WikidataGame.Backend.Repos
 {
-    public class Repository<TEntity, TIdEntity> : IRepository<TEntity, TIdEntity> where TEntity : class where TIdEntity : class
+    public class Repository<TEntity, TIdEntity> : IRepository<TEntity, TIdEntity> where TEntity : class
     {
         protected readonly DbContext Context;
         public Repository(DataContext context)

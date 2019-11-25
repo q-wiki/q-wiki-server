@@ -8,7 +8,7 @@ using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Repos
 {
-    public class UserRepository : Repository<User, string>, IUserRepository
+    public class UserRepository : Repository<User, Guid>, IUserRepository
     {
         public UserRepository(DataContext context) : base(context) { }
 

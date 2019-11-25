@@ -8,7 +8,7 @@ using WikidataGame.Backend.Services;
 
 namespace WikidataGame.Backend.Repos
 {
-    public class GameRepository : Repository<Game, string>, IGameRepository
+    public class GameRepository : Repository<Game, Guid>, IGameRepository
     {
         public GameRepository(DataContext context) : base(context) { }
 

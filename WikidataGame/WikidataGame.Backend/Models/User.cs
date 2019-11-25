@@ -11,7 +11,7 @@ namespace WikidataGame.Backend.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         public string FirebaseUserId { get; set; }

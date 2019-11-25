@@ -6,7 +6,7 @@ using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Repos
 {
-    public interface IGameRepository : IRepository<Game, string>
+    public interface IGameRepository : IRepository<Game, Guid>
     {
         Task<Game> CreateNewGameAsync(User player, int mapWidth, int mapHeight, int accessibleTiles);
 

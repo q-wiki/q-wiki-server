@@ -4,7 +4,7 @@ Q-Wiki is a Wikidata based game (Unity front-end with ASP.NET Core back-end) dev
 Once you clone the repository you might want to use Visual Studio or VS Code depending on your OS.
 ### WikidataGame.Backend
 The WikidataGame.Backend project is the main REST API back-end project written in C# with ASP.NET Core 2.2.
-By default Sqlite will be used as the database system, to switch to MSSQL just add an environment variable "SQLAZURECONNSTR_SQL" with the connection string. To make use of push notifications add an environment variable "CUSTOMCONNSTR_NotificationHub" and supply the connection string of the Azure Notification Hub.
+By default Sqlite will be used as the database system, to switch to MSSQL just add an environment variable "SQLAZURECONNSTR_SQL" with the connection string. To make use of push notifications add an environment variable "CUSTOMCONNSTR_NotificationHub" and supply the connection string of the Azure Notification Hub. Authentication works with Firebase authentication tokens, for this another connection string "CUSTOMCONNSTR_FirebaseAuth" with the firebase json configuration needs to be supplied. Additionally, a secret for JWT authentication is nessecary, which should be provided in appsettings.json as "AuthSecret".
 #### REST
 Check out the swagger documentation that is automatically generated via [swashbuckle](https://github.com/domaindrivendev/Swashbuckle.AspNetCore) from code: https://wikidatagame.azurewebsites.net
 

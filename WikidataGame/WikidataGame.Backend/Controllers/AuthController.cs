@@ -44,8 +44,8 @@ namespace WikidataGame.Backend.Controllers
             [FromHeader(Name = "X-Auth-Token")] string authToken,
             [FromHeader(Name = "X-Push-Token")] string pushToken)
         {
-            if (string.IsNullOrWhiteSpace(authToken))
-                return BadRequest(new { message = "Authentication token needs to be supplied" });
+            if (string.IsNullOrWhiteSpace(authToken) || string.IsNullOrWhiteSpace(username))
+                return BadRequest(new { message = "Authentication token and username need to be supplied" });
 
             var firebaseUidFromToken = await _authService.VerifyTokenAsync(authToken);
             if (string.IsNullOrWhiteSpace(firebaseUidFromToken))

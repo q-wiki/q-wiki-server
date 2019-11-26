@@ -23,13 +23,13 @@ namespace WikidataGame.Backend.Tests
             _output = output;
         }
         
-        private IRepository<Category, string> CategoryRepo()
+        private IRepository<Category, Guid> CategoryRepo()
         {
             var Builderoptions = new DbContextOptionsBuilder<Helpers.DataContext>();
             Builderoptions.UseLazyLoadingProxies().UseInMemoryDatabase(Guid.NewGuid().ToString());
             var context = new Helpers.DataContext(Builderoptions.Options);
             context.Database.EnsureCreated();
-            return new Repository<Category, string>(context);
+            return new Repository<Category, Guid>(context);
         }
 
         [Fact]

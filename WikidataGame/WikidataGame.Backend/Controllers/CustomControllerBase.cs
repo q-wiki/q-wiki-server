@@ -14,7 +14,7 @@ namespace WikidataGame.Backend.Controllers
     {
         protected readonly IGameRepository _gameRepo;
         protected readonly IUserRepository _userRepo;
-        protected readonly IRepository<Category, string> _categoryRepo;
+        protected readonly IRepository<Category, Guid> _categoryRepo;
         protected readonly DataContext _dataContext;
         protected readonly INotificationService _notificationService;
 
@@ -22,13 +22,11 @@ namespace WikidataGame.Backend.Controllers
             DataContext dataContext,
             IUserRepository userRepo,
             IGameRepository gameRepo,
-            IRepository<Category, string> categoryRepo,
             INotificationService notificationService)
         {
             _dataContext = dataContext;
             _userRepo = userRepo;
             _gameRepo = gameRepo;
-            _categoryRepo = categoryRepo;
             _notificationService = notificationService;
         }
 

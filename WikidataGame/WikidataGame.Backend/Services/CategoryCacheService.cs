@@ -9,9 +9,9 @@ namespace WikidataGame.Backend.Services
 {
     public class CategoryCacheService
     {
-        private readonly IRepository<Category, string> _categoryRepo;
+        private readonly IRepository<Category, Guid> _categoryRepo;
         private IEnumerable<Category> _categories;
-        public CategoryCacheService(IRepository<Category, string> categoryRepo)
+        public CategoryCacheService(IRepository<Category, Guid> categoryRepo)
         {
             _categoryRepo = categoryRepo;
         }

@@ -27,10 +27,9 @@ namespace WikidataGame.Backend.Controllers
             IUserRepository userRepo,
             IGameRepository gameRepo,
             IMinigameRepository minigameRepo,
-            IRepository<Models.Category, string> categoryRepo,
             IQuestionRepository questionRepo,
             INotificationService notificationService,
-            CategoryCacheService categoryCacheService) : base(dataContext, userRepo, gameRepo, categoryRepo, notificationService)
+            CategoryCacheService categoryCacheService) : base(dataContext, userRepo, gameRepo, notificationService)
         {
             _minigameRepo = minigameRepo;
             _questionRepo = questionRepo;

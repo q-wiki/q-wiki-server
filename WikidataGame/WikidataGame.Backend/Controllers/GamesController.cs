@@ -27,9 +27,8 @@ namespace WikidataGame.Backend.Controllers
             DataContext dataContext,
             IUserRepository userRepo,
             IGameRepository gameRepo,
-            IRepository<Models.Category, string> categoryRepo,
             CategoryCacheService categoryCacheService,
-            INotificationService notificationService) : base(dataContext, userRepo, gameRepo, categoryRepo, notificationService)
+            INotificationService notificationService) : base(dataContext, userRepo, gameRepo, notificationService)
         {
             _categoryCacheService = categoryCacheService;
         }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WikidataGame.Backend.Dto;
 using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Repos;
 using WikidataGame.Backend.Services;
@@ -17,48 +18,83 @@ namespace WikidataGame.Backend.Controllers
     [Authorize]
     public class FriendsController : CustomControllerBase
     {
-        private readonly IRepository<Models.Friend, Guid> _friendRepo;
+        private readonly IRepository<Models.Friend, Guid> _friendsRepo;
         public FriendsController(
             DataContext dataContext,
             IUserRepository userRepo,
             IGameRepository gameRepo,
-            IRepository<Models.Category, string> categoryRepo,
-            INotificationService notificationService): base(dataContext, userRepo, gameRepo, categoryRepo, notificationService)
+            IRepository<Models.Friend, Guid> friendsRepo,
+            INotificationService notificationService): base(dataContext, userRepo, gameRepo, notificationService)
         {
+            _friendsRepo = friendsRepo;
         }
 
-        // GET: api/Friends
+        /// <summary>
+        /// Retrieves the friendlist for the signed in user
+        /// </summary>
+        /// <returns>List of friends</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Models.Friend>>> GetFriends()
+        [ProducesResponseType(typeof(IEnumerable<Player>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<Player>>> GetFriends()
         {
-            return await _dataContext.Friends.ToListAsync();
+            var user = await GetCurrentUserAsync();
+            var friends = await _friendsRepo.FindAsync(f => f.UserId == user.Id);
+            return Ok(friends.Select(f => Player.FromModel(f)).ToList());
         }
         
 
-        // POST: api/Friends
+        /// <summary>
+        /// Adds a user as a friend
+        /// </summary>
+        /// <param name="friendId">The user id of the player that should be added</param>
+        /// <returns>Details of the added user</returns>
         [HttpPost]
-        public async Task<ActionResult<Models.Friend>> PostFriend(Models.Friend friend)
+        [ProducesResponseType(typeof(Player), StatusCodes.Status201Created)]
+        public async Task<ActionResult<Player>> PostFriend(Guid friendId)
         {
-            _dataContext.Friends.Add(friend);
-            await _dataContext.SaveChangesAsync();
-
-            return CreatedAtAction("GetFriend", new { id = friend.RelationId }, friend);
-        }
-
-        // DELETE: api/Friends/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Models.Friend>> DeleteFriend(string id)
-        {
-            var friend = await _dataContext.Friends.FindAsync(id);
-            if (friend == null)
+            var user = await GetCurrentUserAsync();
+            var friendUser = await _userRepo.GetAsync(friendId);
+            if(friendUser == null) //user does not exist
             {
-                return NotFound();
+                NotFound();
             }
 
-            _dataContext.Friends.Remove(friend);
+            if((await _friendsRepo.SingleOrDefaultAsync(f => f.UserId == user.Id && f.FriendId == friendId)) != null) // already friends
+            {
+                BadRequest();
+            }
+
+            var friend = new Models.Friend
+            {
+                UserId = user.Id,
+                FriendId = friendId,
+            };
+            await _friendsRepo.AddAsync(friend);
             await _dataContext.SaveChangesAsync();
 
-            return friend;
+            return Created("", Player.FromModel(friend));
+        }
+
+        /// <summary>
+        /// Removes a friend from the friend list
+        /// </summary>
+        /// <param name="friendId">User id of the friend to be removed</param>
+        /// <returns></returns>
+        [HttpDelete("{friendId}")]
+        [ProducesResponseType(typeof(Player), StatusCodes.Status204NoContent)]
+        public async Task<ActionResult> DeleteFriend(Guid friendId)
+        {
+            var user = await GetCurrentUserAsync();
+            var friendship = await _friendsRepo.SingleOrDefaultAsync(f => f.UserId == user.Id && f.FriendId == friendId);
+            if (friendship == null) // not friends
+            {
+                BadRequest();
+            }
+
+            _friendsRepo.Remove(friendship);
+            await _dataContext.SaveChangesAsync();
+
+            return NoContent();
         }
 
     }

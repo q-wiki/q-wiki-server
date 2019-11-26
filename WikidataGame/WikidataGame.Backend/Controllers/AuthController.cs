@@ -23,9 +23,9 @@ namespace WikidataGame.Backend.Controllers
             DataContext dataContext,
             IUserRepository userRepo,
             IGameRepository gameRepo,
-            IRepository<Models.Category, string> categoryRepo,
+            IRepository<Models.Category, Guid> categoryRepo,
             INotificationService notificationService,
-            AuthService authService) : base(dataContext, userRepo, gameRepo, categoryRepo, notificationService)
+            AuthService authService) : base(dataContext, userRepo, gameRepo, notificationService)
         {
             _authService = authService;
         }

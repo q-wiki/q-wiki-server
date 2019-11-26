@@ -18,7 +18,19 @@ namespace WikidataGame.Backend.Dto
             return new Player
             {
                 Id = player.Id,
-                Name = $"Player {player.Id}"
+                Name = player.Username
+            };
+        }
+
+        public static Player FromModel(Models.Friend friend)
+        {
+            if (friend == null)
+                return null;
+
+            return new Player
+            {
+                Id = friend.FriendId,
+                Name = friend.FriendUser.Username
             };
         }
     }

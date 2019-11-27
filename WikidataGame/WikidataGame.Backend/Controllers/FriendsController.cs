@@ -56,12 +56,13 @@ namespace WikidataGame.Backend.Controllers
             var friendUser = await _userRepo.GetAsync(friendId);
             if(friendUser == null) //user does not exist
             {
-                NotFound();
+                return NotFound("User not found");
             }
 
-            if((await _friendsRepo.SingleOrDefaultAsync(f => f.UserId == user.Id && f.FriendId == friendId)) != null) // already friends
+            if(friendUser.Id == user.Id || //cannot be friends with oneself
+                (await _friendsRepo.SingleOrDefaultAsync(f => f.UserId == user.Id && f.FriendId == friendId)) != null) // already friends 
             {
-                BadRequest();
+                return BadRequest("Already friends!");
             }
 
             var friend = new Models.Friend
@@ -88,7 +89,7 @@ namespace WikidataGame.Backend.Controllers
             var friendship = await _friendsRepo.SingleOrDefaultAsync(f => f.UserId == user.Id && f.FriendId == friendId);
             if (friendship == null) // not friends
             {
-                BadRequest();
+                return BadRequest("No friendship to delete");
             }
 
             _friendsRepo.Remove(friendship);
@@ -97,5 +98,21 @@ namespace WikidataGame.Backend.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Retrieves users (limit 10) with a username similar to the query string
+        /// </summary>
+        /// <param name="query">Username or part of a username (min. 3 characters)</param>
+        /// <returns>List of users</returns>
+        [HttpGet("Find")]
+        [ProducesResponseType(typeof(IEnumerable<Player>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<Player>>> GetFindFriends(string query)
+        {
+            if (query.Length < 3)
+                return BadRequest();
+
+            var user = await GetCurrentUserAsync();
+            var users = await _userRepo.FindAsync(u => u.Id != user.Id && EF.Functions.Like(u.Username, $"%{query.Replace("%","")}%"));
+            return Ok(users.Take(10).Select(f => Player.FromModel(f)).ToList());
+        }
     }
 }

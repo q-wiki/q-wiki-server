@@ -33,7 +33,7 @@ namespace WikidataGame.Backend.Controllers
         /// <summary>
         /// Authenticates a player 
         /// </summary>
-        /// <param name="username">Username</param>
+        /// <param name="username">Username (min. 3 chars)</param>
         /// <param name="authToken">firebase authentication token</param>
         /// <param name="pushToken">push token generated through firebase/apns</param>
         /// <returns>Information on how to authenticate</returns>
@@ -44,7 +44,7 @@ namespace WikidataGame.Backend.Controllers
             [FromHeader(Name = "X-Auth-Token")] string authToken,
             [FromHeader(Name = "X-Push-Token")] string pushToken)
         {
-            if (string.IsNullOrWhiteSpace(authToken) || string.IsNullOrWhiteSpace(username))
+            if (string.IsNullOrWhiteSpace(authToken) || string.IsNullOrWhiteSpace(username) || username.Length < 3)
                 return BadRequest(new { message = "Authentication token and username need to be supplied" });
 
             var firebaseUidFromToken = await _authService.VerifyTokenAsync(authToken);

@@ -9,7 +9,7 @@ using WikidataGame.Backend.Helpers;
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20191125235336_Initial")]
+    [Migration("20191127203418_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -61,13 +61,11 @@ namespace WikidataGame.Backend.Migrations
 
                     b.Property<Guid>("FriendId");
 
-                    b.Property<Guid?>("FriendUserId");
-
                     b.Property<Guid>("UserId");
 
                     b.HasKey("RelationId");
 
-                    b.HasIndex("FriendUserId");
+                    b.HasIndex("FriendId");
 
                     b.HasIndex("UserId", "FriendId")
                         .IsUnique();
@@ -1058,7 +1056,8 @@ namespace WikidataGame.Backend.Migrations
                 {
                     b.HasOne("WikidataGame.Backend.Models.User", "FriendUser")
                         .WithMany()
-                        .HasForeignKey("FriendUserId");
+                        .HasForeignKey("FriendId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("WikidataGame.Backend.Models.User", "User")
                         .WithMany()

@@ -14,15 +14,16 @@ namespace WikidataGame.Backend.Models
         public Guid RelationId { get; set; }
 
         [Required]
-        [ForeignKey(nameof(User))]
         public Guid UserId { get; set; }
 
+
+        [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; }
 
         [Required]
-        [ForeignKey(nameof(Friend))]
         public Guid FriendId { get; set; }
 
+        [ForeignKey(nameof(FriendId))]
         public virtual User FriendUser { get; set; }
     }
 }

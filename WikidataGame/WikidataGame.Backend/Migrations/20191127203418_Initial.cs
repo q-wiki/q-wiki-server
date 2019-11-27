@@ -62,18 +62,17 @@ namespace WikidataGame.Backend.Migrations
                 {
                     RelationId = table.Column<Guid>(nullable: false),
                     UserId = table.Column<Guid>(nullable: false),
-                    FriendId = table.Column<Guid>(nullable: false),
-                    FriendUserId = table.Column<Guid>(nullable: true)
+                    FriendId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Friends", x => x.RelationId);
                     table.ForeignKey(
-                        name: "FK_Friends_Users_FriendUserId",
-                        column: x => x.FriendUserId,
+                        name: "FK_Friends_Users_FriendId",
+                        column: x => x.FriendId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Friends_Users_UserId",
                         column: x => x.UserId,
@@ -988,9 +987,9 @@ namespace WikidataGame.Backend.Migrations
                         } ORDER BY DESC(?question)", "Which of these moons belongs to {0}?" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Friends_FriendUserId",
+                name: "IX_Friends_FriendId",
                 table: "Friends",
-                column: "FriendUserId");
+                column: "FriendId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Friends_UserId_FriendId",

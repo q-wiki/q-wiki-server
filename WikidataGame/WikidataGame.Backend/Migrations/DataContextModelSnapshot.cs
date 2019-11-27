@@ -14,7 +14,7 @@ namespace WikidataGame.Backend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity("WikidataGame.Backend.Models.Category", b =>
                 {
@@ -50,6 +50,11 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = "f9c52d1a-9315-423d-a818-94c1769fffe5",
                             Title = "History"
+                        },
+                        new
+                        {
+                            Id = "3e888b3e-f04f-40fc-a4e0-78768a49506b",
+                            Title = "Food"
                         });
                 });
 
@@ -991,6 +996,113 @@ namespace WikidataGame.Backend.Migrations
                         # the final results must be sorted ascending
                         ORDER BY ?value",
                             TaskDescription = "Sort these chemical elements by {0} (ascending)!"
+                        },
+                        new
+                        {
+                            Id = "d647f166-4ac0-455b-b9db-e50787d961b1",
+                            CategoryId = "3e888b3e-f04f-40fc-a4e0-78768a49506b",
+                            MiniGameType = 0,
+                            SparqlQuery = @"
+                       SELECT DISTINCT (Sample(GROUP_CONCAT(DISTINCT ?question; SEPARATOR=', ')) AS ?question) (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?answer); SEPARATOR=', ')) AS ?answer) 
+                        ?year
+                        WHERE{
+                        {SELECT DISTINCT ?softDrink ?softDrinkLabel ?year ?inception ?question
+                          WHERE {
+                            ?softDrink (wd:wd31|wdt:P279)* wd:Q147538.
+                            ?softDrink wdt:P571 ?inception.
+                            Filter(?softDrink != wd:Q180289)
+                            ?softDrink rdfs:label ?softDrinkLabel
+                                       #makes sure to get only known drinks in germany by checking if item has a german label
+                            filter langMatches(lang(?softDrinkLabel), 'de')
+                            SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                     ?softDrinkLabel rdfs:label ?answer.
+                                                   }
+                           BIND(Year(?inception) as ?year)
+   
+                          }
+                           ORDER BY (MD5(CONCAT(STR(?question), STR(NOW()))))
+                           LIMIT 5
+                          }
+                           SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                     ?softDrinkLabel rdfs:label ?answer.
+                                                   }
+                           BIND('Order Softdrinks by inception' as ?question)
+                        }
+                        group by ?year 
+                        order by ?year",
+                            TaskDescription = "Sort these drinks by inception (ascending)"
+                        },
+                        new
+                        {
+                            Id = "a38e6677 -092e-4191-a46e-b8e73134da60",
+                            CategoryId = "3e888b3e-f04f-40fc-a4e0-78768a49506b",
+                            MiniGameType = 2,
+                            SparqlQuery = @"
+                        SELECT ?question ?answer 
+                        WITH{
+                        SELECT ?item ?itemLabel ?origin ?originLabel ?originContinent
+                        WHERE {
+                        ?item wdt:P31 wd:Q134768. 
+                        ?item wdt:P495 ?origin.
+                        ?origin wdt:P30 ?originContinent.
+                        }
+                        } AS %cocktails
+                        WITH{
+                        SELECT ?item ?itemLabel ?origin ?originLabel ?originContinent
+                        WHERE {
+                        ?item wdt:P31 wd:Q2536409. 
+                        ?item wdt:P495 ?origin.
+                        ?origin wdt:P30 ?originContinent.
+                        }
+                        } AS %ibaCocktails
+     
+                        WITH{
+                          SELECT ?item ?itemLabel ?origin ?originLabel ?originContinent
+                          WHERE
+                          {
+                           {INCLUDE %cocktails}
+                           UNION
+                           {INCLUDE %ibaCocktails}
+                          }
+                           ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                           LIMIT 1
+                        } AS %selectedCountry
+
+                        WITH{
+                           SELECT ?originContinent
+                           WHERE{
+                             ?originContinent wdt:P31 wd:Q5107.
+                             INCLUDE %selectedCountry
+                           }
+                        } as %selectedContinent
+
+                        WITH{
+                          SELECT DISTINCT ?origin ?originLabel ?answer
+                          WHERE{
+                             ?origin wdt:P31 wd:Q3624078.
+                             FILTER NOT EXISTS { INCLUDE %selectedCountry. }
+                             {
+                               ?originContinent wdt:P31 wd:Q5107.
+                               INCLUDE %selectedContinent
+                             }
+                             ?origin wdt:P30 ?originContinent.
+                           }
+                          ORDER BY (MD5(CONCAT(STR(?item), STR(NOW())))) 
+                          LIMIT 3
+                        } AS %decoyCountries
+
+                        WHERE{
+                          {INCLUDE %selectedCountry}
+                          UNION
+                          {INCLUDE %decoyCountries}
+                          SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                     ?item rdfs:label ?question.
+                                                     ?origin rdfs:label ?answer.
+                                                   }
+                        }
+                        ORDER BY DESC(?question)
+                    ",
+                            TaskDescription = "Where is the cocktail {0} from"
                         });
                 });
 

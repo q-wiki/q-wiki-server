@@ -17,16 +17,16 @@ namespace WikidataGame.Backend.Helpers
                 //    Id = "e9019ee1-0eed-492d-8aa7-feb1974fb265",
                 //    Title = "Nature"
                 //},
-                //new Category
-                //{
-                //    Id = "ddd333f7-ef45-4e13-a2ca-fb4494dce324",
-                //    Title = "Culture"
-                //},
+                new Category
+                {
+                    Id = "ddd333f7-ef45-4e13-a2ca-fb4494dce324",
+                    Title = "Culture"
+                },
                 new Category
                 {
                     Id = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
                     Title = "Geography"
-                }, 
+                },
                 new Category
                 {
                     Id = "1b9185c0-c46b-4abf-bf82-e464f5116c7d",
@@ -695,7 +695,7 @@ namespace WikidataGame.Backend.Helpers
                          }
                          
                          ORDER BY ?firstElectionPeriod
-                       " 
+                       "
                 },
                 new Question
                 {
@@ -918,7 +918,112 @@ namespace WikidataGame.Backend.Helpers
                         
                         # the final results must be sorted ascending
                         ORDER BY ?value"
-                }
+                },
+                new Question
+                {
+                    Id = "07000216-bb4a-4b37-bc38-7af10e9fe8f1",
+                    CategoryId = "ddd333f7-ef45-4e13-a2ca-fb4494dce324",
+                    MiniGameType = MiniGameType.Sort,
+                    TaskDescription = "Order the artists by the inception of their first painting",
+                    SparqlQuery = @"
+                        SELECT ?question ?answer
+                        WITH{
+                        SELECT DISTINCT ?creator
+                          WHERE 
+                          { 
+                            ?painting wdt:P1343 wd:Q66362718;
+                                    wdt:P170 ?creator.
+                          }
+                           ORDER BY (MD5(CONCAT(STR(?answer), STR(NOW()))))      
+                          } as %selectedArtists
+
+                        WITH{
+                            SELECT DISTINCT ?creator ?creatorLabel (SAMPLE(?inception) as ?firstPaintingInception) (SAMPLE(?painting) as ?firstPainting) (GROUP_CONCAT(DISTINCT ?paintingLabel; SEPARATOR=', ') AS ?paintingNames)
+                                    WHERE{
+                                          INCLUDE %selectedArtists.
+                                          {SELECT *
+                                            where{ 
+                                           ?creator wdt:P106 wd:Q1028181.
+                                           ?painting wdt:P170 ?creator.
+                                           ?painting wdt:P571 ?inception.
+                                           Filter(datatype(YEAR(?inception))!='') .  
+                                           SERVICE wikibase:label { bd:serviceParam wikibase:language '[AUTO_LANGUAGE],en'.
+                                                                  ?creator rdfs:label ?creatorLabel}
+                                          }
+                                      ORDER BY ?inception
+                                    }}
+                          GROUP BY ?creator ?creatorLabel
+                          ORDER BY (MD5(CONCAT(STR(?inception), STR(NOW()))))                    
+                        } as %firstPainting
+
+                        WHERE{
+                            INCLUDE %firstPainting.
+                            SERVICE wikibase:label { bd:serviceParam wikibase:language '[AUTO_LANGUAGE],en'. 
+                                                   ?creator rdfs:label ?answer.
+                                                   ?painting rdfs:label ?paintingLabel}
+                            BIND(?creatorLabel as ?answer)
+                            BIND('order the artists by the inception of their first painting' as ?question)
+                        }
+                          ORDER BY ?firstPaintingInception
+                          LIMIT 4
+                    ",
+                },
+                 new Question
+                 {
+                     Id = "e88d7d8b-b5d4-4506-9736-41201badc491",
+                     CategoryId = "ddd333f7-ef45-4e13-a2ca-fb4494dce324",
+                     MiniGameType = MiniGameType.MultipleChoice,
+                     TaskDescription = "What did {0} invent?",
+                     SparqlQuery = @"
+                        SELECT DISTINCT ?question ?answer 
+                        WITH{
+                         SELECT DISTINCT ?inventor ?inventorLabel (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?itemLabel); SEPARATOR=',')) AS ?itemLabel)
+                          WHERE 
+                            { 
+                              ?inventor wdt:P31 wd:Q5; wdt:P106 wd:Q205375.
+                              ?item wdt:P61 ?inventor.
+                              SERVICE wikibase:label { bd:serviceParam wikibase:language '[AUTO_LANGUAGE],en'.
+                                ?item rdfs:label ?itemLabel.
+                                ?inventor rdfs:label ?inventorLabel
+                              }
+                            }
+                          group by ?inventor ?inventorLabel
+                          ORDER BY (MD5(CONCAT(STR(?answer), STR(NOW())))) 
+                         } as %allInventors
+
+                        WITH{
+                         SELECT *
+                          WHERE 
+                            { 
+                             INCLUDE %allInventors
+                            }
+                           ORDER BY (MD5(CONCAT(STR(?answer), STR(NOW())))) 
+                           LIMIT 1
+                        } as %selectedInventor
+
+                        WITH{
+                         SELECT ?itemLabel
+                          WHERE 
+                            { 
+                             INCLUDE %allInventors.
+                             FILTER NOT EXISTS {INCLUDE %selectedInventor}
+                            }
+                           ORDER BY (MD5(CONCAT(STR(?answer), STR(NOW())))) 
+                           LIMIT 3
+                        } as %decoyInventors
+
+                        WHERE{
+                          {INCLUDE %selectedInventor}
+                          UNION
+                          {INCLUDE %decoyInventors}
+                          SERVICE wikibase:label { bd:serviceParam wikibase:language '[AUTO_LANGUAGE],en'.
+                                ?itemLabel rdfs:label ?answer.
+                                ?inventor rdfs:label ?question.
+                                                 }
+                        }
+                        Order by DESC(?question)
+                        ",
+                 }
                 );
         }
     }

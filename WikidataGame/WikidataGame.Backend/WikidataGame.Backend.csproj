@@ -23,7 +23,8 @@
 
   <ItemGroup>
     <PackageReference Include="dotNetRDF" Version="2.2.0" />
-    <PackageReference Include="FirebaseAdmin" Version="1.9.1" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.42.0" />
+    <PackageReference Include="Google.Apis.Games.v1" Version="1.42.0.1771" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="3.1.0" />

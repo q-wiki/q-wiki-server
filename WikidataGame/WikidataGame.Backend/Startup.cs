@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -87,8 +88,8 @@ namespace WikidataGame.Backend
                 {
                     OnTokenValidated = async context =>
                     {
-                        var userRepo = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
-                        var user = await userRepo.SingleOrDefaultAsync(u => u.Id == new Guid(context.Principal.Identity.Name));
+                        var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<User>>();
+                        var user = await userManager.GetUserAsync(context.Principal);
                         if (user == null)
                         {
                             // return unauthorized if user no longer exists
@@ -103,13 +104,38 @@ namespace WikidataGame.Backend
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateAudience = false,
+                    ValidateLifetime = true
                 };
             });
 
+            //configure identity
+            services.AddDefaultIdentity<User>()
+                .AddEntityFrameworkStores<DataContext>()
+                .AddUserManager<UserManager<User>>();
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Password settings.
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 8;
+                options.Password.RequiredUniqueChars = 1;
+
+                // Lockout settings.
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
+
+                // User settings.
+                options.User.RequireUniqueEmail = false;
+            });
+
             services.AddSingleton<INotificationService>(new NotificationService(Configuration.GetConnectionString("NotificationHub")));
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddSingleton(new AuthService(Configuration.GetConnectionString("FirebaseAuth")));
+            services.AddScoped<UserManager<User>>();
+            services.AddSingleton(new AuthService(Configuration.GetConnectionString("GoogleClientSecret")));
             services.AddScoped<IGameRepository, GameRepository>();
             services.AddScoped<IMinigameRepository, MinigameRepository>();
             services.AddScoped<IQuestionRepository, QuestionRepository>();

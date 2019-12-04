@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WikidataGame.Backend.Dto;
@@ -21,10 +22,10 @@ namespace WikidataGame.Backend.Controllers
         private readonly IRepository<Models.Friend, Guid> _friendsRepo;
         public FriendsController(
             DataContext dataContext,
-            IUserRepository userRepo,
+            UserManager<Models.User> userManager,
             IGameRepository gameRepo,
             IRepository<Models.Friend, Guid> friendsRepo,
-            INotificationService notificationService): base(dataContext, userRepo, gameRepo, notificationService)
+            INotificationService notificationService): base(dataContext, userManager, gameRepo, notificationService)
         {
             _friendsRepo = friendsRepo;
         }
@@ -53,7 +54,7 @@ namespace WikidataGame.Backend.Controllers
         public async Task<ActionResult<Player>> PostFriend(Guid friendId)
         {
             var user = await GetCurrentUserAsync();
-            var friendUser = await _userRepo.GetAsync(friendId);
+            var friendUser = await _userManager.FindByIdAsync(friendId.ToString());
             if(friendUser == null) //user does not exist
             {
                 return NotFound("User not found");
@@ -111,8 +112,8 @@ namespace WikidataGame.Backend.Controllers
                 return BadRequest();
 
             var user = await GetCurrentUserAsync();
-            var users = await _userRepo.FindAsync(u => u.Id != user.Id && EF.Functions.Like(u.Username, $"%{query.Replace("%","")}%"));
-            return Ok(users.Take(10).Select(f => Player.FromModel(f)).ToList());
+            var users = await _userManager.Users.Where(u => u.Id != user.Id && EF.Functions.Like(u.UserName, $"%{query.Replace("%","")}%")).Take(10).ToListAsync();
+            return Ok(users.Select(f => Player.FromModel(f)).ToList());
         }
     }
 }

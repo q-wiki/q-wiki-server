@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,26 +14,26 @@ namespace WikidataGame.Backend.Controllers
     public class CustomControllerBase : ControllerBase
     {
         protected readonly IGameRepository _gameRepo;
-        protected readonly IUserRepository _userRepo;
+        protected readonly UserManager<User> _userManager;
         protected readonly IRepository<Category, Guid> _categoryRepo;
         protected readonly DataContext _dataContext;
         protected readonly INotificationService _notificationService;
 
         public CustomControllerBase(
             DataContext dataContext,
-            IUserRepository userRepo,
+           UserManager<User> userManager,
             IGameRepository gameRepo,
             INotificationService notificationService)
         {
             _dataContext = dataContext;
-            _userRepo = userRepo;
+            _userManager = userManager;
             _gameRepo = gameRepo;
             _notificationService = notificationService;
         }
 
         protected async Task<User> GetCurrentUserAsync()
         {
-            return await _userRepo.SingleOrDefaultAsync(u => u.Id == new Guid(User.Identity.Name));
+            return await _userManager.GetUserAsync(User);
         }
 
         protected async Task<bool> IsUserGameParticipantAsync(Guid gameId)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -7,20 +8,14 @@ using System.Threading.Tasks;
 
 namespace WikidataGame.Backend.Models
 {
-    public class User
+    public class User : IdentityUser<Guid>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id { get; set; }
+        public override Guid Id { get; set; }
 
         [Required]
-        public string FirebaseUserId { get; set; }
-
-        [Required]
-        public string Username { get; set; }
-
-        [Required]
-        public GamePlatform Platform { get; set; } = GamePlatform.Android;
+        public GamePlatform PushPlatform { get; set; } = GamePlatform.Android;
 
         public string PushToken { get; set; }
 
@@ -32,5 +27,4 @@ namespace WikidataGame.Backend.Models
         Ios,
         Android
     }
-
 }

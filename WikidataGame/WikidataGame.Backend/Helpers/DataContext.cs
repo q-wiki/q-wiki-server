@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +9,10 @@ using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Helpers
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
-        public DbSet<User> Users { get; set; }
         public DbSet<Friend> Friends { get; set; }
         public DbSet<Game> Games { get; set; }
         public DbSet<MiniGame> MiniGames { get; set; }
@@ -22,8 +23,7 @@ namespace WikidataGame.Backend.Helpers
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GameUser>().HasKey(gu => new { gu.GameId, gu.UserId });
-            modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
-            modelBuilder.Entity<User>().HasIndex(u => u.FirebaseUserId).IsUnique();
+            modelBuilder.Entity<User>().HasIndex(u => u.UserName).IsUnique();
             modelBuilder.Entity<Friend>().HasIndex(f => new { f.UserId, f.FriendId}).IsUnique();
 
             base.OnModelCreating(modelBuilder);

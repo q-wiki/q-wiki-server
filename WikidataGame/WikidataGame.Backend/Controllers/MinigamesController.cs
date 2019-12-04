@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using WikidataGame.Backend.Dto;
@@ -24,12 +25,12 @@ namespace WikidataGame.Backend.Controllers
 
         public MinigamesController(
             DataContext dataContext,
-            IUserRepository userRepo,
+            UserManager<Models.User> userManager,
             IGameRepository gameRepo,
             IMinigameRepository minigameRepo,
             IQuestionRepository questionRepo,
             INotificationService notificationService,
-            CategoryCacheService categoryCacheService) : base(dataContext, userRepo, gameRepo, notificationService)
+            CategoryCacheService categoryCacheService) : base(dataContext, userManager, gameRepo, notificationService)
         {
             _minigameRepo = minigameRepo;
             _questionRepo = questionRepo;

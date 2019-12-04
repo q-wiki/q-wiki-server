@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using WikidataGame.Backend.Dto;
@@ -25,10 +26,10 @@ namespace WikidataGame.Backend.Controllers
         private readonly CategoryCacheService _categoryCacheService;
         public GamesController(
             DataContext dataContext,
-            IUserRepository userRepo,
+            UserManager<Models.User> userManager,
             IGameRepository gameRepo,
             CategoryCacheService categoryCacheService,
-            INotificationService notificationService) : base(dataContext, userRepo, gameRepo, notificationService)
+            INotificationService notificationService) : base(dataContext, userManager, gameRepo, notificationService)
         {
             _categoryCacheService = categoryCacheService;
         }

@@ -18,7 +18,7 @@ namespace WikidataGame.Backend.Dto
             return new Player
             {
                 Id = player.Id,
-                Name = player.Username
+                Name = player.UserName
             };
         }
 
@@ -30,7 +30,7 @@ namespace WikidataGame.Backend.Dto
             return new Player
             {
                 Id = friend.FriendId,
-                Name = friend.FriendUser.Username
+                Name = friend.FriendUser.UserName
             };
         }
     }

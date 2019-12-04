@@ -7,8 +7,10 @@ namespace WikidataGame.Backend.Dto
 {
     public class Player
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; }
+
+        public string ProfileImage { get; set; }
 
         public static Player FromModel(Models.User player)
         {
@@ -18,8 +20,17 @@ namespace WikidataGame.Backend.Dto
             return new Player
             {
                 Id = player.Id,
-                Name = $"Player {player.Id}"
+                Name = player.UserName,
+                ProfileImage = player.ProfileImageUrl
             };
+        }
+
+        public static Player FromModel(Models.Friend friend)
+        {
+            if (friend == null)
+                return null;
+
+            return FromModel(friend.FriendUser);
         }
     }
 }

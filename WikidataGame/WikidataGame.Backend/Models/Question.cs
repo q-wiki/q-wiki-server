@@ -10,8 +10,8 @@ namespace WikidataGame.Backend.Models
     public class Question
     {
         [Key]
-        [StringLength(36)]
-        public string Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
 
         [Required]
         public string SparqlQuery { get; set; }
@@ -20,9 +20,8 @@ namespace WikidataGame.Backend.Models
         public string TaskDescription { get; set; }
 
         [ForeignKey(nameof(Category))]
-        [StringLength(36)]
         [Required]
-        public string CategoryId { get; set; }
+        public Guid CategoryId { get; set; }
         public virtual Category Category { get; set; }
 
         [Required]

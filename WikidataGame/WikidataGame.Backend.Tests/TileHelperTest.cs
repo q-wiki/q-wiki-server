@@ -10,6 +10,7 @@ using WikidataGame.Backend.Repos;
 using Microsoft.EntityFrameworkCore;
 using WikidataGame.Backend.Services;
 using Xunit.Abstractions;
+using System.Threading.Tasks;
 
 namespace WikidataGame.Backend.Tests
 {
@@ -22,44 +23,44 @@ namespace WikidataGame.Backend.Tests
             _output = output;
         }
         
-        private IRepository<Category, string> CategoryRepo()
+        private IRepository<Category, Guid> CategoryRepo()
         {
             var Builderoptions = new DbContextOptionsBuilder<Helpers.DataContext>();
             Builderoptions.UseLazyLoadingProxies().UseInMemoryDatabase(Guid.NewGuid().ToString());
             var context = new Helpers.DataContext(Builderoptions.Options);
             context.Database.EnsureCreated();
-            return new Repository<Category, string>(context);
+            return new Repository<Category, Guid>(context);
         }
 
         [Fact]
-        public void GetCategoriesForTile_SingleTile_GeneratesSameCategoriesWhenAskedRepeatedly()
+        public async Task GetCategoriesForTile_SingleTile_GeneratesSameCategoriesWhenAskedRepeatedly()
         {
             // we should get stable categories for a tile
-            var tile = new Models.Tile { Id = Guid.NewGuid().ToString() };
+            var tile = new Models.Tile { Id = Guid.NewGuid() };
             var categoryRepo = CategoryRepo();
             var categoryService = new CategoryCacheService(categoryRepo);
-            var categoriesForFirstDraw = Helpers.TileHelper.GetCategoriesForTile(categoryService, tile.Id);
-            var categoriesForSecondDraw = Helpers.TileHelper.GetCategoriesForTile(categoryService, tile.Id);
+            var categoriesForFirstDraw = await Helpers.TileHelper.GetCategoriesForTileAsync(categoryService, tile.Id);
+            var categoriesForSecondDraw = await Helpers.TileHelper.GetCategoriesForTileAsync(categoryService, tile.Id);
 
             Assert.Equal(categoriesForFirstDraw, categoriesForSecondDraw);
         }
 
         [Fact]
-        public void GetCategoriesForTile_SingleTile_GeneratesDifferentCategoriesForDifferentTiles()
+        public async Task GetCategoriesForTile_SingleTile_GeneratesDifferentCategoriesForDifferentTiles()
         {
-            var tileOne = new Models.Tile { Id = "b32b5e31-20f7-4c5d-971b-c7b558049e03" };
-            var tileTwo = new Models.Tile { Id = "d3d4e3eb-a90c-4dde-96c9-870f19547529" };
+            var tileOne = new Models.Tile { Id = new Guid("b32b5e31-20f7-4c5d-971b-c7b558049e03") };
+            var tileTwo = new Models.Tile { Id = new Guid("d3d4e3eb-a90c-4dde-96c9-870f19547529") };
             var categoryRepo = CategoryRepo();
 
             var categoryService = new CategoryCacheService(categoryRepo);
-            var categoriesForFirstDraw = Helpers.TileHelper.GetCategoriesForTile(categoryService, tileOne.Id);
-            var categoriesForSecondDraw = Helpers.TileHelper.GetCategoriesForTile(categoryService, tileTwo.Id);
+            var categoriesForFirstDraw = await Helpers.TileHelper.GetCategoriesForTileAsync(categoryService, tileOne.Id);
+            var categoriesForSecondDraw = await Helpers.TileHelper.GetCategoriesForTileAsync(categoryService, tileTwo.Id);
 
             Assert.NotEqual(categoriesForFirstDraw, categoriesForSecondDraw);
         }
 
         [Fact]
-        public void GetNeighbors_TopLeftCorner_GivesValidNeighbors ()
+        public void GetNeighbors_TopLeftCorner_GivesValidNeighbors()
         {
             var width = 10;
             var height = 10;

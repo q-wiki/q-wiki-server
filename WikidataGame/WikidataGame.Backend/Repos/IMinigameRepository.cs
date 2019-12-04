@@ -6,8 +6,8 @@ using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Repos
 {
-    public interface IMinigameRepository : IRepository<MiniGame, string>
+    public interface IMinigameRepository : IRepository<MiniGame, Guid>
     {
-        MiniGame CreateMiniGame(string gameId, string playerId, string tileId, string categoryId, MiniGameType type);
+        Task<MiniGame> CreateMiniGameAsync(Guid gameId, Guid playerId, Guid tileId, Guid categoryId, MiniGameType type);
     }
 }

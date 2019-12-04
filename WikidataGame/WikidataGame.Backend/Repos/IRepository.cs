@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace WikidataGame.Backend.Repos
 {
-    public interface IRepository<TEntity, TIdEntity> where TEntity : class where TIdEntity : class
+    public interface IRepository<TEntity, TIdEntity> where TEntity : class
     {
-        TEntity Get(TIdEntity id);
-        IEnumerable<TEntity> GetAll();
-        IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
-        TEntity SingleOrDefault(Expression<Func<TEntity, bool>> predicate);
+        Task<TEntity> GetAsync(TIdEntity id);
+        Task<IEnumerable<TEntity>> GetAllAsync();
+        Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate);
+        Task<TEntity> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
 
-        void Add(TEntity entity);
-        void AddRange(IEnumerable<TEntity> entities);
+        Task AddAsync(TEntity entity);
+        Task AddRangeAsync(IEnumerable<TEntity> entities);
 
         void Remove(TEntity entity);
         void RemoveRange(IEnumerable<TEntity> entities);

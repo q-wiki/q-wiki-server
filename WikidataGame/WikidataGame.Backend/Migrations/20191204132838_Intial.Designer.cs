@@ -9,8 +9,8 @@ using WikidataGame.Backend.Helpers;
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20191125190457_Initial")]
-    partial class Initial
+    [Migration("20191204132838_Intial")]
+    partial class Intial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -18,11 +18,114 @@ namespace WikidataGame.Backend.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken();
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasName("RoleNameIndex");
+
+                    b.ToTable("AspNetRoles");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ClaimType");
+
+                    b.Property<string>("ClaimValue");
+
+                    b.Property<Guid>("RoleId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ClaimType");
+
+                    b.Property<string>("ClaimValue");
+
+                    b.Property<Guid>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
+                {
+                    b.Property<string>("LoginProvider");
+
+                    b.Property<string>("ProviderKey");
+
+                    b.Property<string>("ProviderDisplayName");
+
+                    b.Property<Guid>("UserId");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
+                {
+                    b.Property<Guid>("UserId");
+
+                    b.Property<Guid>("RoleId");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
+                {
+                    b.Property<Guid>("UserId");
+
+                    b.Property<string>("LoginProvider");
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("Value");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens");
+                });
+
             modelBuilder.Entity("WikidataGame.Backend.Models.Category", b =>
                 {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(36);
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -35,31 +138,49 @@ namespace WikidataGame.Backend.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
-                            Title = "Geography"
-                        },
-                        new
-                        {
-                            Id = "1b9185c0-c46b-4abf-bf82-e464f5116c7d",
-                            Title = "Space"
-                        },
-                        new
-                        {
-                            Id = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
+                            Id = new Guid("6c22af9b-2f45-413b-995d-7ee6c61674e5"),
                             Title = "Chemistry"
                         },
                         new
                         {
-                            Id = "f9c52d1a-9315-423d-a818-94c1769fffe5",
+                            Id = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
+                            Title = "Geography"
+                        },
+                        new
+                        {
+                            Id = new Guid("f9c52d1a-9315-423d-a818-94c1769fffe5"),
                             Title = "History"
+                        },
+                        new
+                        {
+                            Id = new Guid("1b9185c0-c46b-4abf-bf82-e464f5116c7d"),
+                            Title = "Space"
                         });
+                });
+
+            modelBuilder.Entity("WikidataGame.Backend.Models.Friend", b =>
+                {
+                    b.Property<Guid>("RelationId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<Guid>("FriendId");
+
+                    b.Property<Guid>("UserId");
+
+                    b.HasKey("RelationId");
+
+                    b.HasIndex("FriendId");
+
+                    b.HasIndex("UserId", "FriendId")
+                        .IsUnique();
+
+                    b.ToTable("Friends");
                 });
 
             modelBuilder.Entity("WikidataGame.Backend.Models.Game", b =>
                 {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(36);
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("AccessibleTilesCount");
 
@@ -71,8 +192,7 @@ namespace WikidataGame.Backend.Migrations
 
                     b.Property<DateTime?>("MoveStartedAt");
 
-                    b.Property<string>("NextMovePlayerId")
-                        .HasMaxLength(36);
+                    b.Property<Guid?>("NextMovePlayerId");
 
                     b.Property<int>("StepsLeftWithinMove");
 
@@ -85,11 +205,9 @@ namespace WikidataGame.Backend.Migrations
 
             modelBuilder.Entity("WikidataGame.Backend.Models.GameUser", b =>
                 {
-                    b.Property<string>("GameId")
-                        .HasMaxLength(36);
+                    b.Property<Guid>("GameId");
 
-                    b.Property<string>("UserId")
-                        .HasMaxLength(36);
+                    b.Property<Guid>("UserId");
 
                     b.Property<bool>("IsWinner");
 
@@ -102,36 +220,27 @@ namespace WikidataGame.Backend.Migrations
 
             modelBuilder.Entity("WikidataGame.Backend.Models.MiniGame", b =>
                 {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(36);
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("AnswerOptionsString")
                         .IsRequired();
 
-                    b.Property<string>("CategoryId")
-                        .IsRequired()
-                        .HasMaxLength(36);
+                    b.Property<Guid>("CategoryId");
 
                     b.Property<string>("CorrectAnswerString")
                         .IsRequired();
 
-                    b.Property<string>("GameId")
-                        .IsRequired()
-                        .HasMaxLength(36);
+                    b.Property<Guid>("GameId");
 
-                    b.Property<string>("PlayerId")
-                        .IsRequired()
-                        .HasMaxLength(36);
+                    b.Property<Guid>("PlayerId");
 
                     b.Property<int>("Status");
 
                     b.Property<string>("TaskDescription")
                         .IsRequired();
 
-                    b.Property<string>("TileId")
-                        .IsRequired()
-                        .HasMaxLength(36);
+                    b.Property<Guid>("TileId");
 
                     b.Property<int>("Type");
 
@@ -150,13 +259,10 @@ namespace WikidataGame.Backend.Migrations
 
             modelBuilder.Entity("WikidataGame.Backend.Models.Question", b =>
                 {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(36);
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("CategoryId")
-                        .IsRequired()
-                        .HasMaxLength(36);
+                    b.Property<Guid>("CategoryId");
 
                     b.Property<int>("MiniGameType");
 
@@ -175,8 +281,8 @@ namespace WikidataGame.Backend.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "a4b7c4ba-6acb-4f9a-821b-7a44aa7b6761",
-                            CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                            Id = new Guid("a4b7c4ba-6acb-4f9a-821b-7a44aa7b6761"),
+                            CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
                             MiniGameType = 2,
                             SparqlQuery = @"SELECT DISTINCT ?answer ?question WHERE {
                       ?state wdt:P31/wdt:P279* wd:Q3624078;
@@ -207,8 +313,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "aca0f5f7-b000-42fb-b713-f5fe43748761",
-                            CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                            Id = new Guid("aca0f5f7-b000-42fb-b713-f5fe43748761"),
+                            CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
                             MiniGameType = 2,
                             SparqlQuery = @"SELECT ?continent ?answer ?question WHERE {
                         { SELECT ?continent ?answer (COUNT(?item) AS ?question) WHERE {
@@ -227,8 +333,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "9a70639b-3447-475a-905a-e866a0c98a1c",
-                            CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                            Id = new Guid("9a70639b-3447-475a-905a-e866a0c98a1c"),
+                            CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
                             MiniGameType = 2,
                             SparqlQuery = @"SELECT ?answer ?question
                         WITH {
@@ -284,8 +390,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "46679c4f-ef97-445d-9a70-d95a5337720f",
-                            CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                            Id = new Guid("46679c4f-ef97-445d-9a70-d95a5337720f"),
+                            CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
                             MiniGameType = 2,
                             SparqlQuery = @"SELECT DISTINCT ?question ?answer
                         WITH {
@@ -332,8 +438,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "4f6c477e-7025-44b4-a3b0-f3ebd8902902",
-                            CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                            Id = new Guid("4f6c477e-7025-44b4-a3b0-f3ebd8902902"),
+                            CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
                             MiniGameType = 2,
                             SparqlQuery = @"# Which country is no basin country of the Caribbean Sea?
                         SELECT DISTINCT ?question ?answer
@@ -395,8 +501,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "a6a470de-9efb-4fde-9388-6eb20f2ff1f4",
-                            CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                            Id = new Guid("a6a470de-9efb-4fde-9388-6eb20f2ff1f4"),
+                            CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
                             MiniGameType = 2,
                             SparqlQuery = @"# Which country is no basin country of the Mediterranean Sea?
                         SELECT DISTINCT ?question ?answer
@@ -442,8 +548,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "29fed1d0-d306-4946-8109-63b8aaf0262e",
-                            CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                            Id = new Guid("29fed1d0-d306-4946-8109-63b8aaf0262e"),
+                            CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
                             MiniGameType = 2,
                             SparqlQuery = @"# What is the longest river in {continent}?
                         SELECT DISTINCT ?answer ?question 
@@ -476,8 +582,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "bc7a22ee-4985-44c3-9388-5c7dd6b8762e",
-                            CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                            Id = new Guid("bc7a22ee-4985-44c3-9388-5c7dd6b8762e"),
+                            CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
                             MiniGameType = 0,
                             SparqlQuery = @"# sort countries by number of inhabitants (ascending)
                         SELECT (?stateLabel AS ?answer) ?question
@@ -527,8 +633,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "a4a7289a-3053-4ad7-9c60-c75a18305243",
-                            CategoryId = "1b9185c0-c46b-4abf-bf82-e464f5116c7d",
+                            Id = new Guid("a4a7289a-3053-4ad7-9c60-c75a18305243"),
+                            CategoryId = new Guid("1b9185c0-c46b-4abf-bf82-e464f5116c7d"),
                             MiniGameType = 0,
                             SparqlQuery = @"# sort planets by average distance to sun
                         # NOTE: there are only three planets with apoapsis and periapsis in AU; 4 planets in total
@@ -555,8 +661,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "2ed01768-9ab6-4895-8cbf-09dbc6f957e0",
-                            CategoryId = "1b9185c0-c46b-4abf-bf82-e464f5116c7d",
+                            Id = new Guid("2ed01768-9ab6-4895-8cbf-09dbc6f957e0"),
+                            CategoryId = new Guid("1b9185c0-c46b-4abf-bf82-e464f5116c7d"),
                             MiniGameType = 0,
                             SparqlQuery = @"# sort planets by radius
                         SELECT ?answer ?question WHERE {
@@ -577,8 +683,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "14d93797-c61c-4415-b1ed-359d180237ff",
-                            CategoryId = "1b9185c0-c46b-4abf-bf82-e464f5116c7d",
+                            Id = new Guid("14d93797-c61c-4415-b1ed-359d180237ff"),
+                            CategoryId = new Guid("1b9185c0-c46b-4abf-bf82-e464f5116c7d"),
                             MiniGameType = 2,
                             SparqlQuery = @"#Which of these moons belongs to the planet {0}?
                         SELECT ?question ?answer 
@@ -659,8 +765,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "5f7e813a-3cfa-4617-86d1-514b481b37a8",
-                            CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
+                            Id = new Guid("5f7e813a-3cfa-4617-86d1-514b481b37a8"),
+                            CategoryId = new Guid("6c22af9b-2f45-413b-995d-7ee6c61674e5"),
                             MiniGameType = 2,
                             SparqlQuery = @"# What's the chemical symbol for {element}?
                         SELECT ?question ?answer WHERE {
@@ -680,8 +786,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "40677b0f-9d5f-46d2-ab85-a6c40afb5f87",
-                            CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
+                            Id = new Guid("40677b0f-9d5f-46d2-ab85-a6c40afb5f87"),
+                            CategoryId = new Guid("6c22af9b-2f45-413b-995d-7ee6c61674e5"),
                             MiniGameType = 2,
                             SparqlQuery = @"SELECT ?question ?answer WHERE {
                       ?element wdt:P31 wd:Q11344;
@@ -700,8 +806,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "e8f99165-baa3-47b2-be35-c42ab2d5f0a0",
-                            CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
+                            Id = new Guid("e8f99165-baa3-47b2-be35-c42ab2d5f0a0"),
+                            CategoryId = new Guid("6c22af9b-2f45-413b-995d-7ee6c61674e5"),
                             MiniGameType = 0,
                             SparqlQuery = @"#sort chemical elements by number in period system
                         SELECT ?question ?answer WHERE {
@@ -727,8 +833,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "d9011896-04e5-4d32-8d3a-02a6d2b0bdb6",
-                            CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
+                            Id = new Guid("d9011896-04e5-4d32-8d3a-02a6d2b0bdb6"),
+                            CategoryId = new Guid("f9c52d1a-9315-423d-a818-94c1769fffe5"),
                             MiniGameType = 0,
                             SparqlQuery = @"
                          # US presidents by start of their presidency
@@ -774,8 +880,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "909182d1-4ae6-46ea-bd9b-8c4323ea53fa",
-                            CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
+                            Id = new Guid("909182d1-4ae6-46ea-bd9b-8c4323ea53fa"),
+                            CategoryId = new Guid("f9c52d1a-9315-423d-a818-94c1769fffe5"),
                             MiniGameType = 0,
                             SparqlQuery = @"# sort EU countries by the date they joined
                         SELECT ?date (SAMPLE(?answer) AS ?answer) (SAMPLE(?question) AS ?question) 
@@ -812,8 +918,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "86b64102-8074-4c4e-8f3e-71a0e52bb261",
-                            CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
+                            Id = new Guid("86b64102-8074-4c4e-8f3e-71a0e52bb261"),
+                            CategoryId = new Guid("f9c52d1a-9315-423d-a818-94c1769fffe5"),
                             MiniGameType = 2,
                             SparqlQuery = @"# German Chancellors
                         SELECT ?answer (CONCAT(STR(?startYear), ' to ', STR(?endYear)) AS ?question) WHERE {
@@ -836,8 +942,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "d135088c-e062-4016-8eb4-1d68c72915ea",
-                            CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
+                            Id = new Guid("d135088c-e062-4016-8eb4-1d68c72915ea"),
+                            CategoryId = new Guid("f9c52d1a-9315-423d-a818-94c1769fffe5"),
                             MiniGameType = 2,
                             SparqlQuery = @"# empires and colonies
                         SELECT DISTINCT ?empire (?empireLabel as ?question) ?colony (?colonyLabel as ?answer)
@@ -914,8 +1020,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "0d218830-55d2-4d66-8d8f-d402514e9202",
-                            CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5",
+                            Id = new Guid("0d218830-55d2-4d66-8d8f-d402514e9202"),
+                            CategoryId = new Guid("f9c52d1a-9315-423d-a818-94c1769fffe5"),
                             MiniGameType = 2,
                             SparqlQuery = @"# wars of the 20th century
                         SELECT (SAMPLE(?itemLabel) AS ?answer) (YEAR(MAX(?startdate)) AS ?question) WHERE {
@@ -938,8 +1044,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "8273acfe-c278-4cd4-92f5-07dd73a22577",
-                            CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
+                            Id = new Guid("8273acfe-c278-4cd4-92f5-07dd73a22577"),
+                            CategoryId = new Guid("6c22af9b-2f45-413b-995d-7ee6c61674e5"),
                             MiniGameType = 2,
                             SparqlQuery = @"# Which chemical compound has the formula {0}?
                         SELECT DISTINCT ?chemicalCompound ?answer (?chemical_formula AS ?question) ?sitelinks WHERE {
@@ -956,8 +1062,8 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
-                            Id = "bba18c92-47a6-4541-9305-d6453ad8477a",
-                            CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
+                            Id = new Guid("bba18c92-47a6-4541-9305-d6453ad8477a"),
+                            CategoryId = new Guid("6c22af9b-2f45-413b-995d-7ee6c61674e5"),
                             MiniGameType = 0,
                             SparqlQuery = @"
                         # Sort these chemical elements by their melting point
@@ -998,21 +1104,18 @@ namespace WikidataGame.Backend.Migrations
 
             modelBuilder.Entity("WikidataGame.Backend.Models.Tile", b =>
                 {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(36);
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("ChosenCategoryId")
-                        .HasMaxLength(36);
+                    b.Property<Guid?>("ChosenCategoryId");
 
                     b.Property<int>("Difficulty");
 
-                    b.Property<string>("GameId");
+                    b.Property<Guid?>("GameId");
 
                     b.Property<bool>("IsAccessible");
 
-                    b.Property<string>("OwnerId")
-                        .HasMaxLength(36);
+                    b.Property<Guid?>("OwnerId");
 
                     b.HasKey("Id");
 
@@ -1027,31 +1130,121 @@ namespace WikidataGame.Backend.Migrations
 
             modelBuilder.Entity("WikidataGame.Backend.Models.User", b =>
                 {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(36);
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("FirebaseUserId")
-                        .IsRequired();
+                    b.Property<int>("AccessFailedCount");
 
-                    b.Property<int>("Platform");
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken();
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256);
+
+                    b.Property<bool>("EmailConfirmed");
+
+                    b.Property<bool>("LockoutEnabled");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("PasswordHash");
+
+                    b.Property<string>("PhoneNumber");
+
+                    b.Property<bool>("PhoneNumberConfirmed");
+
+                    b.Property<string>("ProfileImageUrl");
+
+                    b.Property<int>("PushPlatform");
 
                     b.Property<string>("PushRegistrationId");
 
                     b.Property<string>("PushToken");
 
-                    b.Property<string>("Username")
-                        .IsRequired();
+                    b.Property<string>("SecurityStamp");
+
+                    b.Property<bool>("TwoFactorEnabled");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256);
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FirebaseUserId")
+                    b.HasIndex("NormalizedEmail")
+                        .HasName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasName("UserNameIndex");
+
+                    b.HasIndex("UserName")
                         .IsUnique();
 
-                    b.HasIndex("Username")
-                        .IsUnique();
+                    b.ToTable("AspNetUsers");
+                });
 
-                    b.ToTable("Users");
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
+                {
+                    b.HasOne("WikidataGame.Backend.Models.User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
+                {
+                    b.HasOne("WikidataGame.Backend.Models.User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("WikidataGame.Backend.Models.User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
+                {
+                    b.HasOne("WikidataGame.Backend.Models.User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("WikidataGame.Backend.Models.Friend", b =>
+                {
+                    b.HasOne("WikidataGame.Backend.Models.User", "FriendUser")
+                        .WithMany()
+                        .HasForeignKey("FriendId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("WikidataGame.Backend.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("WikidataGame.Backend.Models.Game", b =>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,34 +14,32 @@ namespace WikidataGame.Backend.Controllers
     public class CustomControllerBase : ControllerBase
     {
         protected readonly IGameRepository _gameRepo;
-        protected readonly IUserRepository _userRepo;
-        protected readonly IRepository<Category, string> _categoryRepo;
+        protected readonly UserManager<User> _userManager;
+        protected readonly IRepository<Category, Guid> _categoryRepo;
         protected readonly DataContext _dataContext;
         protected readonly INotificationService _notificationService;
 
         public CustomControllerBase(
             DataContext dataContext,
-            IUserRepository userRepo,
+           UserManager<User> userManager,
             IGameRepository gameRepo,
-            IRepository<Category, string> categoryRepo,
             INotificationService notificationService)
         {
             _dataContext = dataContext;
-            _userRepo = userRepo;
+            _userManager = userManager;
             _gameRepo = gameRepo;
-            _categoryRepo = categoryRepo;
             _notificationService = notificationService;
         }
 
-        protected User GetCurrentUser()
+        protected async Task<User> GetCurrentUserAsync()
         {
-            return _userRepo.SingleOrDefault(u => u.Id == User.Identity.Name);
+            return await _userManager.GetUserAsync(User);
         }
 
-        protected bool IsUserGameParticipant(string gameId)
+        protected async Task<bool> IsUserGameParticipantAsync(Guid gameId)
         {
-            var user = GetCurrentUser();
-            var game = _gameRepo.Get(gameId);
+            var user = await GetCurrentUserAsync();
+            var game = await _gameRepo.GetAsync(gameId);
             return game != null && game.GameUsers.SingleOrDefault(gu => gu.UserId == user.Id) != null;
         }
     }

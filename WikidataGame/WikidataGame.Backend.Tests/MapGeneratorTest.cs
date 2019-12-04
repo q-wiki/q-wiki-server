@@ -92,8 +92,8 @@ namespace WikidataGame.Backend.Tests
 
             Assert.All(finalMapCandidate, tile => Assert.Null(tile.Owner));
             
-            var p1 = new Models.User { Id="user-a" };
-            var p2 = new Models.User { Id="user-b" };
+            var p1 = new Models.User { Id = Guid.NewGuid(), UserName = "user-a" };
+            var p2 = new Models.User { Id = Guid.NewGuid(), UserName = "user-b" };
             var players = new List<Models.User>
             {
                 p1,

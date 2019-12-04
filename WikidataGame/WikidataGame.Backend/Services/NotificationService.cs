@@ -76,7 +76,7 @@ namespace WikidataGame.Backend.Services
                 return;
 
             Notification notification;
-            switch (receiver.Platform)
+            switch (receiver.PushPlatform)
             {
                 case GamePlatform.Android:
                     notification = new FcmNotification(JsonConvert.SerializeObject(content));

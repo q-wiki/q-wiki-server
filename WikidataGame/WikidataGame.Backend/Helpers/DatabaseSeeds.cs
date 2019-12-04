@@ -9,61 +9,63 @@ namespace WikidataGame.Backend.Helpers
 {
     public static class DatabaseSeeds
     {
+        public static Category CategoryGeography = new Category
+        {
+            Id = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
+            Title = "Geography"
+        };
+        public static Category CategorySpace = new Category
+        {
+            Id = new Guid("1b9185c0-c46b-4abf-bf82-e464f5116c7d"),
+            Title = "Space"
+        };
+        public static Category CategoryChemistry = new Category
+        {
+            Id = new Guid("6c22af9b-2f45-413b-995d-7ee6c61674e5"),
+            Title = "Chemistry"
+        };
+        public static Category CategoryHistory = new Category
+        {
+            Id = new Guid("f9c52d1a-9315-423d-a818-94c1769fffe5"),
+            Title = "History"
+        };
+        //new Category
+        //{
+        //    Id = "e9019ee1-0eed-492d-8aa7-feb1974fb265",
+        //    Title = "Nature"
+        //},
+        //new Category
+        //{
+        //    Id = "ddd333f7-ef45-4e13-a2ca-fb4494dce324",
+        //    Title = "Culture"
+        //},
+        //new Category
+        //{
+        //    Id = "4941c348-b4c4-43b5-b3d4-85794c68eec4",
+        //    Title = "Celebrities"
+        //},
+        //new Category
+        //{
+        //    Id = "2a388146-e32c-4a08-a246-472eff12849a",
+        //    Title = "Entertainment"
+        //},
+        //new Category
+        //{
+        //    Id = "7f2baca7-cdf4-4e24-855b-c868d9030ba4",
+        //    Title = "Politics"
+        //},
+        //new Category
+        //{
+        //    Id = "3d6c54d3-0fda-4923-a00e-e930640430b3",
+        //    Title = "Sports"
+        //}
         public static void SeedCategories(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Category>().HasData(
-                //new Category
-                //{
-                //    Id = "e9019ee1-0eed-492d-8aa7-feb1974fb265",
-                //    Title = "Nature"
-                //},
-                //new Category
-                //{
-                //    Id = "ddd333f7-ef45-4e13-a2ca-fb4494dce324",
-                //    Title = "Culture"
-                //},
-                new Category
-                {
-                    Id = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
-                    Title = "Geography"
-                }, 
-                new Category
-                {
-                    Id = "1b9185c0-c46b-4abf-bf82-e464f5116c7d",
-                    Title = "Space"
-                },
-                new Category
-                {
-                    Id = "6c22af9b-2f45-413b-995d-7ee6c61674e5",
-                    Title = "Chemistry"
-                },
-                new Category
-                {
-                    Id = "f9c52d1a-9315-423d-a818-94c1769fffe5",
-                    Title = "History"
-                }
-                //,
-                //new Category
-                //{
-                //    Id = "4941c348-b4c4-43b5-b3d4-85794c68eec4",
-                //    Title = "Celebrities"
-                //},
-                //new Category
-                //{
-                //    Id = "2a388146-e32c-4a08-a246-472eff12849a",
-                //    Title = "Entertainment"
-                //},
-                //new Category
-                //{
-                //    Id = "7f2baca7-cdf4-4e24-855b-c868d9030ba4",
-                //    Title = "Politics"
-                //},
-                //new Category
-                //{
-                //    Id = "3d6c54d3-0fda-4923-a00e-e930640430b3",
-                //    Title = "Sports"
-                //}
-                );
+                CategoryChemistry,
+                CategoryGeography,
+                CategoryHistory,
+                CategorySpace);
         }
 
         public static void SeedQuestions(ModelBuilder modelBuilder)
@@ -71,8 +73,8 @@ namespace WikidataGame.Backend.Helpers
             modelBuilder.Entity<Question>().HasData(
                 new Question
                 {
-                    Id = "a4b7c4ba-6acb-4f9a-821b-7a44aa7b6761",
-                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                    Id = new Guid("a4b7c4ba-6acb-4f9a-821b-7a44aa7b6761"),
+                    CategoryId = CategoryGeography.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "What is the name of the capital of {0}?",
                     SparqlQuery = @"SELECT DISTINCT ?answer ?question WHERE {
@@ -103,8 +105,8 @@ namespace WikidataGame.Backend.Helpers
                 },
                 new Question
                 {
-                    Id = "aca0f5f7-b000-42fb-b713-f5fe43748761",
-                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                    Id = new Guid("aca0f5f7-b000-42fb-b713-f5fe43748761"),
+                    CategoryId = CategoryGeography.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "Which continent has {0} countries?",
                     SparqlQuery = @"SELECT ?continent ?answer ?question WHERE {
@@ -123,8 +125,8 @@ namespace WikidataGame.Backend.Helpers
                 },
                 new Question
                 {
-                    Id = "9a70639b-3447-475a-905a-e866a0c98a1c",
-                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                    Id = new Guid("9a70639b-3447-475a-905a-e866a0c98a1c"),
+                    CategoryId = CategoryGeography.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "Which country is a part of {0}?",
                     SparqlQuery = @"SELECT ?answer ?question
@@ -180,8 +182,8 @@ namespace WikidataGame.Backend.Helpers
                 },
                 new Question
                 {
-                    Id = "46679c4f-ef97-445d-9a70-d95a5337720f",
-                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                    Id = new Guid("46679c4f-ef97-445d-9a70-d95a5337720f"),
+                    CategoryId = CategoryGeography.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "Which country is not a basin country of the Baltic Sea?",
                     SparqlQuery = @"SELECT DISTINCT ?question ?answer
@@ -228,8 +230,8 @@ namespace WikidataGame.Backend.Helpers
                 },
                 new Question
                 {
-                    Id = "4f6c477e-7025-44b4-a3b0-f3ebd8902902",
-                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                    Id = new Guid("4f6c477e-7025-44b4-a3b0-f3ebd8902902"),
+                    CategoryId = CategoryGeography.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "Which country is not a basin country of the Caribbean Sea?",
                     SparqlQuery = @"# Which country is no basin country of the Caribbean Sea?
@@ -291,8 +293,8 @@ namespace WikidataGame.Backend.Helpers
                 },
                 new Question
                 {
-                    Id = "a6a470de-9efb-4fde-9388-6eb20f2ff1f4",
-                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                    Id = new Guid("a6a470de-9efb-4fde-9388-6eb20f2ff1f4"),
+                    CategoryId = CategoryGeography.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "Which country is not a basin country of the Mediterranean Sea?",
                     SparqlQuery = @"# Which country is no basin country of the Mediterranean Sea?
@@ -338,8 +340,8 @@ namespace WikidataGame.Backend.Helpers
                 },
                 new Question
                 {
-                    Id = "29fed1d0-d306-4946-8109-63b8aaf0262e",
-                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                    Id = new Guid("29fed1d0-d306-4946-8109-63b8aaf0262e"),
+                    CategoryId = CategoryGeography.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "What is the longest river in {0}?",
                     SparqlQuery = @"# What is the longest river in {continent}?
@@ -398,8 +400,8 @@ namespace WikidataGame.Backend.Helpers
                 },*/
                 new Question
                 {
-                    Id = "bc7a22ee-4985-44c3-9388-5c7dd6b8762e",
-                    CategoryId = "cf3111af-8b18-4c6f-8ee6-115157d54b79",
+                    Id = new Guid("bc7a22ee-4985-44c3-9388-5c7dd6b8762e"),
+                    CategoryId = CategoryGeography.Id,
                     MiniGameType = MiniGameType.Sort,
                     TaskDescription = "Sort countries by {0} (ascending).",
                     SparqlQuery = @"# sort countries by number of inhabitants (ascending)
@@ -450,8 +452,8 @@ namespace WikidataGame.Backend.Helpers
                 // Space
                 new Question
                 {
-                    Id = "a4a7289a-3053-4ad7-9c60-c75a18305243",
-                    CategoryId = "1b9185c0-c46b-4abf-bf82-e464f5116c7d",
+                    Id = new Guid("a4a7289a-3053-4ad7-9c60-c75a18305243"),
+                    CategoryId = CategorySpace.Id,
                     MiniGameType = MiniGameType.Sort,
                     TaskDescription = "Sort planets by {0} (ascending).",
                     SparqlQuery = @"# sort planets by average distance to sun
@@ -478,8 +480,8 @@ namespace WikidataGame.Backend.Helpers
                 },
                 new Question
                 {
-                    Id = "2ed01768-9ab6-4895-8cbf-09dbc6f957e0",
-                    CategoryId = "1b9185c0-c46b-4abf-bf82-e464f5116c7d", // Space
+                    Id = new Guid("2ed01768-9ab6-4895-8cbf-09dbc6f957e0"),
+                    CategoryId = CategorySpace.Id,
                     MiniGameType = MiniGameType.Sort,
                     TaskDescription = "Sort planets by {0} (ascending).",
                     SparqlQuery = @"# sort planets by radius
@@ -500,8 +502,8 @@ namespace WikidataGame.Backend.Helpers
                 },
                 new Question
                 {
-                    Id = "14d93797-c61c-4415-b1ed-359d180237ff",
-                    CategoryId = "1b9185c0-c46b-4abf-bf82-e464f5116c7d", // Space
+                    Id = new Guid("14d93797-c61c-4415-b1ed-359d180237ff"),
+                    CategoryId = CategorySpace.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "Which of these moons belongs to {0}?",
                     SparqlQuery = @"#Which of these moons belongs to the planet {0}?
@@ -583,8 +585,8 @@ namespace WikidataGame.Backend.Helpers
                 // Chemistry
                 new Question
                 {
-                    Id = "5f7e813a-3cfa-4617-86d1-514b481b37a8",
-                    CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5", // Chemistry
+                    Id = new Guid("5f7e813a-3cfa-4617-86d1-514b481b37a8"),
+                    CategoryId = CategoryChemistry.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "What's the chemical symbol for {0}?",
                     SparqlQuery = @"# What's the chemical symbol for {element}?
@@ -604,8 +606,8 @@ namespace WikidataGame.Backend.Helpers
                 },
                 new Question
                 {
-                    Id = "40677b0f-9d5f-46d2-ab85-a6c40afb5f87",
-                    CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5", // Chemistry
+                    Id = new Guid("40677b0f-9d5f-46d2-ab85-a6c40afb5f87"),
+                    CategoryId = CategoryChemistry.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "Which element has the chemical symbol {0}?",
                     SparqlQuery = @"SELECT ?question ?answer WHERE {
@@ -624,8 +626,8 @@ namespace WikidataGame.Backend.Helpers
                 },
                 new Question
                 {
-                    Id = "e8f99165-baa3-47b2-be35-c42ab2d5f0a0",
-                    CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5", // Chemistry
+                    Id = new Guid("e8f99165-baa3-47b2-be35-c42ab2d5f0a0"),
+                    CategoryId = CategoryChemistry.Id,
                     MiniGameType = MiniGameType.Sort,
                     TaskDescription = "Sort chemical elements by {0} (ascending).",
                     SparqlQuery = @"#sort chemical elements by number in period system
@@ -652,8 +654,8 @@ namespace WikidataGame.Backend.Helpers
                 // History
                 new Question
                 {
-                    Id = "d9011896-04e5-4d32-8d3a-02a6d2b0bdb6",
-                    CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5", // History
+                    Id = new Guid("d9011896-04e5-4d32-8d3a-02a6d2b0bdb6"),
+                    CategoryId = CategoryHistory.Id,
                     MiniGameType = MiniGameType.Sort,
                     TaskDescription = "Sort these US presidents by {0} (ascending).",
                     SparqlQuery = @"
@@ -699,8 +701,8 @@ namespace WikidataGame.Backend.Helpers
                 },
                 new Question
                 {
-                    Id = "909182d1-4ae6-46ea-bd9b-8c4323ea53fa",
-                    CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5", // History
+                    Id = new Guid("909182d1-4ae6-46ea-bd9b-8c4323ea53fa"),
+                    CategoryId = CategoryHistory.Id,
                     MiniGameType = MiniGameType.Sort,
                     TaskDescription = "Sort the countries by {0} (ascending).",
                     SparqlQuery = @"# sort EU countries by the date they joined
@@ -737,8 +739,8 @@ namespace WikidataGame.Backend.Helpers
                 },
                 new Question
                 {
-                    Id = "86b64102-8074-4c4e-8f3e-71a0e52bb261",
-                    CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5", // History
+                    Id = new Guid("86b64102-8074-4c4e-8f3e-71a0e52bb261"),
+                    CategoryId = CategoryHistory.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "Who was Federal Chancellor of Germany from {0}?",
                     SparqlQuery = @"# German Chancellors
@@ -761,8 +763,8 @@ namespace WikidataGame.Backend.Helpers
                 },
                 new Question
                 {
-                    Id = "d135088c-e062-4016-8eb4-1d68c72915ea",
-                    CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5", // History
+                    Id = new Guid("d135088c-e062-4016-8eb4-1d68c72915ea"),
+                    CategoryId = CategoryHistory.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "Which colony belonged to the {0}?",
                     SparqlQuery = @"# empires and colonies
@@ -839,8 +841,8 @@ namespace WikidataGame.Backend.Helpers
                 },
                 new Question
                 {
-                    Id = "0d218830-55d2-4d66-8d8f-d402514e9202",
-                    CategoryId = "f9c52d1a-9315-423d-a818-94c1769fffe5", // History
+                    Id = new Guid("0d218830-55d2-4d66-8d8f-d402514e9202"),
+                    CategoryId = CategoryHistory.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "Which of these wars started in {0}?",
                     SparqlQuery = @"# wars of the 20th century
@@ -863,8 +865,8 @@ namespace WikidataGame.Backend.Helpers
                 },
                 new Question
                 {
-                    Id = "8273acfe-c278-4cd4-92f5-07dd73a22577",
-                    CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5", // Chemistry
+                    Id = new Guid("8273acfe-c278-4cd4-92f5-07dd73a22577"),
+                    CategoryId = CategoryChemistry.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
                     TaskDescription = "Which chemical compound has the formula {0}?",
                     SparqlQuery = @"# Which chemical compound has the formula {0}?
@@ -881,8 +883,8 @@ namespace WikidataGame.Backend.Helpers
                 },
                 new Question
                 {
-                    Id = "bba18c92-47a6-4541-9305-d6453ad8477a",
-                    CategoryId = "6c22af9b-2f45-413b-995d-7ee6c61674e5", // Chemistry
+                    Id = new Guid("bba18c92-47a6-4541-9305-d6453ad8477a"),
+                    CategoryId = CategoryChemistry.Id,
                     MiniGameType = MiniGameType.Sort,
                     TaskDescription = "Sort these chemical elements by {0} (ascending)!",
                     SparqlQuery = @"

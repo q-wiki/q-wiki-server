@@ -24,7 +24,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// Initializes a new instance of the MiniGame class.
         /// </summary>
-        public MiniGame(string id = default(string), int? type = default(int?), string taskDescription = default(string), IList<string> answerOptions = default(IList<string>))
+        public MiniGame(System.Guid? id = default(System.Guid?), int? type = default(int?), string taskDescription = default(string), IList<string> answerOptions = default(IList<string>))
         {
             Id = id;
             Type = type;
@@ -41,7 +41,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
+        public System.Guid? Id { get; set; }
 
         /// <summary>
         /// </summary>

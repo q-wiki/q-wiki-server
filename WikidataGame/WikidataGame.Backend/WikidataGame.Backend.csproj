@@ -14,26 +14,23 @@
     <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Data\privacy.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Data\privacy.html" />
+    <EmbeddedResource Include="wwwroot\privacy\index.html" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Migrations\" />
-    <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="dotNetRDF" Version="2.2.0" />
-    <PackageReference Include="FirebaseAdmin" Version="1.9.1" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.42.0" />
+    <PackageReference Include="Google.Apis.Games.v1" Version="1.42.0.1771" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="2.2.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.4" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="4.5.5" />
   </ItemGroup>

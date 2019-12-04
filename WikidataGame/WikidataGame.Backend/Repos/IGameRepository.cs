@@ -6,14 +6,14 @@ using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Repos
 {
-    public interface IGameRepository : IRepository<Game, string>
+    public interface IGameRepository : IRepository<Game, Guid>
     {
-        Game CreateNewGame(User player, int mapWidth, int mapHeight, int accessibleTiles);
+        Task<Game> CreateNewGameAsync(User player, int mapWidth, int mapHeight, int accessibleTiles);
 
-        Game GetOpenGame();
+        Task<Game> GetOpenGameAsync();
 
         Game JoinGame(Game game, User player);
 
-        Game RunningGameForPlayer(User player);
+        Task<Game> RunningGameForPlayerAsync(User player);
     }
 }

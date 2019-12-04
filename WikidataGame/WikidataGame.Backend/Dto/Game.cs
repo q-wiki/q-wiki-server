@@ -10,23 +10,23 @@ namespace WikidataGame.Backend.Dto
 {
     public class Game
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         public IEnumerable<IEnumerable<Tile>> Tiles { get; set; }
 
-        public IEnumerable<string> WinningPlayerIds { get; set; }
+        public IEnumerable<Guid> WinningPlayerIds { get; set; }
 
         public Player Me { get; set; }
 
         public Player Opponent { get; set; }
 
-        public string NextMovePlayerId { get; set; }
+        public Guid? NextMovePlayerId { get; set; }
 
         public DateTime? MoveExpiry { get; set; }
 
         public bool AwaitingOpponentToJoin { get; set; }
 
-        public static Game FromModel(Models.Game game, string currentUserId, CategoryCacheService cacheService)
+        public static Game FromModel(Models.Game game, Guid currentUserId, CategoryCacheService cacheService)
         {
             if (game == null)
                 return null;

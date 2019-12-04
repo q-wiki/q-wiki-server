@@ -9,12 +9,13 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using WikidataGame.Backend.Dto;
+using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Helpers
 {
     public class JwtTokenHelper
     {
-        public static AuthInfo CreateJwtToken(string userId)
+        public static AuthInfo CreateJwtToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(Startup.Configuration.GetValue<string>("AuthSecret"));
@@ -22,7 +23,7 @@ namespace WikidataGame.Backend.Helpers
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, userId)
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -30,7 +31,8 @@ namespace WikidataGame.Backend.Helpers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return new AuthInfo {
                 Bearer = tokenHandler.WriteToken(token),
-                Expires = tokenDescriptor.Expires.Value
+                Expires = tokenDescriptor.Expires.Value,
+                User = Player.FromModel(user)
             };
         }
     }

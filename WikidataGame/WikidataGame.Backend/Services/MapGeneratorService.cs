@@ -86,8 +86,7 @@ namespace WikidataGame.Backend.Services
 
             return noiseField.Select(n => new Tile {
                 IsAccessible = n > threshold,
-                Difficulty = Convert.ToInt32(Math.Round((n - threshold) / difficultyGap)),
-                Id = Guid.NewGuid().ToString()
+                Difficulty = Convert.ToInt32(Math.Round((n - threshold) / difficultyGap))
             }).ToList();
         }
 
@@ -110,10 +109,10 @@ namespace WikidataGame.Backend.Services
             return candidate;
         }
 
-        public static IEnumerable<Tile> SetStartPositions (IEnumerable<Tile> tiles, IEnumerable<string> userIds)
+        public static IEnumerable<Tile> SetStartPositions (IEnumerable<Tile> tiles, IEnumerable<Guid> userIds)
         {
             var candidates = tiles.Where(t => t.IsAccessible && t.Difficulty == 0);
-            var startTiles = new Dictionary<string, string>();
+            var startTiles = new Dictionary<Guid, Guid>();
             var rnd = new Random();
 
             while (startTiles.Values.Distinct().Count() < userIds.Count())

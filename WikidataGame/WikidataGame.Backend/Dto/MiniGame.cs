@@ -7,7 +7,7 @@ namespace WikidataGame.Backend.Dto
 {
     public class MiniGame
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         public MiniGameType Type { get; set; }
 

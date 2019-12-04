@@ -1,12 +1,14 @@
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WikidataGame.Backend.Models
 {
     public class Category
     {
         [Key]
-        [StringLength(36)]
-        public string Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
 
         [Required]
         [StringLength(100)]

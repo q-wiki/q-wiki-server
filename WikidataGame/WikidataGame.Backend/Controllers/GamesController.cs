@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using WikidataGame.Backend.Dto;
@@ -25,11 +26,10 @@ namespace WikidataGame.Backend.Controllers
         private readonly CategoryCacheService _categoryCacheService;
         public GamesController(
             DataContext dataContext,
-            IUserRepository userRepo,
+            UserManager<Models.User> userManager,
             IGameRepository gameRepo,
-            IRepository<Models.Category, string> categoryRepo,
             CategoryCacheService categoryCacheService,
-            INotificationService notificationService) : base(dataContext, userRepo, gameRepo, categoryRepo, notificationService)
+            INotificationService notificationService) : base(dataContext, userManager, gameRepo, notificationService)
         {
             _categoryCacheService = categoryCacheService;
         }
@@ -43,26 +43,26 @@ namespace WikidataGame.Backend.Controllers
         /// <returns>Info about the newly created game</returns>
         [HttpPost]
         [ProducesResponseType(typeof(GameInfo), StatusCodes.Status200OK)]
-        public IActionResult CreateNewGame(
+        public async Task<ActionResult<GameInfo>> CreateNewGame(
             int mapWidth = GameConstants.DefaultMapWidth,
             int mapHeight = GameConstants.DefaultMapHeight,
             int accessibleTilesCount = GameConstants.DefaultAccessibleTilesCount)
         {
-            var user = GetCurrentUser();            
-            var game = _gameRepo.RunningGameForPlayer(user);
+            var user = await GetCurrentUserAsync();            
+            var game = await _gameRepo.RunningGameForPlayerAsync(user);
             if (game == default(Models.Game))
             {
-                game = _gameRepo.GetOpenGame();
+                game = await _gameRepo.GetOpenGameAsync();
                 if (game == default(Models.Game))
                 {
-                    game = _gameRepo.CreateNewGame(user, mapWidth, mapHeight, accessibleTilesCount);
+                    game = await _gameRepo.CreateNewGameAsync(user, mapWidth, mapHeight, accessibleTilesCount);
                 }
                 else
                 {
                     _gameRepo.JoinGame(game, user);
                 }
 
-                _dataContext.SaveChanges();
+                await _dataContext.SaveChangesAsync();
             }
 
             return Ok(GameInfo.FromGame(game));
@@ -75,13 +75,13 @@ namespace WikidataGame.Backend.Controllers
         /// <returns>Info about the specified game</returns>
         [HttpGet("{gameId}")]
         [ProducesResponseType(typeof(Game), StatusCodes.Status200OK)]
-        public IActionResult RetrieveGameState(string gameId)
+        public async Task<ActionResult<Game>> RetrieveGameState(Guid gameId)
         {
-            if (!IsUserGameParticipant(gameId))
+            if (!await IsUserGameParticipantAsync(gameId))
                 return Forbid();
-            var game = _gameRepo.Get(gameId);
+            var game = await _gameRepo.GetAsync(gameId);
 
-            return Ok(Game.FromModel(game, GetCurrentUser().Id, _categoryCacheService));
+            return Ok(Game.FromModel(game, (await GetCurrentUserAsync()).Id, _categoryCacheService));
         }
 
         /// <summary>
@@ -91,20 +91,21 @@ namespace WikidataGame.Backend.Controllers
         /// <returns>204 status code</returns>
         [HttpDelete("{gameId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> DeleteGame(string gameId)
+        public async Task<IActionResult> DeleteGame(Guid gameId)
         {
-            if (!IsUserGameParticipant(gameId))
+            if (!await IsUserGameParticipantAsync(gameId))
                 return Forbid();
 
-            var opponents = _gameRepo.Get(gameId).GameUsers.Select(gu => gu.User).Where(u => u.Id != User.Identity.Name).ToList();
+            var game = await _gameRepo.GetAsync(gameId);
+            var currentUser = await GetCurrentUserAsync();
+            var opponents = game.GameUsers.Select(gu => gu.User).Where(u => u.Id != currentUser.Id).ToList();
             foreach(var opponent in opponents)
             {
                 await _notificationService.SendNotificationAsync(opponent, "Congrats", "You won because your opponent left the game!");
             }
-            var game = _gameRepo.Get(gameId);
             _dataContext.Set<Models.Tile>().RemoveRange(game.Tiles);
             _gameRepo.Remove(game);
-            _dataContext.SaveChanges();
+            await _dataContext.SaveChangesAsync();
 
             return NoContent();
         }

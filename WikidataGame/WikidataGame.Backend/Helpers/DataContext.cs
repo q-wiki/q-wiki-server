@@ -24,7 +24,18 @@ namespace WikidataGame.Backend.Helpers
         {
             modelBuilder.Entity<GameUser>().HasKey(gu => new { gu.GameId, gu.UserId });
             modelBuilder.Entity<User>().HasIndex(u => u.UserName).IsUnique();
-            modelBuilder.Entity<Friend>().HasIndex(f => new { f.UserId, f.FriendId}).IsUnique();
+            modelBuilder.Entity<Friend>().HasKey(f => new { f.UserId, f.FriendId });
+
+            modelBuilder.Entity<Friend>()
+                .HasOne(f => f.User)
+                .WithMany()
+                .HasForeignKey(f => f.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Friend>()
+                .HasOne(f => f.FriendUser)
+                .WithMany()
+                .HasForeignKey(f => f.FriendId);
 
             base.OnModelCreating(modelBuilder);
 

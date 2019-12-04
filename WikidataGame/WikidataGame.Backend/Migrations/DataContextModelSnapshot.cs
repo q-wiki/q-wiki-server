@@ -158,19 +158,18 @@ namespace WikidataGame.Backend.Migrations
 
             modelBuilder.Entity("WikidataGame.Backend.Models.Friend", b =>
                 {
-                    b.Property<Guid>("RelationId")
-                        .ValueGeneratedOnAdd();
+                    b.Property<Guid>("UserId");
 
                     b.Property<Guid>("FriendId");
 
-                    b.Property<Guid>("UserId");
+                    b.Property<Guid>("RelationId")
+                        .ValueGeneratedOnAdd();
 
-                    b.HasKey("RelationId");
+                    b.HasKey("UserId", "FriendId");
+
+                    b.HasAlternateKey("RelationId");
 
                     b.HasIndex("FriendId");
-
-                    b.HasIndex("UserId", "FriendId")
-                        .IsUnique();
 
                     b.ToTable("Friends");
                 });
@@ -1242,7 +1241,7 @@ namespace WikidataGame.Backend.Migrations
                     b.HasOne("WikidataGame.Backend.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("WikidataGame.Backend.Models.Game", b =>

@@ -172,13 +172,14 @@ namespace WikidataGame.Backend.Migrations
                 name: "Friends",
                 columns: table => new
                 {
-                    RelationId = table.Column<Guid>(nullable: false),
                     UserId = table.Column<Guid>(nullable: false),
-                    FriendId = table.Column<Guid>(nullable: false)
+                    FriendId = table.Column<Guid>(nullable: false),
+                    RelationId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Friends", x => x.RelationId);
+                    table.PrimaryKey("PK_Friends", x => new { x.UserId, x.FriendId });
+                    table.UniqueConstraint("AK_Friends_RelationId", x => x.RelationId);
                     table.ForeignKey(
                         name: "FK_Friends_AspNetUsers_FriendId",
                         column: x => x.FriendId,
@@ -190,7 +191,7 @@ namespace WikidataGame.Backend.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1166,12 +1167,6 @@ namespace WikidataGame.Backend.Migrations
                 name: "IX_Friends_FriendId",
                 table: "Friends",
                 column: "FriendId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Friends_UserId_FriendId",
-                table: "Friends",
-                columns: new[] { "UserId", "FriendId" },
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Games_NextMovePlayerId",

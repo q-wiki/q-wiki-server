@@ -19,6 +19,7 @@ namespace WikidataGame.Backend.Controllers
     public class AuthController : CustomControllerBase
     {
         private readonly AuthService _authService;
+        private const string AnonPrefix = "anon";
 
         public AuthController(
             DataContext dataContext,
@@ -50,7 +51,7 @@ namespace WikidataGame.Backend.Controllers
                 if (user == null)
                 {
                     //create
-                    var userToCreate = new Models.User { UserName = username };
+                    var userToCreate = new Models.User { UserName = $"{AnonPrefix}-{username}" };
                     var idresult = await _userManager.CreateAsync(userToCreate, password);
                     if (!idresult.Succeeded)
                     {
@@ -64,7 +65,7 @@ namespace WikidataGame.Backend.Controllers
                     if (!await _userManager.CheckPasswordAsync(user, password))
                         return Unauthorized();
 
-                    user.UserName = username;
+                    user.UserName = $"{AnonPrefix}-{username}";
                     var idresult = await _userManager.UpdateAsync(user);
                     if (!idresult.Succeeded)
                     {

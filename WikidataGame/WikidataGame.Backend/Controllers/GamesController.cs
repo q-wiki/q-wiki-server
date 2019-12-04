@@ -101,7 +101,7 @@ namespace WikidataGame.Backend.Controllers
             var opponents = game.GameUsers.Select(gu => gu.User).Where(u => u.Id != currentUser.Id).ToList();
             foreach(var opponent in opponents)
             {
-                await _notificationService.SendNotificationAsync(opponent, "Congrats", "You won because your opponent left the game!");
+                await _notificationService.SendDeleteNotificationAsync(opponent, "Congrats", "You won because your opponent left the game!");
             }
             _dataContext.Set<Models.Tile>().RemoveRange(game.Tiles);
             _gameRepo.Remove(game);

@@ -70,6 +70,23 @@ namespace WikidataGame.Backend.Services
             await SendNotificationAsync(receiver, notificationObject);
         }
 
+        public async Task SendDeleteNotificationAsync(User receiver, string title, string body)
+        {
+            var notificationObject = new
+            {
+                notification = new
+                {
+                    title = title,
+                    body = body
+                },
+                data = new
+                {
+                    delete = true
+                }
+            };
+            await SendNotificationAsync(receiver, notificationObject);
+        }
+
         private async Task SendNotificationAsync(User receiver, object content)
         {
             if (_hub == null || string.IsNullOrEmpty(receiver.PushRegistrationId))

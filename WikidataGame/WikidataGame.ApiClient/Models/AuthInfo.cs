@@ -22,10 +22,11 @@ namespace WikidataGame.Models
         /// <summary>
         /// Initializes a new instance of the AuthInfo class.
         /// </summary>
-        public AuthInfo(string bearer = default(string), System.DateTime? expires = default(System.DateTime?))
+        public AuthInfo(string bearer = default(string), System.DateTime? expires = default(System.DateTime?), Player user = default(Player))
         {
             Bearer = bearer;
             Expires = expires;
+            User = user;
             CustomInit();
         }
 
@@ -43,6 +44,11 @@ namespace WikidataGame.Models
         /// </summary>
         [JsonProperty(PropertyName = "expires")]
         public System.DateTime? Expires { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "user")]
+        public Player User { get; set; }
 
     }
 }

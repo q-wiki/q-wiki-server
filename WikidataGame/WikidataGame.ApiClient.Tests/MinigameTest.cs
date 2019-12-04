@@ -16,24 +16,24 @@ namespace WikidataGame.ApiClient.Tests
             var authInfo = await RetrieveBearerAsync();
             var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo.Bearer));
             var gameInfo = await apiClient.CreateNewGameAsync();
-            var game = await apiClient.RetrieveGameStateAsync(gameInfo.GameId);
+            var game = await apiClient.RetrieveGameStateAsync(gameInfo.GameId.Value);
             if (game.AwaitingOpponentToJoin.Value)
             {
                 var authInfo2 = await RetrieveBearerAsync();
                 apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo2.Bearer));
                 var gameInfo2 = await apiClient.CreateNewGameAsync();
-                game = await apiClient.RetrieveGameStateAsync(gameInfo2.GameId);
+                game = await apiClient.RetrieveGameStateAsync(gameInfo2.GameId.Value);
             }
 
             Assert.False(game.AwaitingOpponentToJoin.Value);
             var tile = game.Tiles.Where(cg => cg.Count(c => c != null) > 0).First().Where(c => c != null).First();
-            var minigame = await apiClient.InitalizeMinigameAsync(game.Id, new Models.MiniGameInit
+            var minigame = await apiClient.InitalizeMinigameAsync(game.Id.Value, new Models.MiniGameInit
             {
-                CategoryId = string.IsNullOrWhiteSpace(tile.ChosenCategoryId) ? tile.AvailableCategories.First().Id : tile.ChosenCategoryId,
+                CategoryId = !tile.ChosenCategoryId.HasValue ? tile.AvailableCategories.First().Id : tile.ChosenCategoryId,
                 TileId = tile.Id
             });
 
-            Assert.False(string.IsNullOrWhiteSpace(minigame.Id));
+            Assert.True(minigame.Id.HasValue);
             Assert.InRange(minigame.AnswerOptions.Count, 4, 4);
             foreach(var option in minigame.AnswerOptions)
             {
@@ -43,7 +43,7 @@ namespace WikidataGame.ApiClient.Tests
             Assert.NotNull(minigame.Type);
 
             //cleanup
-            await apiClient.DeleteGameAsync(gameInfo.GameId);
+            await apiClient.DeleteGameAsync(gameInfo.GameId.Value);
         }
 
         [Fact]
@@ -52,20 +52,20 @@ namespace WikidataGame.ApiClient.Tests
             var authInfo = await RetrieveBearerAsync();
             var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo.Bearer));
             var gameInfo = await apiClient.CreateNewGameAsync();
-            var game = await apiClient.RetrieveGameStateAsync(gameInfo.GameId);
+            var game = await apiClient.RetrieveGameStateAsync(gameInfo.GameId.Value);
             if (game.AwaitingOpponentToJoin.Value)
             {
                 var authInfo2 = await RetrieveBearerAsync();
                 apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo2.Bearer));
                 var gameInfo2 = await apiClient.CreateNewGameAsync();
-                game = await apiClient.RetrieveGameStateAsync(gameInfo2.GameId);
+                game = await apiClient.RetrieveGameStateAsync(gameInfo2.GameId.Value);
             }
 
             var flattenedTiles = game.Tiles.SelectMany(t => t).ToList();
 
             //Level up
             var tile = flattenedTiles.SingleOrDefault(t => t != null && t.OwnerId == game.Me.Id);
-            var minigameAnswer = await CreateAndAnswerMinigameRandomly(apiClient, game.Id, tile);
+            var minigameAnswer = await CreateAndAnswerMinigameRandomly(apiClient, game.Id.Value, tile);
             var updatedTile = minigameAnswer.Tiles.SelectMany(t => t).SingleOrDefault(t => t != null && t.Id == tile.Id);
             if (minigameAnswer.IsWin.Value)
             {
@@ -77,8 +77,8 @@ namespace WikidataGame.ApiClient.Tests
             }
 
             //occupy new tile
-            tile = flattenedTiles.Where(t => t != null && string.IsNullOrEmpty(t.OwnerId)).First();
-            minigameAnswer = await CreateAndAnswerMinigameRandomly(apiClient, game.Id, tile);
+            tile = flattenedTiles.Where(t => t != null && !t.OwnerId.HasValue).First();
+            minigameAnswer = await CreateAndAnswerMinigameRandomly(apiClient, game.Id.Value, tile);
             updatedTile = minigameAnswer.Tiles.SelectMany(t => t).SingleOrDefault(t => t != null && t.Id == tile.Id);
             if (minigameAnswer.IsWin.Value)
             {
@@ -86,12 +86,12 @@ namespace WikidataGame.ApiClient.Tests
             }
             else
             {
-                Assert.True(string.IsNullOrWhiteSpace(updatedTile.OwnerId));
+                Assert.False(updatedTile.OwnerId.HasValue);
             }
 
             //attack opponent
             tile = flattenedTiles.SingleOrDefault(t => t != null && t.OwnerId == game.Opponent.Id);
-            minigameAnswer = await CreateAndAnswerMinigameRandomly(apiClient, game.Id, tile);
+            minigameAnswer = await CreateAndAnswerMinigameRandomly(apiClient, game.Id.Value, tile);
             updatedTile = minigameAnswer.Tiles.SelectMany(t => t).SingleOrDefault(t => t != null && t.Id == tile.Id);
             if (minigameAnswer.IsWin.Value)
             {
@@ -104,14 +104,14 @@ namespace WikidataGame.ApiClient.Tests
             Assert.True(minigameAnswer.NextMovePlayerId == game.Opponent.Id);
 
             //cleanup
-            await apiClient.DeleteGameAsync(gameInfo.GameId);
+            await apiClient.DeleteGameAsync(gameInfo.GameId.Value);
         }
 
-        private async Task<Models.MiniGameResult> CreateAndAnswerMinigameRandomly(WikidataGameAPI client, string gameId, Models.Tile tile)
+        private async Task<Models.MiniGameResult> CreateAndAnswerMinigameRandomly(WikidataGameAPI client, Guid gameId, Models.Tile tile)
         {
             var minigame = await client.InitalizeMinigameAsync(gameId, new Models.MiniGameInit
             {
-                CategoryId = string.IsNullOrWhiteSpace(tile.ChosenCategoryId) ? tile.AvailableCategories.First().Id : tile.ChosenCategoryId,
+                CategoryId = !tile.ChosenCategoryId.HasValue ? tile.AvailableCategories.First().Id : tile.ChosenCategoryId,
                 TileId = tile.Id
             });
             var answer = new List<string>();
@@ -125,7 +125,7 @@ namespace WikidataGame.ApiClient.Tests
                     break;
             }
 
-            var minigameAnswer = await client.AnswerMinigameAsync(gameId, minigame.Id, answer);
+            var minigameAnswer = await client.AnswerMinigameAsync(gameId, minigame.Id.Value, answer);
             if (minigameAnswer.CorrectAnswer.SequenceEqual(answer))
             {
                 Assert.True(minigameAnswer.IsWin);
@@ -136,7 +136,7 @@ namespace WikidataGame.ApiClient.Tests
             }
             Assert.NotEmpty(minigameAnswer.Tiles);
             Assert.NotEmpty(minigameAnswer.CorrectAnswer);
-            Assert.False(string.IsNullOrWhiteSpace(minigameAnswer.NextMovePlayerId));
+            Assert.True(minigameAnswer.NextMovePlayerId.HasValue);
             return minigameAnswer;
         }
     }

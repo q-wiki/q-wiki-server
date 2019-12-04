@@ -41,13 +41,13 @@ namespace WikidataGame
 
 
         /// <summary>
-        /// Authenticates a player
+        /// Authenticates a player using username/password
         /// </summary>
         /// <param name='xUsername'>
-        /// Username
+        /// Username (min. 3 chars)
         /// </param>
-        /// <param name='xAuthToken'>
-        /// firebase authentication token
+        /// <param name='xPassword'>
+        /// Password (min. 8 chars)
         /// </param>
         /// <param name='xPushToken'>
         /// push token generated through firebase/apns
@@ -58,7 +58,81 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<AuthInfo>> AuthenticateWithHttpMessagesAsync(string xUsername = default(string), string xAuthToken = default(string), string xPushToken = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<AuthInfo>> AuthenticateWithHttpMessagesAsync(string xUsername = default(string), string xPassword = default(string), string xPushToken = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Authenticates a player using Google Play Services
+        /// </summary>
+        /// <param name='xUsername'>
+        /// Username (min. 3 chars)
+        /// </param>
+        /// <param name='xAuthCode'>
+        /// backend auth code
+        /// </param>
+        /// <param name='xPushToken'>
+        /// push token generated through firebase/apns
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<AuthInfo>> AuthenticateGooglePlayWithHttpMessagesAsync(string xUsername = default(string), string xAuthCode = default(string), string xPushToken = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Retrieves the friendlist for the signed in user
+        /// </summary>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<IList<Player>>> GetFriendsWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Adds a user as a friend
+        /// </summary>
+        /// <param name='friendId'>
+        /// The user id of the player that should be added
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<Player>> PostFriendWithHttpMessagesAsync(System.Guid? friendId = default(System.Guid?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Removes a friend from the friend list
+        /// </summary>
+        /// <param name='friendId'>
+        /// User id of the friend to be removed
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<Player>> DeleteFriendWithHttpMessagesAsync(System.Guid friendId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Retrieves users (limit 10) with a username similar to the query
+        /// string
+        /// </summary>
+        /// <param name='query'>
+        /// Username or part of a username (min. 3 characters)
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<IList<Player>>> GetFindFriendsWithHttpMessagesAsync(string query = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Creates a new game and matches the player with an opponent
@@ -92,7 +166,7 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<Game>> RetrieveGameStateWithHttpMessagesAsync(string gameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<Game>> RetrieveGameStateWithHttpMessagesAsync(System.Guid gameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Stops/deletes the specified game
@@ -106,7 +180,7 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse> DeleteGameWithHttpMessagesAsync(string gameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse> DeleteGameWithHttpMessagesAsync(System.Guid gameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Initializes a new minigame
@@ -123,7 +197,7 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<MiniGame>> InitalizeMinigameWithHttpMessagesAsync(string gameId, MiniGameInit minigameParams = default(MiniGameInit), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<MiniGame>> InitalizeMinigameWithHttpMessagesAsync(System.Guid gameId, MiniGameInit minigameParams = default(MiniGameInit), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Retrieves the details of the specified minigame
@@ -140,7 +214,7 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<MiniGame>> RetrieveMinigameInfoWithHttpMessagesAsync(string gameId, string minigameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<MiniGame>> RetrieveMinigameInfoWithHttpMessagesAsync(System.Guid gameId, System.Guid minigameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Post the answer(s) to the specified minigame
@@ -160,7 +234,7 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<MiniGameResult>> AnswerMinigameWithHttpMessagesAsync(string gameId, string minigameId, IList<string> answers = default(IList<string>), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<MiniGameResult>> AnswerMinigameWithHttpMessagesAsync(System.Guid gameId, System.Guid minigameId, IList<string> answers = default(IList<string>), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
     }
 }

@@ -16,9 +16,8 @@ namespace WikidataGame.ApiClient.Tests
 
         protected async Task<AuthInfo> RetrieveBearerAsync()
         {
-            var token = await Firebase.TokenProvider.Program.RequestIdTokenAsync();
             var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials("auth"));
-            return await apiClient.AuthenticateAsync("test12345", token, string.Empty);
+            return await apiClient.AuthenticateAsync(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), string.Empty);
         }
     }
 }

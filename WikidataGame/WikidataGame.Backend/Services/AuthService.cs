@@ -28,7 +28,7 @@ namespace WikidataGame.Backend.Services
                 );
         }
 
-        public async Task<(bool Success, string GooglePlayId, string GooglePlayAccessToken, string GooglePlayRefreshToken)> VerifyAuthCodeAsync(string authCode)
+        public async Task<(bool Success, GoogleResponse Response)> VerifyAuthCodeAsync(string authCode)
         {
             var request = new AuthorizationCodeTokenRequest()
             {
@@ -46,7 +46,7 @@ namespace WikidataGame.Backend.Services
                     new System.Threading.CancellationToken(),
                     Google.Apis.Util.SystemClock.Default);
                 if (tokenResponse == null)
-                    return (false, string.Empty, string.Empty, string.Empty);
+                    return (false, null);
 
                 GoogleCredential credential = GoogleCredential.FromAccessToken(tokenResponse.AccessToken);
                 using GamesService gs = new GamesService(new BaseClientService.Initializer()
@@ -56,14 +56,26 @@ namespace WikidataGame.Backend.Services
                 });
                 var player = await gs.Players.Get("me").ExecuteAsync();
                 if (player == null)
-                    return (false, string.Empty, string.Empty, string.Empty);
+                    return (false, null);
 
-                return (true, player.PlayerId, tokenResponse.AccessToken, tokenResponse.RefreshToken);
+                return (true, new GoogleResponse {
+                    GooglePlayId = player.PlayerId,
+                    GooglePlayAccessToken = tokenResponse.AccessToken,
+                    GooglePlayRefreshToken = tokenResponse.RefreshToken,
+                    GooglePlayProfileImage = player.AvatarImageUrl
+                });
             }
             catch (TokenResponseException)
             {
-                return (false, string.Empty, string.Empty, string.Empty);
+                return (false, null);
             }
         }
+    }
+    public class GoogleResponse
+    {
+        public string GooglePlayId { get; set; }
+        public string GooglePlayAccessToken { get; set; }
+        public string GooglePlayRefreshToken { get; set; }
+        public string GooglePlayProfileImage { get; set; }
     }
 }

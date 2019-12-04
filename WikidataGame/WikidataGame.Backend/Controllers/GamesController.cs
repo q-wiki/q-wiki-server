@@ -97,7 +97,8 @@ namespace WikidataGame.Backend.Controllers
                 return Forbid();
 
             var game = await _gameRepo.GetAsync(gameId);
-            var opponents = game.GameUsers.Select(gu => gu.User).Where(u => u.Id != new Guid(User.Identity.Name)).ToList();
+            var currentUser = await GetCurrentUserAsync();
+            var opponents = game.GameUsers.Select(gu => gu.User).Where(u => u.Id != currentUser.Id).ToList();
             foreach(var opponent in opponents)
             {
                 await _notificationService.SendNotificationAsync(opponent, "Congrats", "You won because your opponent left the game!");

@@ -31,7 +31,8 @@ namespace WikidataGame.Backend.Helpers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return new AuthInfo {
                 Bearer = tokenHandler.WriteToken(token),
-                Expires = tokenDescriptor.Expires.Value
+                Expires = tokenDescriptor.Expires.Value,
+                User = Player.FromModel(user)
             };
         }
     }

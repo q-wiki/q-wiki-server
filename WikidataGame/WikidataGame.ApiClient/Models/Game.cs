@@ -24,7 +24,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// Initializes a new instance of the Game class.
         /// </summary>
-        public Game(string id = default(string), IList<IList<Tile>> tiles = default(IList<IList<Tile>>), IList<string> winningPlayerIds = default(IList<string>), Player me = default(Player), Player opponent = default(Player), string nextMovePlayerId = default(string), System.DateTime? moveExpiry = default(System.DateTime?), bool? awaitingOpponentToJoin = default(bool?))
+        public Game(System.Guid? id = default(System.Guid?), IList<IList<Tile>> tiles = default(IList<IList<Tile>>), IList<System.Guid?> winningPlayerIds = default(IList<System.Guid?>), Player me = default(Player), Player opponent = default(Player), System.Guid? nextMovePlayerId = default(System.Guid?), System.DateTime? moveExpiry = default(System.DateTime?), bool? awaitingOpponentToJoin = default(bool?))
         {
             Id = id;
             Tiles = tiles;
@@ -45,7 +45,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
+        public System.Guid? Id { get; set; }
 
         /// <summary>
         /// </summary>
@@ -55,7 +55,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "winningPlayerIds")]
-        public IList<string> WinningPlayerIds { get; set; }
+        public IList<System.Guid?> WinningPlayerIds { get; set; }
 
         /// <summary>
         /// </summary>
@@ -70,7 +70,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "nextMovePlayerId")]
-        public string NextMovePlayerId { get; set; }
+        public System.Guid? NextMovePlayerId { get; set; }
 
         /// <summary>
         /// </summary>

@@ -1157,6 +1157,8 @@ namespace WikidataGame.Backend.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed");
 
+                    b.Property<string>("ProfileImageUrl");
+
                     b.Property<int>("PushPlatform");
 
                     b.Property<string>("PushRegistrationId");

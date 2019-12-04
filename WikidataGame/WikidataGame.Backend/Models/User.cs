@@ -20,6 +20,8 @@ namespace WikidataGame.Backend.Models
         public string PushToken { get; set; }
 
         public string PushRegistrationId { get; set; }
+
+        public string ProfileImageUrl { get; set; }
     }
 
     public enum GamePlatform

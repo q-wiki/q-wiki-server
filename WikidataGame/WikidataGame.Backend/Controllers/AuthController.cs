@@ -109,19 +109,11 @@ namespace WikidataGame.Backend.Controllers
 
             try
             {
-                var tokens = new Dictionary<string, string> {
-                        { "access", verificationResponse.GooglePlayAccessToken }
-                    };
-                if (!string.IsNullOrWhiteSpace(verificationResponse.GooglePlayRefreshToken))
-                {
-                    tokens.Add("refresh", verificationResponse.GooglePlayRefreshToken);
-                }
                 var user = await CreateOrUpdateUserWithLoginProviderAsync(
                     "Google",
-                    verificationResponse.GooglePlayId,
                     pushToken,
                     username,
-                    tokens);
+                    verificationResponse.Response);
 
                 var authInfo = JwtTokenHelper.CreateJwtToken(user);
                 Response.Headers.Add("WWW-Authenticate", $"Bearer {authInfo.Bearer}");
@@ -135,23 +127,22 @@ namespace WikidataGame.Backend.Controllers
 
         private async Task<Models.User> CreateOrUpdateUserWithLoginProviderAsync(
             string provider,
-            string providerId,
             string pushToken,
             string username,
-            Dictionary<string, string> additonalTokens = null)
+            GoogleResponse response)
         {
-            var user = await _userManager.FindByLoginAsync(provider, providerId);
+            var user = await _userManager.FindByLoginAsync(provider, response.GooglePlayId);
             if (user == null)
             {
                 //create
-                var userToCreate = new Models.User { UserName = username };
+                var userToCreate = new Models.User { UserName = username, ProfileImageUrl = response.GooglePlayProfileImage };
                 var idresult = await _userManager.CreateAsync(userToCreate);
                 if (!idresult.Succeeded)
                 {
                     throw new IdentityErrorException(idresult.Errors);
                 }
                 user = await _userManager.FindByIdAsync(userToCreate.Id.ToString());
-                idresult = await _userManager.AddLoginAsync(user, new UserLoginInfo(provider, providerId, string.Empty));
+                idresult = await _userManager.AddLoginAsync(user, new UserLoginInfo(provider, response.GooglePlayId, string.Empty));
                 if (!idresult.Succeeded)
                 {
                     throw new IdentityErrorException(idresult.Errors);
@@ -161,6 +152,7 @@ namespace WikidataGame.Backend.Controllers
             {
                 //update
                 user.UserName = username;
+                user.ProfileImageUrl = response.GooglePlayProfileImage;
                 var idresult = await _userManager.UpdateAsync(user);
                 if (!idresult.Succeeded)
                 {
@@ -168,17 +160,23 @@ namespace WikidataGame.Backend.Controllers
                 }
             }
 
-            if (additonalTokens != null)
+            var tokens = new Dictionary<string, string> {
+                        { "access", response.GooglePlayAccessToken }
+                    };
+            if (!string.IsNullOrWhiteSpace(response.GooglePlayRefreshToken))
             {
-                foreach (var additionalToken in additonalTokens)
+                tokens.Add("refresh", response.GooglePlayRefreshToken);
+            }
+
+            foreach (var additionalToken in tokens)
+            {
+                var idresult = await _userManager.SetAuthenticationTokenAsync(user, provider, additionalToken.Key, additionalToken.Value);
+                if (!idresult.Succeeded)
                 {
-                    var idresult = await _userManager.SetAuthenticationTokenAsync(user, provider, additionalToken.Key, additionalToken.Value);
-                    if (!idresult.Succeeded)
-                    {
-                        throw new IdentityErrorException(idresult.Errors);
-                    }
+                    throw new IdentityErrorException(idresult.Errors);
                 }
             }
+            
 
             await RegisterPushForUserAsync(user, pushToken);
             return user;
@@ -204,7 +202,7 @@ namespace WikidataGame.Backend.Controllers
                 });
                 user.PushRegistrationId = registrationId;
             }
-            await _dataContext.SaveChangesAsync();
+            await _userManager.UpdateAsync(user);
         }
     }
 }

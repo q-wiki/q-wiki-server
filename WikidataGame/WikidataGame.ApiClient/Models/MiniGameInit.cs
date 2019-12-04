@@ -22,7 +22,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// Initializes a new instance of the MiniGameInit class.
         /// </summary>
-        public MiniGameInit(string tileId = default(string), string categoryId = default(string))
+        public MiniGameInit(System.Guid? tileId = default(System.Guid?), System.Guid? categoryId = default(System.Guid?))
         {
             TileId = tileId;
             CategoryId = categoryId;
@@ -37,12 +37,12 @@ namespace WikidataGame.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "tileId")]
-        public string TileId { get; set; }
+        public System.Guid? TileId { get; set; }
 
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "categoryId")]
-        public string CategoryId { get; set; }
+        public System.Guid? CategoryId { get; set; }
 
     }
 }

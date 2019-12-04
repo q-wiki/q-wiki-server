@@ -22,7 +22,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// Initializes a new instance of the Category class.
         /// </summary>
-        public Category(string id = default(string), string title = default(string))
+        public Category(System.Guid? id = default(System.Guid?), string title = default(string))
         {
             Id = id;
             Title = title;
@@ -37,7 +37,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
+        public System.Guid? Id { get; set; }
 
         /// <summary>
         /// </summary>

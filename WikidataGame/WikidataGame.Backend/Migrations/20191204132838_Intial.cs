@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WikidataGame.Backend.Migrations
 {
-    public partial class Initial : Migration
+    public partial class Intial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -42,7 +42,8 @@ namespace WikidataGame.Backend.Migrations
                     AccessFailedCount = table.Column<int>(nullable: false),
                     PushPlatform = table.Column<int>(nullable: false),
                     PushToken = table.Column<string>(nullable: true),
-                    PushRegistrationId = table.Column<string>(nullable: true)
+                    PushRegistrationId = table.Column<string>(nullable: true),
+                    ProfileImageUrl = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

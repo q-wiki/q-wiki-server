@@ -9,8 +9,8 @@ using WikidataGame.Backend.Helpers;
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20191204104109_Initial")]
-    partial class Initial
+    [Migration("20191204132838_Intial")]
+    partial class Intial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -1158,6 +1158,8 @@ namespace WikidataGame.Backend.Migrations
                     b.Property<string>("PhoneNumber");
 
                     b.Property<bool>("PhoneNumberConfirmed");
+
+                    b.Property<string>("ProfileImageUrl");
 
                     b.Property<int>("PushPlatform");
 

@@ -49,21 +49,24 @@ namespace WikidataGame.Backend.Services
                     return (false, null);
 
                 GoogleCredential credential = GoogleCredential.FromAccessToken(tokenResponse.AccessToken);
-                using GamesService gs = new GamesService(new BaseClientService.Initializer()
+                using (GamesService gs = new GamesService(new BaseClientService.Initializer()
                 {
                     HttpClientInitializer = credential,
                     ApplicationName = "Q-Wiki",
-                });
-                var player = await gs.Players.Get("me").ExecuteAsync();
-                if (player == null)
-                    return (false, null);
+                }))
+                {
+                    var player = await gs.Players.Get("me").ExecuteAsync();
+                    if (player == null)
+                        return (false, null);
 
-                return (true, new GoogleResponse {
-                    GooglePlayId = player.PlayerId,
-                    GooglePlayAccessToken = tokenResponse.AccessToken,
-                    GooglePlayRefreshToken = tokenResponse.RefreshToken,
-                    GooglePlayProfileImage = player.AvatarImageUrl
-                });
+                    return (true, new GoogleResponse
+                    {
+                        GooglePlayId = player.PlayerId,
+                        GooglePlayAccessToken = tokenResponse.AccessToken,
+                        GooglePlayRefreshToken = tokenResponse.RefreshToken,
+                        GooglePlayProfileImage = player.AvatarImageUrl
+                    });
+                }
             }
             catch (TokenResponseException)
             {

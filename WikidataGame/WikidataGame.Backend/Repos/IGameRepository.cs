@@ -8,12 +8,12 @@ namespace WikidataGame.Backend.Repos
 {
     public interface IGameRepository : IRepository<Game, Guid>
     {
-        Task<Game> CreateNewGameAsync(User player, int mapWidth, int mapHeight, int accessibleTiles);
+        Task<Game> CreateNewGameAsync(User player);
 
-        Task<Game> GetOpenGameAsync();
+        Task<IEnumerable<Game>> GetOpenGamesAsync();
 
         Game JoinGame(Game game, User player);
 
-        Task<Game> RunningGameForPlayerAsync(User player);
+        Task<IEnumerable<Game>> RunningGamesForPlayerAsync(User player);
     }
 }

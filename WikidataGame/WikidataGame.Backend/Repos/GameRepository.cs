@@ -12,14 +12,14 @@ namespace WikidataGame.Backend.Repos
     {
         public GameRepository(DataContext context) : base(context) { }
 
-        public async Task<Game> CreateNewGameAsync(User player, int mapWidth, int mapHeight, int accessibleTiles)
+        public async Task<Game> CreateNewGameAsync(User player)
         {
             var game = new Game
             {
-                Tiles = MapGeneratorService.GenerateMap(mapWidth, mapHeight, accessibleTiles).ToList(),
-                MapWidth = mapWidth,
-                MapHeight = mapHeight,
-                AccessibleTilesCount = accessibleTiles,
+                Tiles = MapGeneratorService.GenerateMap(GameConstants.DefaultMapWidth, GameConstants.DefaultMapHeight, GameConstants.DefaultAccessibleTilesCount).ToList(),
+                MapWidth = GameConstants.DefaultMapWidth,
+                MapHeight = GameConstants.DefaultMapHeight,
+                AccessibleTilesCount = GameConstants.DefaultAccessibleTilesCount,
                 StepsLeftWithinMove = Game.StepsPerPlayer,
                 MoveCount = 0
             };
@@ -34,11 +34,9 @@ namespace WikidataGame.Backend.Repos
             return await GetAsync(game.Id);
         }
 
-        public async Task<Game> GetOpenGameAsync()
+        public async Task<IEnumerable<Game>> GetOpenGamesAsync()
         {
-            var games = await FindAsync(g => g.GameUsers.Count() < 2);
-            if (games.Count() < 1) return null;
-            return games.First();
+            return await FindAsync(g => g.GameUsers.Count() < 2);
         }
 
         public Game JoinGame(Game game, User player)
@@ -54,9 +52,9 @@ namespace WikidataGame.Backend.Repos
             return game;
         }
 
-        public async Task<Game> RunningGameForPlayerAsync(User player)
+        public async Task<IEnumerable<Game>> RunningGamesForPlayerAsync(User player)
         {
-            return await SingleOrDefaultAsync(g => g.GameUsers.Select(gu => gu.UserId).Contains(player.Id) && g.GameUsers.Count(gu => gu.IsWinner) <= 0);
+            return await FindAsync(g => g.GameUsers.Select(gu => gu.UserId).Contains(player.Id) && g.GameUsers.Count(gu => gu.IsWinner) <= 0);
         }
     }
 }

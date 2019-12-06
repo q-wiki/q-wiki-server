@@ -37,35 +37,41 @@ namespace WikidataGame.Backend.Controllers
         /// <summary>
         /// Creates a new game and matches the player with an opponent
         /// </summary>
-        /// <param name="mapWidth">Width of generated map</param>
-        /// <param name="mapHeight">Height of generated map</param>
-        /// <param name="accessibleTilesCount">How many accessible tiles the generated map should contain.</param>
         /// <returns>Info about the newly created game</returns>
         [HttpPost]
         [ProducesResponseType(typeof(GameInfo), StatusCodes.Status200OK)]
-        public async Task<ActionResult<GameInfo>> CreateNewGame(
-            int mapWidth = GameConstants.DefaultMapWidth,
-            int mapHeight = GameConstants.DefaultMapHeight,
-            int accessibleTilesCount = GameConstants.DefaultAccessibleTilesCount)
+        public async Task<ActionResult<GameInfo>> CreateNewGame()
         {
             var user = await GetCurrentUserAsync();            
-            var game = await _gameRepo.RunningGameForPlayerAsync(user);
-            if (game == default(Models.Game))
-            {
-                game = await _gameRepo.GetOpenGameAsync();
-                if (game == default(Models.Game))
-                {
-                    game = await _gameRepo.CreateNewGameAsync(user, mapWidth, mapHeight, accessibleTilesCount);
-                }
-                else
-                {
-                    _gameRepo.JoinGame(game, user);
-                }
+            var openGames = await _gameRepo.GetOpenGamesAsync();
 
-                await _dataContext.SaveChangesAsync();
+            Models.Game game;
+            if (openGames.Count() <= 0 || openGames.All(g => g.GameUsers.SingleOrDefault(gu => gu.UserId == user.Id) != null)) 
+            {
+                //no open games, or only games opened by current player
+                game = await _gameRepo.CreateNewGameAsync(user);
+            }
+            else
+            {
+                game = openGames.Where(g => g.GameUsers.SingleOrDefault(gu => gu.UserId == user.Id) == null).First();
+                game = _gameRepo.JoinGame(game, user);
             }
 
+            await _dataContext.SaveChangesAsync();
             return Ok(GameInfo.FromGame(game));
+        }
+
+        /// <summary>
+        /// Retrieves all currently running games for the authenticated player
+        /// </summary>
+        /// <returns>List of game information</returns>
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<GameInfo>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<GameInfo>>> GetGames()
+        {
+            var user = await GetCurrentUserAsync();
+            var games = await _gameRepo.RunningGamesForPlayerAsync(user);
+            return Ok(games.Select(g => GameInfo.FromGame(g)).ToList());
         }
 
         /// <summary>

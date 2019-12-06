@@ -135,24 +135,26 @@ namespace WikidataGame
         Task<HttpOperationResponse<IList<Player>>> GetFindFriendsWithHttpMessagesAsync(string query = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Creates a new game and matches the player with an opponent
+        /// Retrieves all currently running games for the authenticated player
         /// </summary>
-        /// <param name='mapWidth'>
-        /// Width of generated map
-        /// </param>
-        /// <param name='mapHeight'>
-        /// Height of generated map
-        /// </param>
-        /// <param name='accessibleTilesCount'>
-        /// How many accessible tiles the generated map should contain.
-        /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
         /// </param>
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<GameInfo>> CreateNewGameWithHttpMessagesAsync(int? mapWidth = 10, int? mapHeight = 10, int? accessibleTilesCount = 70, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<IList<GameInfo>>> GetGamesWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Creates a new game and matches the player with an opponent
+        /// </summary>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<GameInfo>> CreateNewGameWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Retrieves information on the specified game

@@ -1,5 +1,6 @@
 using Microsoft.Rest;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace WikidataGame.ApiClient.Tests
@@ -90,6 +91,26 @@ namespace WikidataGame.ApiClient.Tests
             await apiClient.DeleteGameAsync(gameInfo.GameId.Value);
             var game = await apiClient.RetrieveGameStateAsync(gameInfo.GameId.Value);
             Assert.Null(game);
+        }
+
+        [Fact]
+        public async void GetGames_NoGamesCreated_ReturnsEmpty()
+        {
+            var authInfo = await RetrieveBearerAsync();
+            var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo.Bearer));
+            var games = await apiClient.GetGamesAsync();
+            Assert.Empty(games);
+        }
+
+        [Fact]
+        public async void GetGames_WithCreatedGame_ReturnsGame()
+        {
+            var authInfo = await RetrieveBearerAsync();
+            var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo.Bearer));
+            var gameInfo = await apiClient.CreateNewGameAsync();
+            var games = await apiClient.GetGamesAsync();
+            Assert.NotEmpty(games);
+            Assert.True(games.First().GameId == gameInfo.GameId);
         }
     }
 }

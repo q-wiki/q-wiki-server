@@ -240,23 +240,31 @@ namespace WikidataGame
             }
 
             /// <summary>
-            /// Creates a new game and matches the player with an opponent
+            /// Retrieves all currently running games for the authenticated player
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='mapWidth'>
-            /// Width of generated map
-            /// </param>
-            /// <param name='mapHeight'>
-            /// Height of generated map
-            /// </param>
-            /// <param name='accessibleTilesCount'>
-            /// How many accessible tiles the generated map should contain.
-            /// </param>
-            public static GameInfo CreateNewGame(this IWikidataGameAPI operations, int? mapWidth = 10, int? mapHeight = 10, int? accessibleTilesCount = 70)
+            public static IList<GameInfo> GetGames(this IWikidataGameAPI operations)
             {
-                return operations.CreateNewGameAsync(mapWidth, mapHeight, accessibleTilesCount).GetAwaiter().GetResult();
+                return operations.GetGamesAsync().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves all currently running games for the authenticated player
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<IList<GameInfo>> GetGamesAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetGamesWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
             }
 
             /// <summary>
@@ -265,21 +273,23 @@ namespace WikidataGame
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='mapWidth'>
-            /// Width of generated map
-            /// </param>
-            /// <param name='mapHeight'>
-            /// Height of generated map
-            /// </param>
-            /// <param name='accessibleTilesCount'>
-            /// How many accessible tiles the generated map should contain.
+            public static GameInfo CreateNewGame(this IWikidataGameAPI operations)
+            {
+                return operations.CreateNewGameAsync().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Creates a new game and matches the player with an opponent
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<GameInfo> CreateNewGameAsync(this IWikidataGameAPI operations, int? mapWidth = 10, int? mapHeight = 10, int? accessibleTilesCount = 70, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<GameInfo> CreateNewGameAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.CreateNewGameWithHttpMessagesAsync(mapWidth, mapHeight, accessibleTilesCount, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.CreateNewGameWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }

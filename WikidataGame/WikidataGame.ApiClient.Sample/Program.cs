@@ -26,7 +26,7 @@ namespace WikidataGame.ApiClient.Sample
             var apiClient2 = new WikidataGameAPI(new Uri("https://wikidatagame.azurewebsites.net"), new TokenCredentials(auth.Bearer));
 
             CancellationTokenSource cts2 = new CancellationTokenSource();
-            var game = await apiClient2.CreateNewGameAsync(10, 10, 70, cts2.Token);
+            var game = await apiClient2.CreateNewGameAsync(cts2.Token);
             Console.WriteLine($"Started game {game.GameId.Value}.");
 
             CancellationTokenSource cts3 = new CancellationTokenSource();

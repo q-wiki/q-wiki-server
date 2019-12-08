@@ -43,17 +43,25 @@ namespace WikidataGame.Backend.Controllers
         public async Task<ActionResult<GameInfo>> CreateNewGame()
         {
             var user = await GetCurrentUserAsync();            
-            var openGames = await _gameRepo.GetOpenGamesAsync();
+            var unmatchedGames = await _gameRepo.GetOpenGamesAsync();
+            var unmatchedGamesWithoutCurrentUser = unmatchedGames.Where(g => g.GameUsers.SingleOrDefault(gu => gu.UserId == user.Id) == null); //unmatched games
+            var runningGames = await _gameRepo.RunningGamesForPlayerAsync(user); //running games for current user
+            var runningGameOpponentIds = runningGames.Select(g => g.GameUsers.SingleOrDefault(gu => gu.UserId != user.Id)?.UserId).ToList(); //opponent ids for running games
 
             Models.Game game;
-            if (openGames.Count() <= 0 || openGames.All(g => g.GameUsers.SingleOrDefault(gu => gu.UserId == user.Id) != null)) 
+            if (unmatchedGamesWithoutCurrentUser.Count() <= 0 ||
+                unmatchedGamesWithoutCurrentUser.All(g => runningGameOpponentIds.Contains(g.GameUsers.SingleOrDefault(gu => gu.UserId != user.Id)?.UserId))) 
             {
-                //no open games, or only games opened by current player
+                //no open games, or only games opened by current player, or only open games with a player the current user is already playing with
                 game = await _gameRepo.CreateNewGameAsync(user);
             }
             else
             {
-                game = openGames.Where(g => g.GameUsers.SingleOrDefault(gu => gu.UserId == user.Id) == null).First();
+                game = unmatchedGamesWithoutCurrentUser.Where(
+                        g => !runningGameOpponentIds.Contains(
+                            g.GameUsers.SingleOrDefault(gu => gu.UserId != user.Id)?.UserId
+                        )
+                    ).First();
                 game = _gameRepo.JoinGame(game, user);
             }
 
@@ -107,7 +115,7 @@ namespace WikidataGame.Backend.Controllers
             var opponents = game.GameUsers.Select(gu => gu.User).Where(u => u.Id != currentUser.Id).ToList();
             foreach(var opponent in opponents)
             {
-                await _notificationService.SendDeleteNotificationAsync(opponent, "Congrats", "You won because your opponent left the game!");
+                await _notificationService.SendNotificationAsync(PushType.Delete, opponent, currentUser, game.Id);
             }
             _dataContext.Set<Models.Tile>().RemoveRange(game.Tiles);
             _gameRepo.Remove(game);

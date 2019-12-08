@@ -142,10 +142,7 @@ namespace WikidataGame.Backend.Controllers
                     game.NextMovePlayerId = nextPlayer.UserId;
                     game.MoveStartedAt = DateTime.UtcNow;
                     game.StepsLeftWithinMove = Models.Game.StepsPerPlayer;
-                    await _notificationService.SendNotificationWithRefreshAsync(
-                        nextPlayer.User,
-                        "It's your turn!",
-                        "You have 12 hours left to play your round.");
+                    await _notificationService.SendNotificationAsync(PushType.YourTurn, nextPlayer.User, await GetCurrentUserAsync(), game.Id);
                 }
             }
             await _dataContext.SaveChangesAsync();
@@ -217,11 +214,19 @@ namespace WikidataGame.Backend.Controllers
             {
                 var user = game.GameUsers.SingleOrDefault(gu => gu.UserId == winnerId);
                 user.IsWinner = true;
-                await _notificationService.SendNotificationAsync(user.User, "Congrats", "You won this game on points!");
+                await _notificationService.SendNotificationAsync(
+                    PushType.YouWon,
+                    user.User,
+                    game.GameUsers.SingleOrDefault(gu => gu.UserId != winnerId)?.User,
+                    game.Id);
             }
             foreach (var looser in game.GameUsers.Where(gu => !winningPlayerIds.Contains(gu.UserId)))
             {
-                await _notificationService.SendNotificationAsync(looser.User, "Too bad.", "You lost the game! Start a new game for another chance.");
+                await _notificationService.SendNotificationAsync(
+                    PushType.YouLost,
+                    looser.User,
+                    game.GameUsers.SingleOrDefault(gu => winningPlayerIds.Contains(gu.UserId))?.User,
+                    game.Id);
             }
         }
     }

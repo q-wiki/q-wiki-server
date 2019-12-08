@@ -24,7 +24,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// Initializes a new instance of the Tile class.
         /// </summary>
-        public Tile(System.Guid? id = default(System.Guid?), System.Guid? chosenCategoryId = default(System.Guid?), IList<Category> availableCategories = default(IList<Category>), int? difficulty = default(int?), System.Guid? ownerId = default(System.Guid?))
+        public Tile(string id = default(string), string chosenCategoryId = default(string), IList<Category> availableCategories = default(IList<Category>), int? difficulty = default(int?), string ownerId = default(string))
         {
             Id = id;
             ChosenCategoryId = chosenCategoryId;
@@ -42,12 +42,12 @@ namespace WikidataGame.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "id")]
-        public System.Guid? Id { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "chosenCategoryId")]
-        public System.Guid? ChosenCategoryId { get; set; }
+        public string ChosenCategoryId { get; set; }
 
         /// <summary>
         /// </summary>
@@ -62,7 +62,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "ownerId")]
-        public System.Guid? OwnerId { get; set; }
+        public string OwnerId { get; set; }
 
     }
 }

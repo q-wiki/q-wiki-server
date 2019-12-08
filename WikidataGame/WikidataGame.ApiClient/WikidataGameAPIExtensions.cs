@@ -146,7 +146,7 @@ namespace WikidataGame
             /// <param name='friendId'>
             /// The user id of the player that should be added
             /// </param>
-            public static Player PostFriend(this IWikidataGameAPI operations, System.Guid? friendId = default(System.Guid?))
+            public static Player PostFriend(this IWikidataGameAPI operations, string friendId = default(string))
             {
                 return operations.PostFriendAsync(friendId).GetAwaiter().GetResult();
             }
@@ -163,7 +163,7 @@ namespace WikidataGame
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<Player> PostFriendAsync(this IWikidataGameAPI operations, System.Guid? friendId = default(System.Guid?), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<Player> PostFriendAsync(this IWikidataGameAPI operations, string friendId = default(string), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.PostFriendWithHttpMessagesAsync(friendId, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -180,7 +180,7 @@ namespace WikidataGame
             /// <param name='friendId'>
             /// User id of the friend to be removed
             /// </param>
-            public static Player DeleteFriend(this IWikidataGameAPI operations, System.Guid friendId)
+            public static Player DeleteFriend(this IWikidataGameAPI operations, string friendId)
             {
                 return operations.DeleteFriendAsync(friendId).GetAwaiter().GetResult();
             }
@@ -197,7 +197,7 @@ namespace WikidataGame
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<Player> DeleteFriendAsync(this IWikidataGameAPI operations, System.Guid friendId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<Player> DeleteFriendAsync(this IWikidataGameAPI operations, string friendId, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.DeleteFriendWithHttpMessagesAsync(friendId, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -304,7 +304,7 @@ namespace WikidataGame
             /// <param name='gameId'>
             /// game identifier
             /// </param>
-            public static Game RetrieveGameState(this IWikidataGameAPI operations, System.Guid gameId)
+            public static Game RetrieveGameState(this IWikidataGameAPI operations, string gameId)
             {
                 return operations.RetrieveGameStateAsync(gameId).GetAwaiter().GetResult();
             }
@@ -321,7 +321,7 @@ namespace WikidataGame
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<Game> RetrieveGameStateAsync(this IWikidataGameAPI operations, System.Guid gameId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<Game> RetrieveGameStateAsync(this IWikidataGameAPI operations, string gameId, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.RetrieveGameStateWithHttpMessagesAsync(gameId, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -338,7 +338,7 @@ namespace WikidataGame
             /// <param name='gameId'>
             /// game identifier
             /// </param>
-            public static void DeleteGame(this IWikidataGameAPI operations, System.Guid gameId)
+            public static void DeleteGame(this IWikidataGameAPI operations, string gameId)
             {
                 operations.DeleteGameAsync(gameId).GetAwaiter().GetResult();
             }
@@ -355,7 +355,7 @@ namespace WikidataGame
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task DeleteGameAsync(this IWikidataGameAPI operations, System.Guid gameId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task DeleteGameAsync(this IWikidataGameAPI operations, string gameId, CancellationToken cancellationToken = default(CancellationToken))
             {
                 (await operations.DeleteGameWithHttpMessagesAsync(gameId, null, cancellationToken).ConfigureAwait(false)).Dispose();
             }
@@ -372,7 +372,7 @@ namespace WikidataGame
             /// <param name='minigameParams'>
             /// minigame information containing category and tile identifier
             /// </param>
-            public static MiniGame InitalizeMinigame(this IWikidataGameAPI operations, System.Guid gameId, MiniGameInit minigameParams = default(MiniGameInit))
+            public static MiniGame InitalizeMinigame(this IWikidataGameAPI operations, string gameId, MiniGameInit minigameParams = default(MiniGameInit))
             {
                 return operations.InitalizeMinigameAsync(gameId, minigameParams).GetAwaiter().GetResult();
             }
@@ -392,7 +392,7 @@ namespace WikidataGame
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<MiniGame> InitalizeMinigameAsync(this IWikidataGameAPI operations, System.Guid gameId, MiniGameInit minigameParams = default(MiniGameInit), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<MiniGame> InitalizeMinigameAsync(this IWikidataGameAPI operations, string gameId, MiniGameInit minigameParams = default(MiniGameInit), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.InitalizeMinigameWithHttpMessagesAsync(gameId, minigameParams, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -412,7 +412,7 @@ namespace WikidataGame
             /// <param name='minigameId'>
             /// minigame identifier
             /// </param>
-            public static MiniGame RetrieveMinigameInfo(this IWikidataGameAPI operations, System.Guid gameId, System.Guid minigameId)
+            public static MiniGame RetrieveMinigameInfo(this IWikidataGameAPI operations, string gameId, string minigameId)
             {
                 return operations.RetrieveMinigameInfoAsync(gameId, minigameId).GetAwaiter().GetResult();
             }
@@ -432,7 +432,7 @@ namespace WikidataGame
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<MiniGame> RetrieveMinigameInfoAsync(this IWikidataGameAPI operations, System.Guid gameId, System.Guid minigameId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<MiniGame> RetrieveMinigameInfoAsync(this IWikidataGameAPI operations, string gameId, string minigameId, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.RetrieveMinigameInfoWithHttpMessagesAsync(gameId, minigameId, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -455,7 +455,7 @@ namespace WikidataGame
             /// <param name='answers'>
             /// answer(s)
             /// </param>
-            public static MiniGameResult AnswerMinigame(this IWikidataGameAPI operations, System.Guid gameId, System.Guid minigameId, IList<string> answers = default(IList<string>))
+            public static MiniGameResult AnswerMinigame(this IWikidataGameAPI operations, string gameId, string minigameId, IList<string> answers = default(IList<string>))
             {
                 return operations.AnswerMinigameAsync(gameId, minigameId, answers).GetAwaiter().GetResult();
             }
@@ -478,7 +478,7 @@ namespace WikidataGame
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<MiniGameResult> AnswerMinigameAsync(this IWikidataGameAPI operations, System.Guid gameId, System.Guid minigameId, IList<string> answers = default(IList<string>), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<MiniGameResult> AnswerMinigameAsync(this IWikidataGameAPI operations, string gameId, string minigameId, IList<string> answers = default(IList<string>), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.AnswerMinigameWithHttpMessagesAsync(gameId, minigameId, answers, null, cancellationToken).ConfigureAwait(false))
                 {

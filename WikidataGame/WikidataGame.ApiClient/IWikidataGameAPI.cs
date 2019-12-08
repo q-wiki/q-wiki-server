@@ -103,7 +103,7 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<Player>> PostFriendWithHttpMessagesAsync(System.Guid? friendId = default(System.Guid?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<Player>> PostFriendWithHttpMessagesAsync(string friendId = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Removes a friend from the friend list
@@ -117,7 +117,7 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<Player>> DeleteFriendWithHttpMessagesAsync(System.Guid friendId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<Player>> DeleteFriendWithHttpMessagesAsync(string friendId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Retrieves users (limit 10) with a username similar to the query
@@ -168,7 +168,7 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<Game>> RetrieveGameStateWithHttpMessagesAsync(System.Guid gameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<Game>> RetrieveGameStateWithHttpMessagesAsync(string gameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Stops/deletes the specified game
@@ -182,7 +182,7 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse> DeleteGameWithHttpMessagesAsync(System.Guid gameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse> DeleteGameWithHttpMessagesAsync(string gameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Initializes a new minigame
@@ -199,7 +199,7 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<MiniGame>> InitalizeMinigameWithHttpMessagesAsync(System.Guid gameId, MiniGameInit minigameParams = default(MiniGameInit), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<MiniGame>> InitalizeMinigameWithHttpMessagesAsync(string gameId, MiniGameInit minigameParams = default(MiniGameInit), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Retrieves the details of the specified minigame
@@ -216,7 +216,7 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<MiniGame>> RetrieveMinigameInfoWithHttpMessagesAsync(System.Guid gameId, System.Guid minigameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<MiniGame>> RetrieveMinigameInfoWithHttpMessagesAsync(string gameId, string minigameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Post the answer(s) to the specified minigame
@@ -236,7 +236,7 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<MiniGameResult>> AnswerMinigameWithHttpMessagesAsync(System.Guid gameId, System.Guid minigameId, IList<string> answers = default(IList<string>), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<MiniGameResult>> AnswerMinigameWithHttpMessagesAsync(string gameId, string minigameId, IList<string> answers = default(IList<string>), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
     }
 }

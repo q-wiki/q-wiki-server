@@ -39,6 +39,20 @@ namespace WikidataGame.Backend.Repos
             return await FindAsync(g => g.GameUsers.Count() < 2);
         }
 
+        public async Task<IEnumerable<Game>> GetGamesForUserToJoinAsync(User user)
+        {
+            var runningGames = await RunningGamesForPlayerAsync(user);
+            var runningGameOpponentIds = runningGames.Select(g => g.GameUsers.SingleOrDefault(gu => gu.UserId != user.Id)?.UserId).ToList();
+            return await FindAsync(g => g.GameUsers.Count() < 2 && 
+                ! g.GameUsers.Any(gu => gu.UserId == user.Id) &&
+                ! runningGameOpponentIds.Contains(g.GameUsers.SingleOrDefault(gu => gu.UserId != user.Id).UserId));
+        }
+
+        public async Task<IEnumerable<Game>> GetOpenGamesForUserAsync(User user)
+        {
+            return await FindAsync(g => g.GameUsers.Count() < 2 && g.GameUsers.SingleOrDefault(gu => gu.UserId == user.Id) != null);
+        }
+
         public Game JoinGame(Game game, User player)
         {
             game.GameUsers.Add(new GameUser

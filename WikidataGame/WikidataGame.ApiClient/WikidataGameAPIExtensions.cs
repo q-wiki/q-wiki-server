@@ -240,6 +240,189 @@ namespace WikidataGame
             }
 
             /// <summary>
+            /// Retrieves all game requests for the authenticated player
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            public static IList<GameRequest> GetGameRequests(this IWikidataGameAPI operations)
+            {
+                return operations.GetGameRequestsAsync().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves all game requests for the authenticated player
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<IList<GameRequest>> GetGameRequestsAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetGameRequestsWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Sends a game request to the specified user
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='userId'>
+            /// user id
+            /// </param>
+            public static GameRequest RequestMatch(this IWikidataGameAPI operations, System.Guid? userId = default(System.Guid?))
+            {
+                return operations.RequestMatchAsync(userId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Sends a game request to the specified user
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='userId'>
+            /// user id
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<GameRequest> RequestMatchAsync(this IWikidataGameAPI operations, System.Guid? userId = default(System.Guid?), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.RequestMatchWithHttpMessagesAsync(userId, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Deletes a game request for the sender or recipient
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='gameRequestId'>
+            /// game request identifier
+            /// </param>
+            public static void DeleteGameRequest(this IWikidataGameAPI operations, System.Guid? gameRequestId = default(System.Guid?))
+            {
+                operations.DeleteGameRequestAsync(gameRequestId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Deletes a game request for the sender or recipient
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='gameRequestId'>
+            /// game request identifier
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task DeleteGameRequestAsync(this IWikidataGameAPI operations, System.Guid? gameRequestId = default(System.Guid?), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                (await operations.DeleteGameRequestWithHttpMessagesAsync(gameRequestId, null, cancellationToken).ConfigureAwait(false)).Dispose();
+            }
+
+            /// <summary>
+            /// Retrieves all incoming game requests for the authenticated player
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            public static IList<GameRequest> GetIncomingGameRequests(this IWikidataGameAPI operations)
+            {
+                return operations.GetIncomingGameRequestsAsync().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves all incoming game requests for the authenticated player
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<IList<GameRequest>> GetIncomingGameRequestsAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetIncomingGameRequestsWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Retrieves all outgoing game requests for the authenticated player
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            public static IList<GameRequest> GetOutgoingGameRequests(this IWikidataGameAPI operations)
+            {
+                return operations.GetOutgoingGameRequestsAsync().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves all outgoing game requests for the authenticated player
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<IList<GameRequest>> GetOutgoingGameRequestsAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetOutgoingGameRequestsWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Creates a new game by accepting a game request
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='gameRequestId'>
+            /// game request identifier
+            /// </param>
+            public static GameInfo CreateNewGameByRequest(this IWikidataGameAPI operations, System.Guid? gameRequestId = default(System.Guid?))
+            {
+                return operations.CreateNewGameByRequestAsync(gameRequestId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Creates a new game by accepting a game request
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='gameRequestId'>
+            /// game request identifier
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<GameInfo> CreateNewGameByRequestAsync(this IWikidataGameAPI operations, System.Guid? gameRequestId = default(System.Guid?), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.CreateNewGameByRequestWithHttpMessagesAsync(gameRequestId, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
             /// Retrieves all currently running games for the authenticated player
             /// </summary>
             /// <param name='operations'>

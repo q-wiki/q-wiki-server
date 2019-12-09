@@ -19,6 +19,7 @@ namespace WikidataGame.Backend.Helpers
         public DbSet<Tile> Tiles { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Question> Questions { get; set; }
+        public DbSet<GameRequest> GameRequests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,6 +37,18 @@ namespace WikidataGame.Backend.Helpers
                 .HasOne(f => f.FriendUser)
                 .WithMany()
                 .HasForeignKey(f => f.FriendId);
+
+            modelBuilder.Entity<GameRequest>().HasKey(gr => gr.Id);
+            modelBuilder.Entity<GameRequest>()
+                .HasOne(f => f.Sender)
+                .WithMany()
+                .HasForeignKey(f => f.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<GameRequest>()
+                .HasOne(f => f.Recipient)
+                .WithMany()
+                .HasForeignKey(f => f.RecipientId);
 
             base.OnModelCreating(modelBuilder);
 

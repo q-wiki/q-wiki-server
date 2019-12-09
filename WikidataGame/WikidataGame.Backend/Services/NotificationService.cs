@@ -67,6 +67,15 @@ namespace WikidataGame.Backend.Services
                     Body = "You won against {0} because {0} was inactive!",
                     Data = new PushData { Action = "won" }
                 }
+            },
+            {
+                PushType.GameRequest,
+                new PushTemplate
+                {
+                    Title = "New game request",
+                    Body = "{0} wants to challenge you! Open Q-Wiki to accept the request.",
+                    Data = new PushData { Action = "request" }
+                }
             }
         };
 
@@ -81,10 +90,12 @@ namespace WikidataGame.Backend.Services
             }
         }
 
-        public async Task SendNotificationAsync(PushType type, User recipient, User opponent, Guid gameId)
+        public async Task SendNotificationAsync(PushType type, User recipient, User opponent, Guid? gameId = null)
         {
             PushTemplates.TryGetValue(type, out var template);
-            template.Data.GameId = gameId;
+            if(gameId.HasValue)
+                template.Data.GameId = gameId.Value;
+
             var notificationObject = new
             {
                 notification = new
@@ -185,7 +196,8 @@ namespace WikidataGame.Backend.Services
         YouWon,
         YouLostTimeout,
         YouWonTimeout,
-        Delete
+        Delete,
+        GameRequest
     }
 
     public class PushTemplate

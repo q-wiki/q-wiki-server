@@ -141,6 +141,7 @@ namespace WikidataGame.Backend
             services.AddScoped<IQuestionRepository, QuestionRepository>();
             services.AddSingleton<IRepository<Category, Guid>, Repository<Category, Guid>>();
             services.AddScoped<IRepository<Friend, Guid>, Repository<Friend, Guid>>();
+            services.AddScoped<IRepository<GameRequest, Guid>, Repository<GameRequest, Guid>>();
             services.AddScoped<IMinigameService, MultipleChoiceMinigameService>();
             services.AddScoped<IMinigameService, SortingMinigameService>();
             services.AddSingleton<CategoryCacheService, CategoryCacheService>();

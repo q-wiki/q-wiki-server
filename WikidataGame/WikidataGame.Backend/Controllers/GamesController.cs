@@ -17,21 +17,53 @@ using WikidataGame.Backend.Services;
 
 namespace WikidataGame.Backend.Controllers
 {
-    [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
     public class GamesController : CustomControllerBase
     {
         private readonly CategoryCacheService _categoryCacheService;
+        private readonly IRepository<Models.GameRequest, Guid> _gameRequestRepo;
+
         public GamesController(
             DataContext dataContext,
             UserManager<Models.User> userManager,
             IGameRepository gameRepo,
             CategoryCacheService categoryCacheService,
-            INotificationService notificationService) : base(dataContext, userManager, gameRepo, notificationService)
+            INotificationService notificationService,
+            IRepository<Models.GameRequest, Guid> gameRequestRepo) : base(dataContext, userManager, gameRepo, notificationService)
         {
             _categoryCacheService = categoryCacheService;
+            _gameRequestRepo = gameRequestRepo;
+        }
+
+        /// <summary>
+        /// Creates a new game by accepting a game request
+        /// </summary>
+        /// <param name="gameRequestId">game request identifier</param>
+        /// <returns>Info about the newly created game</returns>
+        [HttpPost("AcceptRequest")]
+        [ProducesResponseType(typeof(GameInfo), StatusCodes.Status200OK)]
+        public async Task<ActionResult<GameInfo>> CreateNewGameByRequest(Guid gameRequestId)
+        {
+            var user = await GetCurrentUserAsync();
+            // create game from request
+            var gameRequest = await _gameRequestRepo.GetAsync(gameRequestId);
+            if (gameRequest == null)
+            {
+                return NotFound("Game request not found");
+            }
+            if (gameRequest.RecipientId != user.Id)
+            {
+                return Forbid();
+            }
+            _gameRequestRepo.Remove(gameRequest);
+            var game = await _gameRepo.CreateNewGameAsync(gameRequest.Sender);
+            _gameRepo.JoinGame(game, user);
+            
+
+            await _dataContext.SaveChangesAsync();
+            return Ok(GameInfo.FromGame(game));
         }
 
         /// <summary>
@@ -42,27 +74,19 @@ namespace WikidataGame.Backend.Controllers
         [ProducesResponseType(typeof(GameInfo), StatusCodes.Status200OK)]
         public async Task<ActionResult<GameInfo>> CreateNewGame()
         {
-            var user = await GetCurrentUserAsync();            
-            var unmatchedGames = await _gameRepo.GetOpenGamesAsync();
-            var unmatchedGamesWithoutCurrentUser = unmatchedGames.Where(g => g.GameUsers.SingleOrDefault(gu => gu.UserId == user.Id) == null); //unmatched games
-            var runningGames = await _gameRepo.RunningGamesForPlayerAsync(user); //running games for current user
-            var runningGameOpponentIds = runningGames.Select(g => g.GameUsers.SingleOrDefault(gu => gu.UserId != user.Id)?.UserId).ToList(); //opponent ids for running games
-
+            var user = await GetCurrentUserAsync();
+            
+            //find matching player
+            var availableGames = await _gameRepo.GetGamesForUserToJoinAsync(user);
             Models.Game game;
-            if (unmatchedGamesWithoutCurrentUser.Count() <= 0 ||
-                unmatchedGamesWithoutCurrentUser.All(g => runningGameOpponentIds.Contains(g.GameUsers.SingleOrDefault(gu => gu.UserId != user.Id)?.UserId))) 
+            if (availableGames.Count() <= 0)
             {
                 //no open games, or only games opened by current player, or only open games with a player the current user is already playing with
                 game = await _gameRepo.CreateNewGameAsync(user);
             }
             else
             {
-                game = unmatchedGamesWithoutCurrentUser.Where(
-                        g => !runningGameOpponentIds.Contains(
-                            g.GameUsers.SingleOrDefault(gu => gu.UserId != user.Id)?.UserId
-                        )
-                    ).First();
-                game = _gameRepo.JoinGame(game, user);
+                game = _gameRepo.JoinGame(availableGames.First(), user);
             }
 
             await _dataContext.SaveChangesAsync();

@@ -12,6 +12,8 @@ namespace WikidataGame.Backend.Repos
 
         Task<IEnumerable<Game>> GetOpenGamesAsync();
 
+        Task<IEnumerable<Game>> GetGamesForUserToJoinAsync(User user);
+
         Game JoinGame(Game game, User player);
 
         Task<IEnumerable<Game>> RunningGamesForPlayerAsync(User player);

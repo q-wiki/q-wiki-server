@@ -8,6 +8,6 @@ namespace WikidataGame.Backend.Services
     {
         Task DeleteUserAsync(User user);
         Task<string> RegisterOrUpdatePushChannelAsync(User user, DeviceRegistration deviceRegistration);
-        Task SendNotificationAsync(PushType type, User recipient, User opponent, Guid gameId);
+        Task SendNotificationAsync(PushType type, User recipient, User opponent, Guid? gameId = null);
     }
 }

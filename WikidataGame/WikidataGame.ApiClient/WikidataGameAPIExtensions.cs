@@ -245,7 +245,7 @@ namespace WikidataGame
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            public static IList<GameRequest> GetGameRequests(this IWikidataGameAPI operations)
+            public static GameRequestList GetGameRequests(this IWikidataGameAPI operations)
             {
                 return operations.GetGameRequestsAsync().GetAwaiter().GetResult();
             }
@@ -259,7 +259,7 @@ namespace WikidataGame
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<IList<GameRequest>> GetGameRequestsAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<GameRequestList> GetGameRequestsAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.GetGameRequestsWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
                 {
@@ -330,62 +330,6 @@ namespace WikidataGame
             public static async Task DeleteGameRequestAsync(this IWikidataGameAPI operations, System.Guid? gameRequestId = default(System.Guid?), CancellationToken cancellationToken = default(CancellationToken))
             {
                 (await operations.DeleteGameRequestWithHttpMessagesAsync(gameRequestId, null, cancellationToken).ConfigureAwait(false)).Dispose();
-            }
-
-            /// <summary>
-            /// Retrieves all incoming game requests for the authenticated player
-            /// </summary>
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            public static IList<GameRequest> GetIncomingGameRequests(this IWikidataGameAPI operations)
-            {
-                return operations.GetIncomingGameRequestsAsync().GetAwaiter().GetResult();
-            }
-
-            /// <summary>
-            /// Retrieves all incoming game requests for the authenticated player
-            /// </summary>
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='cancellationToken'>
-            /// The cancellation token.
-            /// </param>
-            public static async Task<IList<GameRequest>> GetIncomingGameRequestsAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
-            {
-                using (var _result = await operations.GetIncomingGameRequestsWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
-                {
-                    return _result.Body;
-                }
-            }
-
-            /// <summary>
-            /// Retrieves all outgoing game requests for the authenticated player
-            /// </summary>
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            public static IList<GameRequest> GetOutgoingGameRequests(this IWikidataGameAPI operations)
-            {
-                return operations.GetOutgoingGameRequestsAsync().GetAwaiter().GetResult();
-            }
-
-            /// <summary>
-            /// Retrieves all outgoing game requests for the authenticated player
-            /// </summary>
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='cancellationToken'>
-            /// The cancellation token.
-            /// </param>
-            public static async Task<IList<GameRequest>> GetOutgoingGameRequestsAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
-            {
-                using (var _result = await operations.GetOutgoingGameRequestsWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
-                {
-                    return _result.Body;
-                }
             }
 
             /// <summary>

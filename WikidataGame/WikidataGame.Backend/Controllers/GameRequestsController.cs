@@ -33,40 +33,19 @@ namespace WikidataGame.Backend.Controllers
         /// <summary>
         /// Retrieves all game requests for the authenticated player
         /// </summary>
-        /// <returns>List of game requests</returns>
+        /// <returns>Two list of game requests (incoming/outgoing)</returns>
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<GameRequest>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<GameRequest>>> GetGameRequests()
+        [ProducesResponseType(typeof(GameRequestList), StatusCodes.Status200OK)]
+        public async Task<ActionResult<GameRequestList>> GetGameRequests()
         {
             var user = await GetCurrentUserAsync();
-            var gameRequests = await _gameRequestRepo.FindAsync(gr => gr.RecipientId == user.Id || gr.SenderId == user.Id);
-            return Ok(gameRequests.Select(gr => GameRequest.FromModel(gr)).ToList());
-        }
-
-        /// <summary>
-        /// Retrieves all incoming game requests for the authenticated player
-        /// </summary>
-        /// <returns>List of game requests</returns>
-        [HttpGet("Incoming")]
-        [ProducesResponseType(typeof(IEnumerable<GameRequest>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<GameRequest>>> GetIncomingGameRequests()
-        {
-            var user = await GetCurrentUserAsync();
-            var gameRequests = await _gameRequestRepo.FindAsync(gr => gr.RecipientId == user.Id);
-            return Ok(gameRequests.Select(gr => GameRequest.FromModel(gr)).ToList());
-        }
-
-        /// <summary>
-        /// Retrieves all outgoing game requests for the authenticated player
-        /// </summary>
-        /// <returns>List of game requests</returns>
-        [HttpGet("Outgoing")]
-        [ProducesResponseType(typeof(IEnumerable<GameRequest>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<GameRequest>>> GetOutgoingGameRequests()
-        {
-            var user = await GetCurrentUserAsync();
-            var gameRequests = await _gameRequestRepo.FindAsync(gr => gr.SenderId == user.Id);
-            return Ok(gameRequests.Select(gr => GameRequest.FromModel(gr)).ToList());
+            var incomingRequests = await _gameRequestRepo.FindAsync(gr => gr.RecipientId == user.Id);
+            var outgoingRequests = await _gameRequestRepo.FindAsync(gr => gr.SenderId == user.Id);
+            var gameRequestList = new GameRequestList {
+                Incoming = incomingRequests.Select(gr => GameRequest.FromModel(gr)).ToList(),
+                Outgoing = outgoingRequests.Select(gr => GameRequest.FromModel(gr)).ToList()
+            };
+            return Ok(gameRequestList);
         }
 
         /// <summary>

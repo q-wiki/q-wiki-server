@@ -13,7 +13,8 @@ namespace WikidataGame.ApiClient.Tests
             var authInfo = await RetrieveBearerAsync();
             var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo.Bearer));
             var gameRequests = await apiClient.GetGameRequestsAsync();
-            Assert.Empty(gameRequests);
+            Assert.Empty(gameRequests.Outgoing);
+            Assert.Empty(gameRequests.Incoming);
         }
 
         [Fact]
@@ -26,21 +27,13 @@ namespace WikidataGame.ApiClient.Tests
             var request = await apiClient.RequestMatchAsync(authInfo2.User.Id);
 
             var gameRequests = await apiClient.GetGameRequestsAsync();
-            Assert.NotEmpty(gameRequests);
-            Assert.True(gameRequests.First().Id == request.Id);
-
-            var outgoingGameRequests = await apiClient.GetOutgoingGameRequestsAsync();
-            Assert.NotEmpty(outgoingGameRequests);
-            Assert.True(outgoingGameRequests.First().Id == request.Id);
+            Assert.NotEmpty(gameRequests.Outgoing);
+            Assert.True(gameRequests.Outgoing.First().Id == request.Id);
 
             var apiClient2 = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo2.Bearer));
             var gameRequests2 = await apiClient2.GetGameRequestsAsync();
-            Assert.NotEmpty(gameRequests2);
-            Assert.True(gameRequests2.First().Id == request.Id);
-
-            var incomingGameRequests = await apiClient2.GetIncomingGameRequestsAsync();
-            Assert.NotEmpty(incomingGameRequests);
-            Assert.True(incomingGameRequests.First().Id == request.Id);
+            Assert.NotEmpty(gameRequests2.Incoming);
+            Assert.True(gameRequests2.Incoming.First().Id == request.Id);
         }
 
         [Fact]
@@ -54,7 +47,7 @@ namespace WikidataGame.ApiClient.Tests
             await apiClient.DeleteGameRequestAsync(request.Id);
 
             var gameRequests = await apiClient.GetGameRequestsAsync();
-            Assert.Empty(gameRequests);
+            Assert.Empty(gameRequests.Outgoing);
         }
 
         [Fact]

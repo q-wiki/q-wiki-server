@@ -45,13 +45,17 @@ namespace WikidataGame.Backend.Controllers
             [FromHeader(Name = "X-Password")] string password,
             [FromHeader(Name = "X-Push-Token")] string pushToken)
         {
+            if(!username.StartsWith(AnonPrefix))
+            {
+                username = $"{AnonPrefix}-{username}";
+            }
             try
             {
                 var user = await _userManager.FindByNameAsync(username);
                 if (user == null)
                 {
                     //create
-                    var userToCreate = new Models.User { UserName = $"{AnonPrefix}-{username}" };
+                    var userToCreate = new Models.User { UserName = username };
                     var idresult = await _userManager.CreateAsync(userToCreate, password);
                     if (!idresult.Succeeded)
                     {
@@ -65,7 +69,6 @@ namespace WikidataGame.Backend.Controllers
                     if (!await _userManager.CheckPasswordAsync(user, password))
                         return Unauthorized();
 
-                    user.UserName = $"{AnonPrefix}-{username}";
                     var idresult = await _userManager.UpdateAsync(user);
                     if (!idresult.Succeeded)
                     {

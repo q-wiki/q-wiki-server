@@ -9,6 +9,7 @@ using Microsoft.Azure.NotificationHubs;
 using Microsoft.Azure.NotificationHubs.Messaging;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Services
@@ -16,6 +17,58 @@ namespace WikidataGame.Backend.Services
     public class NotificationService : INotificationService
     {
         public const string UserIdTag = "userid";
+
+        public Dictionary<PushType, PushTemplate> PushTemplates { get; } = new Dictionary<PushType, PushTemplate>
+        {
+            {
+                PushType.Delete,
+                new PushTemplate {
+                    Title = "Congrats",
+                    Body = "You won against {0} because {0} left the game!",
+                    Data = new PushData { Action = "won" }
+                }
+            },
+            {
+                PushType.YouLost,
+                new PushTemplate {
+                    Title = "Too bad!",
+                    Body = "You lost against {0}! Start a new game for another chance.",
+                    Data = new PushData { Action = "lost" }
+                }
+            },
+            {
+                PushType.YouLostTimeout,
+                new PushTemplate {
+                    Title = "Too bad!",
+                    Body = "You lost against {0} due to inactivity!",
+                    Data = new PushData { Action = "lost" }
+                }
+            },
+            {
+                PushType.YourTurn,
+                new PushTemplate {
+                    Title = "It's your turn!",
+                    Body = "You have 12 hours left to play your round against {0}.",
+                    Data = new PushData { Action = "refresh" }
+                }
+            },
+            {
+                PushType.YouWon,
+                new PushTemplate {
+                    Title = "Congrats",
+                    Body = "You won against {0} on points!",
+                    Data = new PushData { Action = "won" }
+                }
+            },
+            {
+                PushType.YouWonTimeout,
+                new PushTemplate {
+                    Title = "Congrats",
+                    Body = "You won against {0} because {0} was inactive!",
+                    Data = new PushData { Action = "won" }
+                }
+            }
+        };
 
         private readonly NotificationHubClient _hub;
 
@@ -28,63 +81,20 @@ namespace WikidataGame.Backend.Services
             }
         }
 
-        public async Task SendNotificationAsync(User receiver, string title, string body)
+        public async Task SendNotificationAsync(PushType type, User recipient, User opponent, Guid gameId)
         {
+            PushTemplates.TryGetValue(type, out var template);
+            template.Data.GameId = gameId;
             var notificationObject = new
             {
                 notification = new
                 {
-                    title = title,
-                    body = body
-                }
-            };
-            await SendNotificationAsync(receiver, notificationObject);
-        }
-
-        public async Task SendNotificationWithRefreshAsync(User receiver, string title, string body)
-        {
-            var notificationObject = new
-            {
-                notification = new
-                {
-                    title = title,
-                    body = body
+                    title = string.Format(template.Title, opponent.UserName),
+                    body = string.Format(template.Body, opponent.UserName)
                 },
-                data = new
-                {
-                    refresh = true
-                }
+                data = template.Data
             };
-            await SendNotificationAsync(receiver, notificationObject);
-        }
-
-        public async Task SendRefreshNotificationAsync(User receiver)
-        {
-            var notificationObject = new
-            {
-                data = new
-                {
-                    refresh = true
-                }
-            };
-            await SendNotificationAsync(receiver, notificationObject);
-        }
-
-        public async Task SendDeleteNotificationAsync(User receiver, string title, string body)
-        {
-            var notificationObject = new
-            {
-                notification = new
-                {
-                    title = title,
-                    body = body
-                },
-                data = new
-                {
-                    delete = true
-                }
-            };
-            await SendNotificationAsync(receiver, notificationObject);
+            await SendNotificationAsync(recipient, notificationObject);
         }
 
         private async Task SendNotificationAsync(User receiver, object content)
@@ -167,4 +177,28 @@ namespace WikidataGame.Backend.Services
         public string Handle { get; set; }
         public string[] Tags { get; set; }
     }
+
+    public enum PushType
+    {
+        YourTurn,
+        YouLost,
+        YouWon,
+        YouLostTimeout,
+        YouWonTimeout,
+        Delete
+    }
+
+    public class PushTemplate
+    {
+        public string Title { get; set; }
+        public string Body { get; set; }
+        public PushData Data { get; set; }
+    }
+
+    public class PushData
+    {
+        public string Action { get; set; }
+        public Guid GameId { get; set; }
+    }
+
 }

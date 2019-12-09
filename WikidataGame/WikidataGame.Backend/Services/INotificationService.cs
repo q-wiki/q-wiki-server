@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Services
@@ -7,9 +8,6 @@ namespace WikidataGame.Backend.Services
     {
         Task DeleteUserAsync(User user);
         Task<string> RegisterOrUpdatePushChannelAsync(User user, DeviceRegistration deviceRegistration);
-        Task SendNotificationAsync(User receiver, string title, string body);
-        Task SendDeleteNotificationAsync(User receiver, string title, string body);
-        Task SendNotificationWithRefreshAsync(User receiver, string title, string body);
-        Task SendRefreshNotificationAsync(User receiver);
+        Task SendNotificationAsync(PushType type, User recipient, User opponent, Guid gameId);
     }
 }

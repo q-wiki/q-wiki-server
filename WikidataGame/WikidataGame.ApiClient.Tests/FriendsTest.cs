@@ -52,7 +52,7 @@ namespace WikidataGame.ApiClient.Tests
             var authInfo2 = await RetrieveBearerAsync();
 
             await apiClient.PostFriendAsync(authInfo2.User.Id);
-            await apiClient.DeleteFriendAsync(authInfo2.User.Id.Value);
+            await apiClient.DeleteFriendAsync(authInfo2.User.Id);
 
             var friends = await apiClient.GetFriendsAsync();
             Assert.Empty(friends);

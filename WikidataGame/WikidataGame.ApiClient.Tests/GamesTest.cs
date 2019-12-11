@@ -29,10 +29,10 @@ namespace WikidataGame.ApiClient.Tests
             var authInfo = await RetrieveBearerAsync();
             var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo.Bearer));
             var gameInfo = await apiClient.CreateNewGameAsync();
-            Assert.False(gameInfo.GameId.HasValue && gameInfo.GameId.Value == default);
+            Assert.False(string.IsNullOrEmpty(gameInfo.GameId));
 
             //cleanup
-            await apiClient.DeleteGameAsync(gameInfo.GameId.Value);
+            await apiClient.DeleteGameAsync(gameInfo.GameId);
         }
 
         [Fact]
@@ -41,16 +41,16 @@ namespace WikidataGame.ApiClient.Tests
             var authInfo = await RetrieveBearerAsync();
             var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo.Bearer));
             var gameInfo = await apiClient.CreateNewGameAsync();
-            var game = await apiClient.RetrieveGameStateAsync(gameInfo.GameId.Value);
-            Assert.True(game.Id.HasValue);
+            var game = await apiClient.RetrieveGameStateAsync(gameInfo.GameId);
+            Assert.False(string.IsNullOrEmpty(game.Id));
             Assert.NotNull(game.AwaitingOpponentToJoin);
             Assert.NotNull(game.Me);
-            Assert.True(game.Me.Id.HasValue);
+            Assert.False(string.IsNullOrEmpty(game.Me.Id));
             Assert.False(string.IsNullOrWhiteSpace(game.Me.Name));
             if (!game.AwaitingOpponentToJoin.Value)
             {
                 Assert.NotNull(game.Opponent);
-                Assert.True(game.Opponent.Id.HasValue);
+                Assert.False(string.IsNullOrEmpty(game.Opponent.Id));
                 Assert.False(string.IsNullOrWhiteSpace(game.Opponent.Name));
             }
             Assert.NotEmpty(game.Tiles);
@@ -60,7 +60,7 @@ namespace WikidataGame.ApiClient.Tests
                 {
                     if (tile != null)
                     {
-                        Assert.True(tile.Id.HasValue);
+                        Assert.False(string.IsNullOrEmpty(tile.Id));
                         Assert.NotNull(tile.Difficulty);
                         Assert.NotEmpty(tile.AvailableCategories);
                         Assert.Null(tile.ChosenCategoryId);
@@ -70,7 +70,7 @@ namespace WikidataGame.ApiClient.Tests
             Assert.Empty(game.WinningPlayerIds);
 
             //cleanup
-            await apiClient.DeleteGameAsync(gameInfo.GameId.Value);
+            await apiClient.DeleteGameAsync(gameInfo.GameId);
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace WikidataGame.ApiClient.Tests
         {
             var authInfo = await RetrieveBearerAsync();
             var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo.Bearer));
-            var game = await apiClient.RetrieveGameStateAsync(Guid.NewGuid());
+            var game = await apiClient.RetrieveGameStateAsync(Guid.NewGuid().ToString());
             Assert.Null(game);
         }
 
@@ -88,8 +88,8 @@ namespace WikidataGame.ApiClient.Tests
             var authInfo = await RetrieveBearerAsync();
             var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo.Bearer));
             var gameInfo = await apiClient.CreateNewGameAsync();
-            await apiClient.DeleteGameAsync(gameInfo.GameId.Value);
-            var game = await apiClient.RetrieveGameStateAsync(gameInfo.GameId.Value);
+            await apiClient.DeleteGameAsync(gameInfo.GameId);
+            var game = await apiClient.RetrieveGameStateAsync(gameInfo.GameId);
             Assert.Null(game);
         }
 

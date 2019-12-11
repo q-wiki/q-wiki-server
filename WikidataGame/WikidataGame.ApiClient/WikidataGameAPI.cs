@@ -779,7 +779,7 @@ namespace WikidataGame
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<Player>> PostFriendWithHttpMessagesAsync(System.Guid? friendId = default(System.Guid?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<Player>> PostFriendWithHttpMessagesAsync(string friendId = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -798,7 +798,7 @@ namespace WikidataGame
             List<string> _queryParameters = new List<string>();
             if (friendId != null)
             {
-                _queryParameters.Add(string.Format("friendId={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(friendId, SerializationSettings).Trim('"'))));
+                _queryParameters.Add(string.Format("friendId={0}", System.Uri.EscapeDataString(friendId)));
             }
             if (_queryParameters.Count > 0)
             {
@@ -915,11 +915,21 @@ namespace WikidataGame
         /// <exception cref="SerializationException">
         /// Thrown when unable to deserialize the response
         /// </exception>
+        /// <exception cref="ValidationException">
+        /// Thrown when a required parameter is null
+        /// </exception>
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown when a required parameter is null
+        /// </exception>
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<Player>> DeleteFriendWithHttpMessagesAsync(System.Guid friendId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<Player>> DeleteFriendWithHttpMessagesAsync(string friendId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (friendId == null)
+            {
+                throw new ValidationException(ValidationRules.CannotBeNull, "friendId");
+            }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
             string _invocationId = null;
@@ -934,7 +944,7 @@ namespace WikidataGame
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
             var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/Friends/{friendId}").ToString();
-            _url = _url.Replace("{friendId}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(friendId, SerializationSettings).Trim('"')));
+            _url = _url.Replace("{friendId}", System.Uri.EscapeDataString(friendId));
             // Create HTTP transport objects
             var _httpRequest = new HttpRequestMessage();
             HttpResponseMessage _httpResponse = null;
@@ -1314,7 +1324,7 @@ namespace WikidataGame
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<GameRequest>> RequestMatchWithHttpMessagesAsync(System.Guid? userId = default(System.Guid?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<GameRequest>> RequestMatchWithHttpMessagesAsync(string userId = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -1333,7 +1343,7 @@ namespace WikidataGame
             List<string> _queryParameters = new List<string>();
             if (userId != null)
             {
-                _queryParameters.Add(string.Format("userId={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(userId, SerializationSettings).Trim('"'))));
+                _queryParameters.Add(string.Format("userId={0}", System.Uri.EscapeDataString(userId)));
             }
             if (_queryParameters.Count > 0)
             {
@@ -1450,7 +1460,7 @@ namespace WikidataGame
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse> DeleteGameRequestWithHttpMessagesAsync(System.Guid? gameRequestId = default(System.Guid?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse> DeleteGameRequestWithHttpMessagesAsync(string gameRequestId = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -1469,7 +1479,7 @@ namespace WikidataGame
             List<string> _queryParameters = new List<string>();
             if (gameRequestId != null)
             {
-                _queryParameters.Add(string.Format("gameRequestId={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(gameRequestId, SerializationSettings).Trim('"'))));
+                _queryParameters.Add(string.Format("gameRequestId={0}", System.Uri.EscapeDataString(gameRequestId)));
             }
             if (_queryParameters.Count > 0)
             {
@@ -1571,7 +1581,7 @@ namespace WikidataGame
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<GameInfo>> CreateNewGameByRequestWithHttpMessagesAsync(System.Guid? gameRequestId = default(System.Guid?), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<GameInfo>> CreateNewGameByRequestWithHttpMessagesAsync(string gameRequestId = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -1590,7 +1600,7 @@ namespace WikidataGame
             List<string> _queryParameters = new List<string>();
             if (gameRequestId != null)
             {
-                _queryParameters.Add(string.Format("gameRequestId={0}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(gameRequestId, SerializationSettings).Trim('"'))));
+                _queryParameters.Add(string.Format("gameRequestId={0}", System.Uri.EscapeDataString(gameRequestId)));
             }
             if (_queryParameters.Count > 0)
             {
@@ -1959,11 +1969,21 @@ namespace WikidataGame
         /// <exception cref="SerializationException">
         /// Thrown when unable to deserialize the response
         /// </exception>
+        /// <exception cref="ValidationException">
+        /// Thrown when a required parameter is null
+        /// </exception>
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown when a required parameter is null
+        /// </exception>
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<Game>> RetrieveGameStateWithHttpMessagesAsync(System.Guid gameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<Game>> RetrieveGameStateWithHttpMessagesAsync(string gameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (gameId == null)
+            {
+                throw new ValidationException(ValidationRules.CannotBeNull, "gameId");
+            }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
             string _invocationId = null;
@@ -1978,7 +1998,7 @@ namespace WikidataGame
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
             var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/Games/{gameId}").ToString();
-            _url = _url.Replace("{gameId}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(gameId, SerializationSettings).Trim('"')));
+            _url = _url.Replace("{gameId}", System.Uri.EscapeDataString(gameId));
             // Create HTTP transport objects
             var _httpRequest = new HttpRequestMessage();
             HttpResponseMessage _httpResponse = null;
@@ -2087,11 +2107,21 @@ namespace WikidataGame
         /// <exception cref="HttpOperationException">
         /// Thrown when the operation returned an invalid status code
         /// </exception>
+        /// <exception cref="ValidationException">
+        /// Thrown when a required parameter is null
+        /// </exception>
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown when a required parameter is null
+        /// </exception>
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse> DeleteGameWithHttpMessagesAsync(System.Guid gameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse> DeleteGameWithHttpMessagesAsync(string gameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (gameId == null)
+            {
+                throw new ValidationException(ValidationRules.CannotBeNull, "gameId");
+            }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
             string _invocationId = null;
@@ -2106,7 +2136,7 @@ namespace WikidataGame
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
             var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/Games/{gameId}").ToString();
-            _url = _url.Replace("{gameId}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(gameId, SerializationSettings).Trim('"')));
+            _url = _url.Replace("{gameId}", System.Uri.EscapeDataString(gameId));
             // Create HTTP transport objects
             var _httpRequest = new HttpRequestMessage();
             HttpResponseMessage _httpResponse = null;
@@ -2203,11 +2233,21 @@ namespace WikidataGame
         /// <exception cref="SerializationException">
         /// Thrown when unable to deserialize the response
         /// </exception>
+        /// <exception cref="ValidationException">
+        /// Thrown when a required parameter is null
+        /// </exception>
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown when a required parameter is null
+        /// </exception>
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<MiniGame>> InitalizeMinigameWithHttpMessagesAsync(System.Guid gameId, MiniGameInit minigameParams = default(MiniGameInit), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<MiniGame>> InitalizeMinigameWithHttpMessagesAsync(string gameId, MiniGameInit minigameParams = default(MiniGameInit), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (gameId == null)
+            {
+                throw new ValidationException(ValidationRules.CannotBeNull, "gameId");
+            }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
             string _invocationId = null;
@@ -2223,7 +2263,7 @@ namespace WikidataGame
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
             var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/games/{gameId}/minigames").ToString();
-            _url = _url.Replace("{gameId}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(gameId, SerializationSettings).Trim('"')));
+            _url = _url.Replace("{gameId}", System.Uri.EscapeDataString(gameId));
             // Create HTTP transport objects
             var _httpRequest = new HttpRequestMessage();
             HttpResponseMessage _httpResponse = null;
@@ -2344,11 +2384,25 @@ namespace WikidataGame
         /// <exception cref="SerializationException">
         /// Thrown when unable to deserialize the response
         /// </exception>
+        /// <exception cref="ValidationException">
+        /// Thrown when a required parameter is null
+        /// </exception>
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown when a required parameter is null
+        /// </exception>
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<MiniGame>> RetrieveMinigameInfoWithHttpMessagesAsync(System.Guid gameId, System.Guid minigameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<MiniGame>> RetrieveMinigameInfoWithHttpMessagesAsync(string gameId, string minigameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (gameId == null)
+            {
+                throw new ValidationException(ValidationRules.CannotBeNull, "gameId");
+            }
+            if (minigameId == null)
+            {
+                throw new ValidationException(ValidationRules.CannotBeNull, "minigameId");
+            }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
             string _invocationId = null;
@@ -2364,8 +2418,8 @@ namespace WikidataGame
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
             var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/games/{gameId}/minigames/{minigameId}").ToString();
-            _url = _url.Replace("{gameId}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(gameId, SerializationSettings).Trim('"')));
-            _url = _url.Replace("{minigameId}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(minigameId, SerializationSettings).Trim('"')));
+            _url = _url.Replace("{gameId}", System.Uri.EscapeDataString(gameId));
+            _url = _url.Replace("{minigameId}", System.Uri.EscapeDataString(minigameId));
             // Create HTTP transport objects
             var _httpRequest = new HttpRequestMessage();
             HttpResponseMessage _httpResponse = null;
@@ -2483,11 +2537,25 @@ namespace WikidataGame
         /// <exception cref="SerializationException">
         /// Thrown when unable to deserialize the response
         /// </exception>
+        /// <exception cref="ValidationException">
+        /// Thrown when a required parameter is null
+        /// </exception>
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown when a required parameter is null
+        /// </exception>
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<MiniGameResult>> AnswerMinigameWithHttpMessagesAsync(System.Guid gameId, System.Guid minigameId, IList<string> answers = default(IList<string>), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<MiniGameResult>> AnswerMinigameWithHttpMessagesAsync(string gameId, string minigameId, IList<string> answers = default(IList<string>), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (gameId == null)
+            {
+                throw new ValidationException(ValidationRules.CannotBeNull, "gameId");
+            }
+            if (minigameId == null)
+            {
+                throw new ValidationException(ValidationRules.CannotBeNull, "minigameId");
+            }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
             string _invocationId = null;
@@ -2504,8 +2572,8 @@ namespace WikidataGame
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
             var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/games/{gameId}/minigames/{minigameId}").ToString();
-            _url = _url.Replace("{gameId}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(gameId, SerializationSettings).Trim('"')));
-            _url = _url.Replace("{minigameId}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(minigameId, SerializationSettings).Trim('"')));
+            _url = _url.Replace("{gameId}", System.Uri.EscapeDataString(gameId));
+            _url = _url.Replace("{minigameId}", System.Uri.EscapeDataString(minigameId));
             // Create HTTP transport objects
             var _httpRequest = new HttpRequestMessage();
             HttpResponseMessage _httpResponse = null;

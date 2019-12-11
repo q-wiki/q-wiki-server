@@ -22,7 +22,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// Initializes a new instance of the GameRequest class.
         /// </summary>
-        public GameRequest(System.Guid? id = default(System.Guid?), Player sender = default(Player), Player recipient = default(Player))
+        public GameRequest(string id = default(string), Player sender = default(Player), Player recipient = default(Player))
         {
             Id = id;
             Sender = sender;
@@ -38,7 +38,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "id")]
-        public System.Guid? Id { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// </summary>

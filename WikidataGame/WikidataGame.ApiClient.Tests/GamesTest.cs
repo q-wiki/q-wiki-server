@@ -8,14 +8,6 @@ namespace WikidataGame.ApiClient.Tests
     public class GameTest : ClientTestBase
     {
         [Fact]
-        public async void RequestAuth_ForTestUser_ReturnsBearer()
-        {
-            var authInfo = await RetrieveBearerAsync();
-            Assert.False(string.IsNullOrWhiteSpace(authInfo.Bearer));
-            Assert.NotNull(authInfo.Expires);
-        }
-
-        [Fact]
         public async void CreateGame_WithWrongCredentials_ReturnsNull()
         {
             var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials("bla"));

@@ -19,7 +19,7 @@ namespace WikidataGame.Backend.Controllers
     public class AuthController : CustomControllerBase
     {
         private readonly AuthService _authService;
-        private const string AnonPrefix = "anon";
+        public const string AnonPrefix = "anon";
 
         public AuthController(
             DataContext dataContext,

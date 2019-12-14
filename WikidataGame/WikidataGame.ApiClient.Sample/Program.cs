@@ -27,11 +27,11 @@ namespace WikidataGame.ApiClient.Sample
 
             CancellationTokenSource cts2 = new CancellationTokenSource();
             var game = await apiClient2.CreateNewGameAsync(cts2.Token);
-            Console.WriteLine($"Started game {game.GameId.Value}.");
+            Console.WriteLine($"Started game {game.GameId}.");
 
             CancellationTokenSource cts3 = new CancellationTokenSource();
-            var fullGame = await apiClient2.RetrieveGameStateAsync(game.GameId.Value, cts3.Token);
-            Console.WriteLine($"My player id is {fullGame.Me.Id.Value}.");
+            var fullGame = await apiClient2.RetrieveGameStateAsync(game.GameId, cts3.Token);
+            Console.WriteLine($"My player id is {fullGame.Me.Id}.");
             Console.ReadLine();
         }
     }

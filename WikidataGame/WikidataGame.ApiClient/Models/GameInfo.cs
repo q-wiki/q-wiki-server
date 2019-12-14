@@ -22,7 +22,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// Initializes a new instance of the GameInfo class.
         /// </summary>
-        public GameInfo(System.Guid? gameId = default(System.Guid?), bool? isAwaitingOpponentToJoin = default(bool?), string message = default(string))
+        public GameInfo(string gameId = default(string), bool? isAwaitingOpponentToJoin = default(bool?), string message = default(string))
         {
             GameId = gameId;
             IsAwaitingOpponentToJoin = isAwaitingOpponentToJoin;
@@ -38,7 +38,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "gameId")]
-        public System.Guid? GameId { get; set; }
+        public string GameId { get; set; }
 
         /// <summary>
         /// </summary>

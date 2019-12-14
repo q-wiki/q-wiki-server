@@ -1,1 +1,0 @@
-autorest --input-file=swagger.json --csharp --output-folder=. --namespace=WikidataGame --add-credentials=true

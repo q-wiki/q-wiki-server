@@ -61,10 +61,10 @@ namespace WikidataGame.ApiClient.Tests
             var apiClient2 = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo2.Bearer));
             var gameInfo = await apiClient2.CreateNewGameByRequestAsync(request.Id);
 
-            Assert.False(gameInfo.GameId.HasValue && gameInfo.GameId.Value == default);
+            Assert.False(string.IsNullOrEmpty(gameInfo.GameId));
 
             //cleanup
-            await apiClient2.DeleteGameAsync(gameInfo.GameId.Value);
+            await apiClient2.DeleteGameAsync(gameInfo.GameId);
         }
 
     }

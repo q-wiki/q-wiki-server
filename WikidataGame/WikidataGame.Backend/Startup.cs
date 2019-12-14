@@ -21,6 +21,7 @@ using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Models;
 using WikidataGame.Backend.Repos;
 using WikidataGame.Backend.Services;
+using WikidataGame.Backend.Validators;
 
 namespace WikidataGame.Backend
 {
@@ -132,7 +133,7 @@ namespace WikidataGame.Backend
                 // User settings.
                 options.User.RequireUniqueEmail = false;
             });
-
+            services.AddTransient<IUserValidator<User>, UserValidator>();
             services.AddSingleton<INotificationService>(new NotificationService(Configuration.GetConnectionString("NotificationHub")));
             services.AddScoped<UserManager<User>>();
             services.AddSingleton(new AuthService(Configuration.GetConnectionString("GoogleClientSecret")));

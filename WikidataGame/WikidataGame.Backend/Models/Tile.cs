@@ -11,6 +11,9 @@ namespace WikidataGame.Backend.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
+        [Required]
+        public int MapIndex { get; set; }
+
         [ForeignKey(nameof(Category))]
         public Guid? ChosenCategoryId { get; set; }
         public virtual Category ChosenCategory { get; set; }

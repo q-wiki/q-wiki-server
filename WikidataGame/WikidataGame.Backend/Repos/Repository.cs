@@ -79,5 +79,12 @@ namespace WikidataGame.Backend.Repos
         /// <param name="entities">Enumerable of entities to update</param>
         public void UpdateRange(IEnumerable<TEntity> entities) => Context.Set<TEntity>().UpdateRange(entities);
 
+        public async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            if(predicate == null)
+                return await Context.Set<TEntity>().CountAsync();
+
+            return await Context.Set<TEntity>().CountAsync(predicate);
+        }
     }
 }

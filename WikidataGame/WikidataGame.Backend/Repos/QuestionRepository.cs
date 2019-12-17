@@ -14,7 +14,7 @@ namespace WikidataGame.Backend.Repos
 
         public async Task<Question> GetRandomQuestionForCategoryAsync(Guid categoryId)
         {
-            return await Context.Set<Question>().Where(q => q.CategoryId == categoryId)
+            return await Context.Set<Question>().Where(q => q.Status == QuestionStatus.Approved && q.CategoryId == categoryId)
                 .OrderBy(q => Guid.NewGuid()).FirstOrDefaultAsync();
         }
     }

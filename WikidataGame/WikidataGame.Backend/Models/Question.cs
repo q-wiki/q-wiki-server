@@ -26,5 +26,17 @@ namespace WikidataGame.Backend.Models
 
         [Required]
         public MiniGameType MiniGameType { get; set; }
+
+        [Required]
+        public QuestionStatus Status { get; set; }
+
+        public virtual ICollection<QuestionRating> Ratings { get; set; }
+    }
+
+    public enum QuestionStatus
+    {
+        Pending,
+        Rejected,
+        Approved
     }
 }

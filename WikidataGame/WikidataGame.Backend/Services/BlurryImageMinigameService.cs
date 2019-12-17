@@ -23,7 +23,7 @@ namespace WikidataGame.Backend.Services
             // use method in baseclass to query wikidata with question
             var data = QueryWikidata(question.SparqlQuery);
 
-            var minigame = await _minigameRepo.CreateMiniGameAsync(gameId, playerId, tileId, question.CategoryId, MiniGameType);
+            var minigame = await _minigameRepo.CreateMiniGameAsync(gameId, playerId, tileId, question, MiniGameType);
 
             minigame.TaskDescription = string.Format(question.TaskDescription, data[0].Item1); // placeholder and answer in first tuple!
             minigame.CorrectAnswer = new List<string> { data[0].Item2 }; // placeholder and answer in first tuple!

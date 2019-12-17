@@ -172,7 +172,16 @@ namespace WikidataGame.Backend
 
             app.Run(async (context) => await Task.Run(() => context.Response.Redirect("/swagger")));
 
-            app.ApplicationServices.GetService<DataContext>().Database.Migrate();
+            var dataContext = app.ApplicationServices.GetService<DataContext>();
+            if (dataContext.Database.IsSqlite())
+            {
+                //SQLite is missing major migration functionality, but is only used for testing purposes
+                dataContext.Database.EnsureCreated();
+            }
+            else
+            {
+                dataContext.Database.Migrate();
+            }
         }
     }
 }

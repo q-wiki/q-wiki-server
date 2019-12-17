@@ -23,7 +23,7 @@ namespace WikidataGame.Backend.Services
             // use method in baseclass to query wikidata with question
             var data = QueryWikidata(question.SparqlQuery);
 
-            var minigame = await _minigameRepo.CreateMiniGameAsync(gameId, playerId, tileId, question.CategoryId, MiniGameType);
+            var minigame = await _minigameRepo.CreateMiniGameAsync(gameId, playerId, tileId, question, MiniGameType);
 
             // each row looks like this: (placeholderValue, label) where placeholderValue is the value
             // that gets used in the template string, value is the actual value to sort on and label is the

@@ -250,6 +250,8 @@ namespace WikidataGame.Backend.Migrations
 
                     b.Property<Guid>("PlayerId");
 
+                    b.Property<Guid>("QuestionId");
+
                     b.Property<int>("Status");
 
                     b.Property<string>("TaskDescription")
@@ -267,6 +269,8 @@ namespace WikidataGame.Backend.Migrations
 
                     b.HasIndex("PlayerId");
 
+                    b.HasIndex("QuestionId");
+
                     b.HasIndex("TileId");
 
                     b.ToTable("MiniGames");
@@ -283,6 +287,8 @@ namespace WikidataGame.Backend.Migrations
 
                     b.Property<string>("SparqlQuery")
                         .IsRequired();
+
+                    b.Property<int>("Status");
 
                     b.Property<string>("TaskDescription")
                         .IsRequired();
@@ -324,6 +330,7 @@ namespace WikidataGame.Backend.Migrations
                     } 
                     ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) # order by random
                     LIMIT 4",
+                            Status = 2,
                             TaskDescription = "What is the name of the capital of {0}?"
                         },
                         new
@@ -344,6 +351,7 @@ namespace WikidataGame.Backend.Migrations
                         }
                         ORDER BY MD5(CONCAT(STR(?answer), STR(NOW())))
                         LIMIT 4",
+                            Status = 2,
                             TaskDescription = "Which continent has {0} countries?"
                         },
                         new
@@ -401,6 +409,7 @@ namespace WikidataGame.Backend.Migrations
                           }
                         }
                         ORDER BY DESC(?question)",
+                            Status = 2,
                             TaskDescription = "Which country is a part of {0}?"
                         },
                         new
@@ -449,6 +458,7 @@ namespace WikidataGame.Backend.Migrations
                           }
                         }
                         order by DESC(?question)",
+                            Status = 2,
                             TaskDescription = "Which country is not a basin country of the Baltic Sea?"
                         },
                         new
@@ -512,6 +522,7 @@ namespace WikidataGame.Backend.Migrations
                           }
                         }
                         order by DESC(?noSea)",
+                            Status = 2,
                             TaskDescription = "Which country is not a basin country of the Caribbean Sea?"
                         },
                         new
@@ -559,6 +570,7 @@ namespace WikidataGame.Backend.Migrations
                           }
                         }
                         order by DESC(?noSea)",
+                            Status = 2,
                             TaskDescription = "Which country is not a basin country of the Mediterranean Sea?"
                         },
                         new
@@ -593,6 +605,7 @@ namespace WikidataGame.Backend.Migrations
                         }
                         order by desc(?length)
                         limit 4",
+                            Status = 2,
                             TaskDescription = "What is the longest river in {0}?"
                         },
                         new
@@ -644,6 +657,7 @@ namespace WikidataGame.Backend.Migrations
                           INCLUDE %states.
                           BIND('number of inhabitants' AS ?question).
                         } ORDER BY ?population",
+                            Status = 2,
                             TaskDescription = "Sort countries by {0} (ascending)."
                         },
                         new
@@ -672,6 +686,7 @@ namespace WikidataGame.Backend.Migrations
                           }
                           BIND('average distance to sun' as ?question)
                         } ORDER BY ?avgDistanceToSun",
+                            Status = 2,
                             TaskDescription = "Sort planets by {0} (ascending)."
                         },
                         new
@@ -694,6 +709,7 @@ namespace WikidataGame.Backend.Migrations
                           BIND ('radius' as ?question)
                         }
                         ORDER BY ?radius",
+                            Status = 2,
                             TaskDescription = "Sort planets by {0} (ascending)."
                         },
                         new
@@ -776,6 +792,7 @@ namespace WikidataGame.Backend.Migrations
                             ?moon rdfs:label ?answer.
                           }
                         } ORDER BY DESC(?question)",
+                            Status = 2,
                             TaskDescription = "Which of these moons belongs to {0}?"
                         },
                         new
@@ -797,6 +814,7 @@ namespace WikidataGame.Backend.Migrations
                         }
                         ORDER BY MD5(CONCAT(STR(?question), STR(NOW()))) # order by random
                         LIMIT 4",
+                            Status = 2,
                             TaskDescription = "What's the chemical symbol for {0}?"
                         },
                         new
@@ -817,6 +835,7 @@ namespace WikidataGame.Backend.Migrations
                     }
                     ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) # order by random
                     LIMIT 4",
+                            Status = 2,
                             TaskDescription = "Which element has the chemical symbol {0}?"
                         },
                         new
@@ -844,6 +863,7 @@ namespace WikidataGame.Backend.Migrations
                           }
                           BIND (?element as ?answer).
                         } ORDER BY ASC(?number)",
+                            Status = 2,
                             TaskDescription = "Sort chemical elements by {0} (ascending)."
                         },
                         new
@@ -891,6 +911,7 @@ namespace WikidataGame.Backend.Migrations
                          
                          ORDER BY ?firstElectionPeriod
                        ",
+                            Status = 2,
                             TaskDescription = "Sort these US presidents by {0} (ascending)."
                         },
                         new
@@ -929,6 +950,7 @@ namespace WikidataGame.Backend.Migrations
                         }
                         GROUP BY ?date
                         ORDER BY ?date",
+                            Status = 2,
                             TaskDescription = "Sort the countries by {0} (ascending)."
                         },
                         new
@@ -953,6 +975,7 @@ namespace WikidataGame.Backend.Migrations
                         }
                         ORDER BY (MD5(CONCAT(STR(?person), STR(NOW()))))
                         LIMIT 4",
+                            Status = 2,
                             TaskDescription = "Who was Federal Chancellor of Germany from {0}?"
                         },
                         new
@@ -1031,6 +1054,7 @@ namespace WikidataGame.Backend.Migrations
                             UNION
                             {INCLUDE %threeOtherColonies.}
                         } ORDER BY DESC(?empire)",
+                            Status = 2,
                             TaskDescription = "Which colony belonged to the {0}?"
                         },
                         new
@@ -1055,6 +1079,7 @@ namespace WikidataGame.Backend.Migrations
                         GROUP BY ?itemLabel
                         ORDER BY (MD5(CONCAT(STR(?item), STR(NOW()))))
                         LIMIT 4",
+                            Status = 2,
                             TaskDescription = "Which of these wars started in {0}?"
                         },
                         new
@@ -1073,6 +1098,7 @@ namespace WikidataGame.Backend.Migrations
                         }
                         ORDER BY (MD5(CONCAT(STR(?answer), STR(NOW()))))
                         LIMIT 4",
+                            Status = 2,
                             TaskDescription = "Which chemical compound has the formula {0}?"
                         },
                         new
@@ -1113,8 +1139,25 @@ namespace WikidataGame.Backend.Migrations
                         
                         # the final results must be sorted ascending
                         ORDER BY ?value",
+                            Status = 2,
                             TaskDescription = "Sort these chemical elements by {0} (ascending)!"
                         });
+                });
+
+            modelBuilder.Entity("WikidataGame.Backend.Models.QuestionRating", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<Guid>("QuestionId");
+
+                    b.Property<int>("Rating");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("QuestionRatings");
                 });
 
             modelBuilder.Entity("WikidataGame.Backend.Models.Tile", b =>
@@ -1312,6 +1355,11 @@ namespace WikidataGame.Backend.Migrations
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("WikidataGame.Backend.Models.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("WikidataGame.Backend.Models.Tile", "Tile")
                         .WithMany()
                         .HasForeignKey("TileId")
@@ -1323,6 +1371,14 @@ namespace WikidataGame.Backend.Migrations
                     b.HasOne("WikidataGame.Backend.Models.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("WikidataGame.Backend.Models.QuestionRating", b =>
+                {
+                    b.HasOne("WikidataGame.Backend.Models.Question", "Question")
+                        .WithMany("Ratings")
+                        .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

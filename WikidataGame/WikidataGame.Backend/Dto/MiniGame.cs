@@ -33,4 +33,19 @@ namespace WikidataGame.Backend.Dto
         BlurryImage,
         MultipleChoice
     }
+
+    public class DetailedMiniGame : MiniGame
+    {
+        public Question Question { get; set; }
+
+        public IEnumerable<string> CorrectAnswer { get; set; }
+
+        public new static MiniGame FromModel(Models.MiniGame minigame)
+        {
+            var detailedMiniGame = MiniGame.FromModel(minigame) as DetailedMiniGame;
+            detailedMiniGame.Question = Question.FromModel(minigame.Question);
+            detailedMiniGame.CorrectAnswer = minigame.CorrectAnswer;
+            return detailedMiniGame;
+        }
+    }
 }

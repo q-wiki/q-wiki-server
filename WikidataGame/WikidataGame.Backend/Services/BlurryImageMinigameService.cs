@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WikidataGame.Backend.Dto;
+using WikidataGame.Backend.Models;
 using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Repos;
 
@@ -16,9 +16,9 @@ namespace WikidataGame.Backend.Services
         {
         }
 
-        public Models.MiniGameType MiniGameType => Models.MiniGameType.BlurryImage;
+        public MiniGameType MiniGameType => MiniGameType.BlurryImage;
 
-        public async Task<MiniGame> GenerateMiniGameAsync(Guid gameId, Guid playerId, Models.Question question, Guid tileId)
+        public async Task<MiniGame> GenerateMiniGameAsync(Guid gameId, Guid playerId, Question question, Guid tileId)
         {
             // use method in baseclass to query wikidata with question
             var data = QueryWikidata(question.SparqlQuery);
@@ -32,7 +32,7 @@ namespace WikidataGame.Backend.Services
 
             await _dataContext.SaveChangesAsync();
 
-            return MiniGame.FromModel(minigame);
+            return minigame;
         }
     }
 }

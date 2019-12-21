@@ -14,17 +14,6 @@ namespace WikidataGame.Backend.Dto
         public string TaskDescription { get; set; }
 
         public IEnumerable<string> AnswerOptions { get; set; }
-
-        public static MiniGame FromModel(Models.MiniGame minigame)
-        {
-            return new MiniGame
-            {
-                Id = minigame.Id,
-                TaskDescription = minigame.TaskDescription,
-                AnswerOptions = minigame.AnswerOptions,
-                Type = (MiniGameType)Enum.Parse(typeof(MiniGameType), minigame.Type.ToString())
-            };
-        }
     }
 
     public enum MiniGameType
@@ -39,13 +28,5 @@ namespace WikidataGame.Backend.Dto
         public Question Question { get; set; }
 
         public IEnumerable<string> CorrectAnswer { get; set; }
-
-        public new static MiniGame FromModel(Models.MiniGame minigame)
-        {
-            var detailedMiniGame = MiniGame.FromModel(minigame) as DetailedMiniGame;
-            detailedMiniGame.Question = Question.FromModel(minigame.Question);
-            detailedMiniGame.CorrectAnswer = minigame.CorrectAnswer;
-            return detailedMiniGame;
-        }
     }
 }

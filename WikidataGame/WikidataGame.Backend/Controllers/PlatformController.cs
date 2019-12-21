@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WikidataGame.Backend.Dto;
@@ -20,19 +21,22 @@ namespace WikidataGame.Backend.Controllers
         private readonly IRepository<Models.Category, Guid> _categoryRepo;
         private readonly IQuestionRepository _questionRepo;
         private readonly IMinigameRepository _miniGameRepo;
+        private readonly IMapper _mapper;
 
         public PlatformController(
             DataContext dataContext,
             IGameRepository gameRepo,
             IRepository<Models.Category, Guid> categoryRepo,
             IQuestionRepository questionRepo,
-            IMinigameRepository miniGameRepo)
+            IMinigameRepository miniGameRepo,
+            IMapper mapper)
         {
             _dataContext = dataContext;
             _gameRepo = gameRepo;
             _categoryRepo = categoryRepo;
             _questionRepo = questionRepo;
             _miniGameRepo = miniGameRepo;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -65,7 +69,7 @@ namespace WikidataGame.Backend.Controllers
             if (minigame == null || minigame.Status == Models.MiniGameStatus.Unknown)
                 return NotFound();
 
-            return Ok(DetailedMiniGame.FromModel(minigame));
+            return Ok(_mapper.Map<DetailedMiniGame>(minigame));
         }
 
         /// <summary>
@@ -77,7 +81,7 @@ namespace WikidataGame.Backend.Controllers
         public async Task<ActionResult<IEnumerable<Question>>> GetPlatformQuestions()
         {
             var questions = await _questionRepo.GetAllAsync();
-            return Ok(questions.Select(q => Question.FromModel(q)).ToList());
+            return Ok(questions.Select(q => _mapper.Map<Question>(q)).ToList());
         }
 
         /// <summary>
@@ -88,7 +92,7 @@ namespace WikidataGame.Backend.Controllers
         /// <returns>list of questions</returns>
         [HttpPost("Question/{questionId}/Rating")]
         [ProducesResponseType(typeof(Question), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Question>>> AddPlatformQuestionRating(
+        public async Task<ActionResult<Question>> AddPlatformQuestionRating(
             Guid questionId,
             [Required, Range(1,5)] int rating)
         {
@@ -103,7 +107,14 @@ namespace WikidataGame.Backend.Controllers
 
             await _dataContext.SaveChangesAsync();
 
-            return Ok(Question.FromModel(question));
+            return Ok(_mapper.Map<Question>(question));
+        }
+
+        [HttpPost("Question")]
+        [ProducesResponseType(typeof(Question), StatusCodes.Status201Created)]
+        public async Task<ActionResult<Question>> AddPlatformQuestion([FromBody] Question question)
+        {
+            return null;
         }
 
         /// <summary>
@@ -115,7 +126,9 @@ namespace WikidataGame.Backend.Controllers
         public async Task<ActionResult<IEnumerable<Category>>> GetPlatformCategories()
         {
             var categories = await _categoryRepo.GetAllAsync();
-            return Ok(categories.Select(c => Category.FromModel(c)).ToList());
+            return Ok(categories.Select(c => _mapper.Map<Category>(c)).ToList());
         }
+
+
     }
 }

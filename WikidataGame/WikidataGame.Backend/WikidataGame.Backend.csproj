@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="dotNetRDF" Version="2.2.0" />
     <PackageReference Include="Google.Apis.Auth" Version="1.42.0" />
     <PackageReference Include="Google.Apis.Games.v1" Version="1.42.0.1771" />

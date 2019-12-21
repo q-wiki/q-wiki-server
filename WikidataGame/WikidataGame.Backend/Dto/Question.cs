@@ -18,18 +18,5 @@ namespace WikidataGame.Backend.Dto
         public MiniGameType MiniGameType { get; set; }
 
         public double Rating { get; set; }
-
-        public static Question FromModel(Models.Question question)
-        {
-            return new Question
-            {
-                Id = question.Id,
-                Category = Category.FromModel(question.Category),
-                SparqlQuery = question.SparqlQuery,
-                TaskDescription = question.TaskDescription,
-                MiniGameType = (MiniGameType)Enum.Parse(typeof(MiniGameType), question.MiniGameType.ToString()),
-                Rating = question.Ratings.Any() ? question.Ratings.Average(qr => qr.Rating) : 0
-            };
-        }
     }
 }

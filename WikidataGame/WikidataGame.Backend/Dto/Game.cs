@@ -26,21 +26,5 @@ namespace WikidataGame.Backend.Dto
 
         public bool AwaitingOpponentToJoin { get; set; }
 
-        public static Game FromModel(Models.Game game, Guid currentUserId, CategoryCacheService cacheService)
-        {
-            if (game == null)
-                return null;
-
-            return new Game {
-                Id = game.Id,
-                Tiles = TileHelper.TileEnumerableModel2Dto(game, cacheService),
-                AwaitingOpponentToJoin = game.GameUsers.Count() < 2,
-                WinningPlayerIds = game.GameUsers.Where(gu => gu.IsWinner).Select(gu => gu.UserId).ToList(),
-                NextMovePlayerId = game.NextMovePlayerId,
-                MoveExpiry = game.MoveStartedAt.HasValue ? game.MoveStartedAt.Value.Add(Models.Game.MaxMoveDuration) : (DateTime?)null,
-                Me = Player.FromModel(game.GameUsers.SingleOrDefault(gu => gu.UserId == currentUserId)?.User),
-                Opponent = Player.FromModel(game.GameUsers.SingleOrDefault(gu => gu.UserId != currentUserId)?.User)
-            };
-        }
     }
 }

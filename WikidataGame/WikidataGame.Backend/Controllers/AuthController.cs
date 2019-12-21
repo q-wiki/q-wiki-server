@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +27,8 @@ namespace WikidataGame.Backend.Controllers
             UserManager<Models.User> userManager,
             IGameRepository gameRepo,
             INotificationService notificationService,
-            AuthService authService) : base(dataContext, userManager, gameRepo, notificationService)
+            IMapper mapper,
+            AuthService authService) : base(dataContext, userManager, gameRepo, notificationService, mapper)
         {
             _authService = authService;
         }
@@ -77,7 +79,7 @@ namespace WikidataGame.Backend.Controllers
                 }
 
                 await RegisterPushForUserAsync(user, pushToken);
-                var authInfo = JwtTokenHelper.CreateJwtToken(user);
+                var authInfo = JwtTokenHelper.CreateJwtToken(user, _mapper);
                 Response.Headers.Add("WWW-Authenticate", $"Bearer {authInfo.Bearer}");
                 return Ok(authInfo);
             }
@@ -119,7 +121,7 @@ namespace WikidataGame.Backend.Controllers
                     username,
                     verificationResponse.Response);
 
-                var authInfo = JwtTokenHelper.CreateJwtToken(user);
+                var authInfo = JwtTokenHelper.CreateJwtToken(user, _mapper);
                 Response.Headers.Add("WWW-Authenticate", $"Bearer {authInfo.Bearer}");
                 return Ok(authInfo);
             }

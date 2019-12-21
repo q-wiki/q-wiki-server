@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -24,8 +25,9 @@ namespace WikidataGame.Backend.Controllers
             UserManager<Models.User> userManager,
             IGameRepository gameRepo,
             INotificationService notificationService,
+            IMapper mapper,
             IRepository<Models.GameRequest, Guid> gameRequestRepo)
-            : base(dataContext, userManager, gameRepo, notificationService)
+            : base(dataContext, userManager, gameRepo, notificationService, mapper)
         {
             _gameRequestRepo = gameRequestRepo;
         }
@@ -42,8 +44,8 @@ namespace WikidataGame.Backend.Controllers
             var incomingRequests = await _gameRequestRepo.FindAsync(gr => gr.RecipientId == user.Id);
             var outgoingRequests = await _gameRequestRepo.FindAsync(gr => gr.SenderId == user.Id);
             var gameRequestList = new GameRequestList {
-                Incoming = incomingRequests.Select(gr => GameRequest.FromModel(gr)).ToList(),
-                Outgoing = outgoingRequests.Select(gr => GameRequest.FromModel(gr)).ToList()
+                Incoming = incomingRequests.Select(gr => _mapper.Map<GameRequest>(gr)).ToList(),
+                Outgoing = outgoingRequests.Select(gr => _mapper.Map<GameRequest>(gr)).ToList()
             };
             return Ok(gameRequestList);
         }
@@ -54,7 +56,7 @@ namespace WikidataGame.Backend.Controllers
         /// <param name="userId">user id</param>
         /// <returns>The created game request</returns>
         [HttpPost]
-        [ProducesResponseType(typeof(GameRequest), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GameRequest), StatusCodes.Status201Created)]
         public async Task<ActionResult<GameRequest>> RequestMatch(Guid userId)
         {
             var user = await GetCurrentUserAsync();
@@ -81,7 +83,7 @@ namespace WikidataGame.Backend.Controllers
 
             await _notificationService.SendNotificationAsync(PushType.GameRequest, friendUser, user);
 
-            return Ok(GameRequest.FromModel(request));
+            return Created(string.Empty, _mapper.Map<GameRequest>(request));
         }
 
         /// <summary>

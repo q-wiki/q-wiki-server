@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -18,17 +19,20 @@ namespace WikidataGame.Backend.Controllers
         protected readonly IRepository<Category, Guid> _categoryRepo;
         protected readonly DataContext _dataContext;
         protected readonly INotificationService _notificationService;
+        protected readonly IMapper _mapper;
 
         public CustomControllerBase(
             DataContext dataContext,
            UserManager<User> userManager,
             IGameRepository gameRepo,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IMapper mapper)
         {
             _dataContext = dataContext;
             _userManager = userManager;
             _gameRepo = gameRepo;
             _notificationService = notificationService;
+            _mapper = mapper;
         }
 
         protected async Task<User> GetCurrentUserAsync()

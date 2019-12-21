@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -133,6 +134,9 @@ namespace WikidataGame.Backend
                 // User settings.
                 options.User.RequireUniqueEmail = false;
             });
+            services.AddSingleton((provider) => new MapperConfiguration(cfg =>
+                cfg.AddProfile(new AutomapperProfile(provider))
+            ).CreateMapper());
             services.AddTransient<IUserValidator<User>, UserValidator>();
             services.AddSingleton<INotificationService>(new NotificationService(Configuration.GetConnectionString("NotificationHub")));
             services.AddScoped<UserManager<User>>();
@@ -150,7 +154,7 @@ namespace WikidataGame.Backend
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public async void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -182,6 +186,8 @@ namespace WikidataGame.Backend
             {
                 dataContext.Database.Migrate();
             }
+
+            await app.ApplicationServices.GetService<CategoryCacheService>().InitializeAsync();
         }
     }
 }

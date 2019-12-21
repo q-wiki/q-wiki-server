@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WikidataGame.Backend.Dto;
 using WikidataGame.Backend.Helpers;
+using WikidataGame.Backend.Models;
 using WikidataGame.Backend.Repos;
 
 namespace WikidataGame.Backend.Services
@@ -16,7 +16,7 @@ namespace WikidataGame.Backend.Services
         {
         }
 
-        public Models.MiniGameType MiniGameType => Models.MiniGameType.Sort;
+        public MiniGameType MiniGameType => MiniGameType.Sort;
 
         public async Task<MiniGame> GenerateMiniGameAsync(Guid gameId, Guid playerId, Models.Question question, Guid tileId)
         {
@@ -36,7 +36,7 @@ namespace WikidataGame.Backend.Services
 
             await _dataContext.SaveChangesAsync();
 
-            return MiniGame.FromModel(minigame);
+            return minigame;
         }
     }
 }

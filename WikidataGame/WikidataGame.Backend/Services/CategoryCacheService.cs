@@ -16,11 +16,11 @@ namespace WikidataGame.Backend.Services
             _categoryRepo = categoryRepo;
         }
 
-        public async Task<IEnumerable<Category>> GetCategoriesAsync()
+        public IEnumerable<Category> Categories { get => _categories; }
+
+        public async Task InitializeAsync()
         {
-            if (_categories == null)
-                _categories = await _categoryRepo.GetAllAsync();
-            return _categories;
+            _categories = await _categoryRepo.GetAllAsync();
         }
     }
 }

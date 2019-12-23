@@ -51,6 +51,12 @@ namespace WikidataGame.Backend.Helpers
                 .WithMany()
                 .HasForeignKey(f => f.RecipientId);
 
+            modelBuilder.Entity<MiniGame>()
+                .HasOne(m => m.Question)
+                .WithMany()
+                .HasForeignKey(m => m.QuestionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             base.OnModelCreating(modelBuilder);
 
             //Seed Database

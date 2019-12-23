@@ -74,9 +74,10 @@ namespace WikidataGame.Backend.Models
         public Guid CategoryId { get; set; }
         public virtual Category Category { get; set; }
 
-        [ForeignKey(nameof(Question))]
         [Required]
         public Guid QuestionId { get; set; }
+
+        [ForeignKey(nameof(QuestionId))]
         public virtual Question Question { get; set; }
 
     }

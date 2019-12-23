@@ -114,7 +114,18 @@ namespace WikidataGame.Backend.Controllers
         [ProducesResponseType(typeof(Question), StatusCodes.Status201Created)]
         public async Task<ActionResult<Question>> AddPlatformQuestion([FromBody] Question question)
         {
-            return null;
+            var questionModel = _mapper.Map<Models.Question>(question);
+            var category =  await _categoryRepo.GetAsync(question.Category.Id);
+            if (category == null)
+                return BadRequest("Unknown category");
+
+            questionModel.Category = category;
+            questionModel.Status = Models.QuestionStatus.Pending;
+
+            await _questionRepo.AddAsync(questionModel);
+            await _dataContext.SaveChangesAsync();
+
+            return Created(string.Empty, _mapper.Map<Dto.Question>(questionModel));            
         }
 
         /// <summary>

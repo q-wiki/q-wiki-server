@@ -12,7 +12,7 @@ namespace WikidataGame.Backend.Helpers
     {
         public AutomapperProfile(IServiceProvider services)
         {
-            CreateMap<Models.Category, Dto.Category>().ReverseMap();
+            CreateMap<Models.Category, Dto.Category>();
 
             CreateMap<Models.User, Dto.Player>()
                 .ForMember(dto => dto.Name, opt => opt.MapFrom(model => model.UserName))
@@ -73,7 +73,12 @@ namespace WikidataGame.Backend.Helpers
                     model => (Dto.MiniGameType)Enum.Parse(typeof(Dto.MiniGameType), model.MiniGameType.ToString())))
                 .ForMember(dto => dto.Rating, opt => opt.MapFrom(
                     model => model.Ratings.Any() ? model.Ratings.Average(qr => qr.Rating) : 0))
-                .ReverseMap();
+                .ReverseMap()
+                .ForMember(model => model.Id, opt => opt.Ignore())
+                .ForMember(model => model.Ratings, opt => opt.Ignore())
+                .ForMember(model => model.Status, opt => opt.Ignore())
+                .ForMember(model => model.Category, opt => opt.Ignore())
+                .ForMember(model => model.CategoryId, opt => opt.Ignore());
 
             CreateMap<Models.GameRequest, Dto.GameRequest>()
                 .ForMember(dto => dto.Sender, opt => opt.MapFrom(model => model.Sender))

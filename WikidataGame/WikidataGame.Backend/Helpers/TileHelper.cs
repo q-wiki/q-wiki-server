@@ -12,9 +12,10 @@ namespace WikidataGame.Backend.Helpers
     {
         public static IEnumerable<IEnumerable<Dto.Tile>> TileEnumerableModel2Dto(Game game, CategoryCacheService categoryCacheService)
         {
+            var tiles = game.Tiles.OrderBy(t => t.MapIndex);
             return Enumerable.Range(0, game.MapHeight)
                 .Select(yCoord =>
-                    game.Tiles.Skip(yCoord * game.MapWidth)
+                    tiles.Skip(yCoord * game.MapWidth)
                         .Take(game.MapWidth)
                         // inaccessible tiles are represented as `null`
                         .Select(async t => t.IsAccessible ? await Dto.Tile.FromModelAsync(t, categoryCacheService) : null)

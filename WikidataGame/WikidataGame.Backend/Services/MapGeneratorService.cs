@@ -84,7 +84,8 @@ namespace WikidataGame.Backend.Services
             var highestPoint = noiseField.Max();
             var difficultyGap = (highestPoint - threshold) / 2;
 
-            return noiseField.Select(n => new Tile {
+            return noiseField.Select((n, index) => new Tile {
+                MapIndex = index,
                 IsAccessible = n > threshold,
                 Difficulty = Convert.ToInt32(Math.Round((n - threshold) / difficultyGap))
             }).ToList();

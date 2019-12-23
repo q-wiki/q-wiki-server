@@ -1,4 +1,3 @@
-
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -36,7 +35,7 @@ namespace WikidataGame.Backend.Tests
         public async Task GetCategoriesForTile_SingleTile_GeneratesSameCategoriesWhenAskedRepeatedly()
         {
             // we should get stable categories for a tile
-            var tile = new Models.Tile { Id = Guid.NewGuid() };
+            var tile = new Tile { Id = Guid.NewGuid() };
             var categoryRepo = CategoryRepo();
             var categoryService = new CategoryCacheService(categoryRepo);
             var categoriesForFirstDraw = await Helpers.TileHelper.GetCategoriesForTileAsync(categoryService, tile.Id);
@@ -48,8 +47,8 @@ namespace WikidataGame.Backend.Tests
         [Fact]
         public async Task GetCategoriesForTile_SingleTile_GeneratesDifferentCategoriesForDifferentTiles()
         {
-            var tileOne = new Models.Tile { Id = new Guid("b32b5e31-20f7-4c5d-971b-c7b558049e03") };
-            var tileTwo = new Models.Tile { Id = new Guid("d3d4e3eb-a90c-4dde-96c9-870f19547529") };
+            var tileOne = new Tile { Id = new Guid("b32b5e31-20f7-4c5d-971b-c7b558049e03") };
+            var tileTwo = new Tile { Id = new Guid("d3d4e3eb-a90c-4dde-96c9-870f19547529") };
             var categoryRepo = CategoryRepo();
 
             var categoryService = new CategoryCacheService(categoryRepo);
@@ -64,7 +63,7 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 10;
             var height = 10;
-            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+            var tiles = MapGeneratorService.GenerateMapCandidate(
                 width, height, 50
             );
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 0, 0, width, height);
@@ -85,7 +84,7 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 10;
             var height = 10;
-            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+            var tiles = MapGeneratorService.GenerateMapCandidate(
                 width, height, 50
             );
 
@@ -113,7 +112,7 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 10;
             var height = 10;
-            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+            var tiles = MapGeneratorService.GenerateMapCandidate(
                 width, height, 50
             );
 
@@ -137,7 +136,7 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 10;
             var height = 10;
-            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+            var tiles = MapGeneratorService.GenerateMapCandidate(
                 width, height, 50
             );
 
@@ -161,7 +160,7 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 19;
             var height = 19;
-            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+            var tiles = MapGeneratorService.GenerateMapCandidate(
                 width, height, 200
             );
 
@@ -187,7 +186,7 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 20;
             var height = 20;
-            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+            var tiles = MapGeneratorService.GenerateMapCandidate(
                 width, height, 200
             );
 
@@ -213,7 +212,7 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 4;
             var height = 4;
-            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+            var tiles = MapGeneratorService.GenerateMapCandidate(
                 width, height, 9
             );
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 0, 3, width, height);
@@ -236,7 +235,7 @@ namespace WikidataGame.Backend.Tests
         {
             var width = 4;
             var height = 4;
-            var tiles = Services.MapGeneratorService.GenerateMapCandidate(
+            var tiles = MapGeneratorService.GenerateMapCandidate(
                 width, height, 6
             );
             var neighbors = Helpers.TileHelper.GetNeighbors(tiles, 3, 3, width, height);
@@ -261,22 +260,23 @@ namespace WikidataGame.Backend.Tests
                 "o", "o", "o", "o",
                 "o", "o", "o", "o",
                 "x", "x", "x", "x"
-            }.Select(x => new Models.Tile { IsAccessible = x == "x" });
+            }.Select(x => new Tile { IsAccessible = x == "x" });
 
             var verticalIsland = new [] {
-                "x", "o", "x",
-                "x", "o", "x",
-                "x", "o", "x"
-            }.Select(x => new Models.Tile { IsAccessible = x == "x" });
+                "x", "o", "o", "x",
+                "x", "o", "o", "x",
+                "x", "o", "o", "x",
+                "x", "o", "o", "x"
+            }.Select(x => new Tile { IsAccessible = x == "x" });
 
             var smallSeparatedPart = new [] {
                 "x", "o", "x",
                 "o", "o", "x",
                 "o", "x", "x"
-            }.Select(x => new Models.Tile { IsAccessible = x == "x" });
+            }.Select(x => new Tile { IsAccessible = x == "x" });
 
             Assert.True(Helpers.TileHelper.HasIslands(horizontalIsland, 4, 4));
-            Assert.True(Helpers.TileHelper.HasIslands(verticalIsland, 3, 3));
+            Assert.True(Helpers.TileHelper.HasIslands(verticalIsland, 4, 4));
             Assert.True(Helpers.TileHelper.HasIslands(smallSeparatedPart, 3, 3));
         }
 
@@ -287,33 +287,33 @@ namespace WikidataGame.Backend.Tests
                 "o", "o", "o", "o",
                 "o", "x", "x", "o",
                 "o", "o", "o", "o"
-            }.Select(x => new Models.Tile { IsAccessible = x == "x" });
+            }.Select(x => new Tile { IsAccessible = x == "x" });
 
             var accessibleInUpperPart = new [] {
                 "x", "x", "x", "o",
                 "x", "x", "o", "o",
                 "x", "o", "o", "o"
-            }.Select(x => new Models.Tile { IsAccessible = x == "x" });
+            }.Select(x => new Tile { IsAccessible = x == "x" });
 
             var accessibleInLowerPart = new [] {
                 "o", "o", "o",
                 "o", "o", "o",
                 "o", "x", "x"
-            }.Select(x => new Models.Tile { IsAccessible = x == "x" });
+            }.Select(x => new Tile { IsAccessible = x == "x" });
 
             var withBridge = new [] {
                 "x", "x", "x",
                 "o", "x", "o",
                 "x", "x", "x"
-            }.Select(x => new Models.Tile { IsAccessible = x == "x" });
+            }.Select(x => new Tile { IsAccessible = x == "x" });
 
             var completelyAccessible = Enumerable.Range(0, 9)
-                .Select(_ => new Models.Tile {
+                .Select(_ => new Tile {
                     IsAccessible = true
                 });
 
             var completelyInaccessible = Enumerable.Range(0, 9)
-                .Select(_ => new Models.Tile {
+                .Select(_ => new Tile {
                     IsAccessible = false
                 });
 
@@ -342,15 +342,14 @@ namespace WikidataGame.Backend.Tests
             }.Select(x => new Models.Tile { IsAccessible = x == "x" });
             
             var ex2 = new [] {
-                "x", "x", "x", "x", "x", "x", "x", "x",
-                "o", "x", "x", "x", "x", "x", "o", "o",
-                "x", "x", "x", "x", "x", "x", "o", "o",
-                "x", "x", "x", "x", "x", "x", "o", "x", // <- the last x here is the island
-                "x", "o", "x", "x", "x", "o", "x", "o",
-                "x", "x", "x", "x", "x", "x", "x", "x",
-                "x", "x", "o", "x", "x", "x", "o", "x",
-                "x", "x", "x", "o", "x", "x", "o", "x",
-                "o", "o", "o", "o", "o", "o", "o", "x" 
+                "x", "o", "x", "o", "x", "x", "o", "x",
+                "o", "x", "x", "x", "x", "x", "x", "x",
+                "x", "x", "x", "x", "x", "o", "o", "x",
+                "x", "x", "x", "x", "x", "x", "x", "o",
+                "x", "x", "x", "x", "o", "x", "x", "x",
+                "x", "x", "x", "x", "o", "x", "x", "x",
+                "o", "x", "x", "o", "x", "x", "x", "x",
+                "x", "x", "x", "o", "x", "o", "x", "o"
             }.Select(x => new Models.Tile { IsAccessible = x == "x" });
 
             Assert.True(Helpers.TileHelper.HasIslands(ex1, 10, 10));

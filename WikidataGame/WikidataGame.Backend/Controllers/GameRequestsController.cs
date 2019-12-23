@@ -65,7 +65,7 @@ namespace WikidataGame.Backend.Controllers
             {
                 return NotFound("User not found");
             }
-            var similarGameRequests = await _gameRequestRepo.FindAsync(gr => gr.RecipientId == user.Id || gr.SenderId == user.Id);
+            var similarGameRequests = await _gameRequestRepo.FindAsync(gr => gr.RecipientId == user.Id && gr.SenderId == user.Id);
             var runningGames = await _gameRepo.RunningGamesForPlayerAsync(user);
             if (similarGameRequests.Any() || runningGames.Any(g => g.GameUsers.Any(gu => gu.UserId == friendUser.Id)))
             {

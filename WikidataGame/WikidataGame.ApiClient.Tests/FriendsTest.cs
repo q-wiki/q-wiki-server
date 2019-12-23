@@ -28,6 +28,7 @@ namespace WikidataGame.ApiClient.Tests
 
             var friends = await apiClient.GetFriendsAsync();
             Assert.NotEmpty(friends);
+            Assert.All(friends, f => ModelAssertion.AssertPlayer(f));
             Assert.True(friends.First().Id == authInfo2.User.Id);
         }
 
@@ -41,6 +42,7 @@ namespace WikidataGame.ApiClient.Tests
             var results = await apiClient.GetFindFriendsAsync(authInfo2.User.Name);
 
             Assert.NotEmpty(results);
+            Assert.All(results, r => ModelAssertion.AssertPlayer(r));
             Assert.True(results.First().Id == authInfo2.User.Id);
         }
 

@@ -21,7 +21,7 @@ namespace WikidataGame.ApiClient.Tests
             var authInfo = await RetrieveBearerAsync();
             var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo.Bearer));
             var gameInfo = await apiClient.CreateNewGameAsync();
-            Assert.False(string.IsNullOrEmpty(gameInfo.GameId));
+            ModelAssertion.AssertGameInfo(gameInfo);
 
             //cleanup
             await apiClient.DeleteGameAsync(gameInfo.GameId);
@@ -34,31 +34,7 @@ namespace WikidataGame.ApiClient.Tests
             var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo.Bearer));
             var gameInfo = await apiClient.CreateNewGameAsync();
             var game = await apiClient.RetrieveGameStateAsync(gameInfo.GameId);
-            Assert.False(string.IsNullOrEmpty(game.Id));
-            Assert.NotNull(game.AwaitingOpponentToJoin);
-            Assert.NotNull(game.Me);
-            Assert.False(string.IsNullOrEmpty(game.Me.Id));
-            Assert.False(string.IsNullOrWhiteSpace(game.Me.Name));
-            if (!game.AwaitingOpponentToJoin.Value)
-            {
-                Assert.NotNull(game.Opponent);
-                Assert.False(string.IsNullOrEmpty(game.Opponent.Id));
-                Assert.False(string.IsNullOrWhiteSpace(game.Opponent.Name));
-            }
-            Assert.NotEmpty(game.Tiles);
-            foreach(var tilegroup in game.Tiles)
-            {
-                foreach (var tile in tilegroup)
-                {
-                    if (tile != null)
-                    {
-                        Assert.False(string.IsNullOrEmpty(tile.Id));
-                        Assert.NotNull(tile.Difficulty);
-                        Assert.NotEmpty(tile.AvailableCategories);
-                        Assert.Null(tile.ChosenCategoryId);
-                    }
-                }
-            }
+            ModelAssertion.AssertGame(game);
             Assert.Empty(game.WinningPlayerIds);
 
             //cleanup
@@ -102,6 +78,7 @@ namespace WikidataGame.ApiClient.Tests
             var gameInfo = await apiClient.CreateNewGameAsync();
             var games = await apiClient.GetGamesAsync();
             Assert.NotEmpty(games);
+            Assert.All(games, gi => ModelAssertion.AssertGameInfo(gi));
             Assert.True(games.First().GameId == gameInfo.GameId);
         }
     }

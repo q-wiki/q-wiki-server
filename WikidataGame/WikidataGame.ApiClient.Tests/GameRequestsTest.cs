@@ -28,11 +28,13 @@ namespace WikidataGame.ApiClient.Tests
 
             var gameRequests = await apiClient.GetGameRequestsAsync();
             Assert.NotEmpty(gameRequests.Outgoing);
+            Assert.All(gameRequests.Outgoing, gr => ModelAssertion.AssertGameRequest(gr));
             Assert.True(gameRequests.Outgoing.First().Id == request.Id);
 
             var apiClient2 = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo2.Bearer));
             var gameRequests2 = await apiClient2.GetGameRequestsAsync();
             Assert.NotEmpty(gameRequests2.Incoming);
+            Assert.All(gameRequests.Incoming, gr => ModelAssertion.AssertGameRequest(gr));
             Assert.True(gameRequests2.Incoming.First().Id == request.Id);
         }
 
@@ -61,7 +63,7 @@ namespace WikidataGame.ApiClient.Tests
             var apiClient2 = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo2.Bearer));
             var gameInfo = await apiClient2.CreateNewGameByRequestAsync(request.Id);
 
-            Assert.False(string.IsNullOrEmpty(gameInfo.GameId));
+            ModelAssertion.AssertGameInfo(gameInfo);
 
             //cleanup
             await apiClient2.DeleteGameAsync(gameInfo.GameId);

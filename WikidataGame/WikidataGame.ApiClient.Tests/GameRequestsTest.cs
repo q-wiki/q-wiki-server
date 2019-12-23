@@ -39,6 +39,30 @@ namespace WikidataGame.ApiClient.Tests
         }
 
         [Fact]
+        public async void SendMultipleGameRequests_ForTestUser_RequestsHaveBeenCreated()
+        {
+            var authInfo = await RetrieveBearerAsync();
+            var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo.Bearer));
+            var authInfo2 = await RetrieveBearerAsync();
+
+            var request = await apiClient.RequestMatchAsync(authInfo2.User.Id);
+
+            var gameRequests = await apiClient.GetGameRequestsAsync();
+            Assert.NotEmpty(gameRequests.Outgoing);
+            Assert.Equal(1, gameRequests.Outgoing.Count);
+            Assert.All(gameRequests.Outgoing, gr => ModelAssertion.AssertGameRequest(gr));
+
+            var authInfo3 = await RetrieveBearerAsync();
+
+            request = await apiClient.RequestMatchAsync(authInfo3.User.Id);
+
+            gameRequests = await apiClient.GetGameRequestsAsync();
+            Assert.NotEmpty(gameRequests.Outgoing);
+            Assert.Equal(2, gameRequests.Outgoing.Count);
+            Assert.All(gameRequests.Outgoing, gr => ModelAssertion.AssertGameRequest(gr));
+        }
+
+        [Fact]
         public async void DeleteGameRequest_ForTestUser_GameRequestHasBeenDeleted()
         {
             var authInfo = await RetrieveBearerAsync();

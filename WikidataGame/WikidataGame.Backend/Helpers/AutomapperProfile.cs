@@ -73,6 +73,8 @@ namespace WikidataGame.Backend.Helpers
                     model => (Dto.MiniGameType)Enum.Parse(typeof(Dto.MiniGameType), model.MiniGameType.ToString())))
                 .ForMember(dto => dto.Rating, opt => opt.MapFrom(
                     model => model.Ratings.Any() ? model.Ratings.Average(qr => qr.Rating) : 0))
+                .ForMember(dto => dto.Status, opt => opt.MapFrom(
+                    model => (Dto.QuestionStatus)Enum.Parse(typeof(Dto.QuestionStatus), model.Status.ToString())))
                 .ReverseMap()
                 .ForMember(model => model.Id, opt => opt.Ignore())
                 .ForMember(model => model.Ratings, opt => opt.Ignore())

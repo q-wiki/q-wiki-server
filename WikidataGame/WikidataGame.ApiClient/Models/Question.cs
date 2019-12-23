@@ -23,13 +23,14 @@ namespace WikidataGame.Models
         /// <summary>
         /// Initializes a new instance of the Question class.
         /// </summary>
-        public Question(string sparqlQuery, string taskDescription, Category category, int miniGameType, string id = default(string), double? rating = default(double?))
+        public Question(string sparqlQuery, string taskDescription, Category category, int miniGameType, string id = default(string), int? status = default(int?), double? rating = default(double?))
         {
             Id = id;
             SparqlQuery = sparqlQuery;
             TaskDescription = taskDescription;
             Category = category;
             MiniGameType = miniGameType;
+            Status = status;
             Rating = rating;
             CustomInit();
         }
@@ -63,6 +64,11 @@ namespace WikidataGame.Models
         /// </summary>
         [JsonProperty(PropertyName = "miniGameType")]
         public int MiniGameType { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "status")]
+        public int? Status { get; set; }
 
         /// <summary>
         /// </summary>

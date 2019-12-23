@@ -22,6 +22,15 @@ namespace WikidataGame.Backend.Dto
         [Required]
         public MiniGameType MiniGameType { get; set; }
 
+        public QuestionStatus Status { get; set; }
+
         public double Rating { get; set; }
+    }
+
+    public enum QuestionStatus
+    {
+        Pending,
+        Rejected,
+        Approved
     }
 }

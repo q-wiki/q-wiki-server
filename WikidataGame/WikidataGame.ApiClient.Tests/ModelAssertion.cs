@@ -21,10 +21,10 @@ namespace WikidataGame.ApiClient.Tests
             AssertGuid(question.Id);
             Assert.False(string.IsNullOrEmpty(question.SparqlQuery));
             Assert.False(string.IsNullOrEmpty(question.TaskDescription));
-
             AssertCategory(question.Category);
             Assert.True(question.Rating.HasValue);
             Assert.InRange(question.Rating.Value, 0, 5);
+            Assert.True(question.Status.HasValue);
         }
 
         public static void AssertAuthInfo(AuthInfo authInfo)

@@ -107,6 +107,7 @@ namespace WikidataGame.ApiClient.Tests
             Assert.Equal(question.TaskDescription, createdQuestion.TaskDescription);
             Assert.Equal(question.Category.Id, createdQuestion.Category.Id);
             Assert.Equal(0, createdQuestion.Rating);
+            Assert.Equal(0, createdQuestion.Status); //pending
         }
     }
 }

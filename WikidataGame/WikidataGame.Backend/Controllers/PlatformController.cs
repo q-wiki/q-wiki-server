@@ -125,14 +125,14 @@ namespace WikidataGame.Backend.Controllers
             await _questionRepo.AddAsync(questionModel);
             await _dataContext.SaveChangesAsync();
 
-            return Created(string.Empty, _mapper.Map<Dto.Question>(questionModel));            
+            return Created(string.Empty, _mapper.Map<Question>(questionModel));            
         }
 
         /// <summary>
         /// Retrieves a list of all available categories
         /// </summary>
         /// <returns>list of categories</returns>
-        [HttpGet("Categories")]
+        [HttpGet("Category")]
         [ProducesResponseType(typeof(IEnumerable<Category>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Category>>> GetPlatformCategories()
         {

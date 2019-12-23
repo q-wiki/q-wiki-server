@@ -23,10 +23,12 @@ namespace WikidataGame.ApiClient.Tests
             var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo.Bearer));
             var authInfo2 = await RetrieveBearerAsync();
 
-            await apiClient.PostFriendAsync(authInfo2.User.Id);
+            var friend = await apiClient.PostFriendAsync(authInfo2.User.Id);
+            Assert.True(friend.Id == authInfo2.User.Id);
 
             var friends = await apiClient.GetFriendsAsync();
             Assert.NotEmpty(friends);
+            Assert.All(friends, f => ModelAssertion.AssertPlayer(f));
             Assert.True(friends.First().Id == authInfo2.User.Id);
         }
 
@@ -40,6 +42,7 @@ namespace WikidataGame.ApiClient.Tests
             var results = await apiClient.GetFindFriendsAsync(authInfo2.User.Name);
 
             Assert.NotEmpty(results);
+            Assert.All(results, r => ModelAssertion.AssertPlayer(r));
             Assert.True(results.First().Id == authInfo2.User.Id);
         }
 

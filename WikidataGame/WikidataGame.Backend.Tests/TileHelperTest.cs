@@ -38,8 +38,9 @@ namespace WikidataGame.Backend.Tests
             var tile = new Tile { Id = Guid.NewGuid() };
             var categoryRepo = CategoryRepo();
             var categoryService = new CategoryCacheService(categoryRepo);
-            var categoriesForFirstDraw = await Helpers.TileHelper.GetCategoriesForTileAsync(categoryService, tile.Id);
-            var categoriesForSecondDraw = await Helpers.TileHelper.GetCategoriesForTileAsync(categoryService, tile.Id);
+            await categoryService.InitializeAsync();
+            var categoriesForFirstDraw = Helpers.TileHelper.GetCategoriesForTile(categoryService, tile.Id);
+            var categoriesForSecondDraw = Helpers.TileHelper.GetCategoriesForTile(categoryService, tile.Id);
 
             Assert.Equal(categoriesForFirstDraw, categoriesForSecondDraw);
         }
@@ -52,8 +53,9 @@ namespace WikidataGame.Backend.Tests
             var categoryRepo = CategoryRepo();
 
             var categoryService = new CategoryCacheService(categoryRepo);
-            var categoriesForFirstDraw = await Helpers.TileHelper.GetCategoriesForTileAsync(categoryService, tileOne.Id);
-            var categoriesForSecondDraw = await Helpers.TileHelper.GetCategoriesForTileAsync(categoryService, tileTwo.Id);
+            await categoryService.InitializeAsync();
+            var categoriesForFirstDraw = Helpers.TileHelper.GetCategoriesForTile(categoryService, tileOne.Id);
+            var categoriesForSecondDraw = Helpers.TileHelper.GetCategoriesForTile(categoryService, tileTwo.Id);
 
             Assert.NotEqual(categoriesForFirstDraw, categoriesForSecondDraw);
         }

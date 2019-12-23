@@ -21,19 +21,5 @@ namespace WikidataGame.Backend.Dto
 
         public Guid? OwnerId { get; set; }
 
-        public static async Task<Tile> FromModelAsync(Models.Tile tile, CategoryCacheService categoryService)
-        {
-            if (tile == null)
-                return null;
-
-            return new Tile
-            {
-                Id = tile.Id,
-                ChosenCategoryId = tile.ChosenCategoryId,
-                AvailableCategories = (await TileHelper.GetCategoriesForTileAsync(categoryService, tile.Id)).Select(c => Category.FromModel(c)).ToList(),
-                Difficulty = tile.Difficulty,
-                OwnerId = tile.OwnerId
-            };
-        }
     }
 }

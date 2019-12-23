@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -133,6 +134,9 @@ namespace WikidataGame.Backend
                 // User settings.
                 options.User.RequireUniqueEmail = false;
             });
+            services.AddSingleton((provider) => new MapperConfiguration(cfg =>
+                cfg.AddProfile(new AutomapperProfile(provider))
+            ).CreateMapper());
             services.AddTransient<IUserValidator<User>, UserValidator>();
             services.AddSingleton<INotificationService>(new NotificationService(Configuration.GetConnectionString("NotificationHub")));
             services.AddScoped<UserManager<User>>();
@@ -140,7 +144,7 @@ namespace WikidataGame.Backend
             services.AddScoped<IGameRepository, GameRepository>();
             services.AddScoped<IMinigameRepository, MinigameRepository>();
             services.AddScoped<IQuestionRepository, QuestionRepository>();
-            services.AddSingleton<IRepository<Category, Guid>, Repository<Category, Guid>>();
+            services.AddScoped<IRepository<Category, Guid>, Repository<Category, Guid>>();
             services.AddScoped<IRepository<Friend, Guid>, Repository<Friend, Guid>>();
             services.AddScoped<IRepository<GameRequest, Guid>, Repository<GameRequest, Guid>>();
             services.AddScoped<IMinigameService, MultipleChoiceMinigameService>();
@@ -150,7 +154,7 @@ namespace WikidataGame.Backend
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public async void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -172,7 +176,18 @@ namespace WikidataGame.Backend
 
             app.Run(async (context) => await Task.Run(() => context.Response.Redirect("/swagger")));
 
-            app.ApplicationServices.GetService<DataContext>().Database.Migrate();
+            var dataContext = app.ApplicationServices.GetService<DataContext>();
+            if (dataContext.Database.IsSqlite())
+            {
+                //SQLite is missing major migration functionality, but is only used for testing purposes
+                dataContext.Database.EnsureCreated();
+            }
+            else
+            {
+                dataContext.Database.Migrate();
+            }
+
+            await app.ApplicationServices.GetService<CategoryCacheService>().InitializeAsync();
         }
     }
 }

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WikidataGame.Backend.Dto;
 using WikidataGame.Backend.Helpers;
+using WikidataGame.Backend.Models;
 using WikidataGame.Backend.Repos;
 
 namespace WikidataGame.Backend.Services
@@ -16,14 +16,14 @@ namespace WikidataGame.Backend.Services
         {
         }
 
-        public Models.MiniGameType MiniGameType => Models.MiniGameType.Sort;
+        public MiniGameType MiniGameType => MiniGameType.Sort;
 
         public async Task<MiniGame> GenerateMiniGameAsync(Guid gameId, Guid playerId, Models.Question question, Guid tileId)
         {
             // use method in baseclass to query wikidata with question
             var data = QueryWikidata(question.SparqlQuery);
 
-            var minigame = await _minigameRepo.CreateMiniGameAsync(gameId, playerId, tileId, question.CategoryId, MiniGameType);
+            var minigame = await _minigameRepo.CreateMiniGameAsync(gameId, playerId, tileId, question, MiniGameType);
 
             // each row looks like this: (placeholderValue, label) where placeholderValue is the value
             // that gets used in the template string, value is the actual value to sort on and label is the
@@ -36,7 +36,7 @@ namespace WikidataGame.Backend.Services
 
             await _dataContext.SaveChangesAsync();
 
-            return MiniGame.FromModel(minigame);
+            return minigame;
         }
     }
 }

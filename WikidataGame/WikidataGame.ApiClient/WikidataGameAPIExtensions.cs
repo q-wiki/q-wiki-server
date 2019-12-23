@@ -613,5 +613,191 @@ namespace WikidataGame
                 }
             }
 
+            /// <summary>
+            /// Retrieves statistics containing the number of categories, games played and
+            /// questions added
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            public static PlatformStats GetPlatformStats(this IWikidataGameAPI operations)
+            {
+                return operations.GetPlatformStatsAsync().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves statistics containing the number of categories, games played and
+            /// questions added
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<PlatformStats> GetPlatformStatsAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetPlatformStatsWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Retrieves detailed information on a bygone minigame by id
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='minigameId'>
+            /// minigame identifier
+            /// </param>
+            public static DetailedMiniGame GetPlatformMinigameById(this IWikidataGameAPI operations, string minigameId)
+            {
+                return operations.GetPlatformMinigameByIdAsync(minigameId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves detailed information on a bygone minigame by id
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='minigameId'>
+            /// minigame identifier
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<DetailedMiniGame> GetPlatformMinigameByIdAsync(this IWikidataGameAPI operations, string minigameId, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetPlatformMinigameByIdWithHttpMessagesAsync(minigameId, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Retrieves a list of all available questions
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            public static IList<Question> GetPlatformQuestions(this IWikidataGameAPI operations)
+            {
+                return operations.GetPlatformQuestionsAsync().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves a list of all available questions
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<IList<Question>> GetPlatformQuestionsAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetPlatformQuestionsWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='question'>
+            /// </param>
+            public static Question AddPlatformQuestion(this IWikidataGameAPI operations, Question question = default(Question))
+            {
+                return operations.AddPlatformQuestionAsync(question).GetAwaiter().GetResult();
+            }
+
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='question'>
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<Question> AddPlatformQuestionAsync(this IWikidataGameAPI operations, Question question = default(Question), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.AddPlatformQuestionWithHttpMessagesAsync(question, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Adds a rating for the specified question
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='questionId'>
+            /// question identifier
+            /// </param>
+            /// <param name='rating'>
+            /// rating (1-5)
+            /// </param>
+            public static Question AddPlatformQuestionRating(this IWikidataGameAPI operations, string questionId, int rating)
+            {
+                return operations.AddPlatformQuestionRatingAsync(questionId, rating).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Adds a rating for the specified question
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='questionId'>
+            /// question identifier
+            /// </param>
+            /// <param name='rating'>
+            /// rating (1-5)
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<Question> AddPlatformQuestionRatingAsync(this IWikidataGameAPI operations, string questionId, int rating, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.AddPlatformQuestionRatingWithHttpMessagesAsync(questionId, rating, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Retrieves a list of all available categories
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            public static IList<Category> GetPlatformCategories(this IWikidataGameAPI operations)
+            {
+                return operations.GetPlatformCategoriesAsync().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves a list of all available categories
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<IList<Category>> GetPlatformCategoriesAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetPlatformCategoriesWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
     }
 }

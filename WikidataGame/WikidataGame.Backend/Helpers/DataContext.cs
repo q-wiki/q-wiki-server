@@ -19,6 +19,7 @@ namespace WikidataGame.Backend.Helpers
         public DbSet<Tile> Tiles { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Question> Questions { get; set; }
+        public DbSet<QuestionRating> QuestionRatings { get; set; }
         public DbSet<GameRequest> GameRequests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

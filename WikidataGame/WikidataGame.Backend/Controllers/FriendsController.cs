@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -25,7 +26,8 @@ namespace WikidataGame.Backend.Controllers
             UserManager<Models.User> userManager,
             IGameRepository gameRepo,
             IRepository<Models.Friend, Guid> friendsRepo,
-            INotificationService notificationService): base(dataContext, userManager, gameRepo, notificationService)
+            INotificationService notificationService,
+            IMapper mapper) : base(dataContext, userManager, gameRepo, notificationService, mapper)
         {
             _friendsRepo = friendsRepo;
         }
@@ -40,7 +42,7 @@ namespace WikidataGame.Backend.Controllers
         {
             var user = await GetCurrentUserAsync();
             var friends = await _friendsRepo.FindAsync(f => f.UserId == user.Id);
-            return Ok(friends.Select(f => Player.FromModel(f)).ToList());
+            return Ok(friends.Select(f => _mapper.Map<Player>(f.FriendUser)).ToList());
         }
         
 
@@ -74,7 +76,7 @@ namespace WikidataGame.Backend.Controllers
             await _friendsRepo.AddAsync(friend);
             await _dataContext.SaveChangesAsync();
 
-            return Created("", Player.FromModel(friend));
+            return Created(string.Empty, _mapper.Map<Player>(friendUser));
         }
 
         /// <summary>
@@ -113,7 +115,7 @@ namespace WikidataGame.Backend.Controllers
 
             var user = await GetCurrentUserAsync();
             var users = await _userManager.Users.Where(u => u.Id != user.Id && EF.Functions.Like(u.UserName, $"%{query.Replace("%","")}%")).Take(10).ToListAsync();
-            return Ok(users.Select(f => Player.FromModel(f)).ToList());
+            return Ok(users.Select(f => _mapper.Map<Player>(f)).ToList());
         }
     }
 }

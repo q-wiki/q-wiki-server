@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -31,7 +32,8 @@ namespace WikidataGame.Backend.Controllers
             IGameRepository gameRepo,
             CategoryCacheService categoryCacheService,
             INotificationService notificationService,
-            IRepository<Models.GameRequest, Guid> gameRequestRepo) : base(dataContext, userManager, gameRepo, notificationService)
+            IMapper mapper,
+            IRepository<Models.GameRequest, Guid> gameRequestRepo) : base(dataContext, userManager, gameRepo, notificationService, mapper)
         {
             _categoryCacheService = categoryCacheService;
             _gameRequestRepo = gameRequestRepo;
@@ -43,7 +45,7 @@ namespace WikidataGame.Backend.Controllers
         /// <param name="gameRequestId">game request identifier</param>
         /// <returns>Info about the newly created game</returns>
         [HttpPost("AcceptRequest")]
-        [ProducesResponseType(typeof(GameInfo), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GameInfo), StatusCodes.Status201Created)]
         public async Task<ActionResult<GameInfo>> CreateNewGameByRequest(Guid gameRequestId)
         {
             var user = await GetCurrentUserAsync();
@@ -63,7 +65,7 @@ namespace WikidataGame.Backend.Controllers
             
 
             await _dataContext.SaveChangesAsync();
-            return Ok(GameInfo.FromGame(game));
+            return Created(string.Empty, _mapper.Map<GameInfo>(game));
         }
 
         /// <summary>
@@ -71,7 +73,7 @@ namespace WikidataGame.Backend.Controllers
         /// </summary>
         /// <returns>Info about the newly created game</returns>
         [HttpPost]
-        [ProducesResponseType(typeof(GameInfo), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GameInfo), StatusCodes.Status201Created)]
         public async Task<ActionResult<GameInfo>> CreateNewGame()
         {
             var user = await GetCurrentUserAsync();
@@ -90,7 +92,7 @@ namespace WikidataGame.Backend.Controllers
             }
 
             await _dataContext.SaveChangesAsync();
-            return Ok(GameInfo.FromGame(game));
+            return Created(string.Empty, _mapper.Map<GameInfo>(game));
         }
 
         /// <summary>
@@ -103,7 +105,7 @@ namespace WikidataGame.Backend.Controllers
         {
             var user = await GetCurrentUserAsync();
             var games = await _gameRepo.RunningGamesForPlayerAsync(user);
-            return Ok(games.Select(g => GameInfo.FromGame(g)).ToList());
+            return Ok(games.Select(g => _mapper.Map<GameInfo>(g)).ToList());
         }
 
         /// <summary>
@@ -119,7 +121,8 @@ namespace WikidataGame.Backend.Controllers
                 return Forbid();
             var game = await _gameRepo.GetAsync(gameId);
 
-            return Ok(Game.FromModel(game, (await GetCurrentUserAsync()).Id, _categoryCacheService));
+            var userId = (await GetCurrentUserAsync()).Id;
+            return Ok(_mapper.Map<Game>(game, opt => opt.Items[nameof(Models.GameUser.UserId)] = userId));
         }
 
         /// <summary>

@@ -15,7 +15,7 @@ namespace WikidataGame.ApiClient.Tests
         {
             var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials("auth"));
             var authInfo = await apiClient.AuthenticateAsync(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), string.Empty);
-            AssertAuthInfo(authInfo);
+            ModelAssertion.AssertAuthInfo(authInfo);
         }
 
         [Fact]
@@ -26,7 +26,7 @@ namespace WikidataGame.ApiClient.Tests
             var authInfo = await apiClient.AuthenticateAsync(Guid.NewGuid().ToString(), password, string.Empty);
             var apiClient2 = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials("auth"));
             var authInfo2 = await apiClient2.AuthenticateAsync(authInfo.User.Name, password, string.Empty);
-            AssertAuthInfo(authInfo2);
+            ModelAssertion.AssertAuthInfo(authInfo2);
         }
 
         [Fact]
@@ -66,11 +66,6 @@ namespace WikidataGame.ApiClient.Tests
             Assert.True(ex.Response.StatusCode == HttpStatusCode.BadRequest);
         }
 
-        private void AssertAuthInfo(AuthInfo authInfo)
-        {
-            Assert.NotNull(authInfo);
-            Assert.False(string.IsNullOrWhiteSpace(authInfo.Bearer));
-            Assert.NotNull(authInfo.User);
-        }
+        
     }
 }

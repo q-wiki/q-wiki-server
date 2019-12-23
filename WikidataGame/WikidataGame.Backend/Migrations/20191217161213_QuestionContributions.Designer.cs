@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WikidataGame.Backend.Helpers;
 
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20191217161213_QuestionContributions")]
+    partial class QuestionContributions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1172,8 +1174,6 @@ namespace WikidataGame.Backend.Migrations
                     b.Property<Guid?>("GameId");
 
                     b.Property<bool>("IsAccessible");
-
-                    b.Property<int>("MapIndex");
 
                     b.Property<Guid?>("OwnerId");
 

@@ -10,19 +10,6 @@ namespace WikidataGame.Backend.Helpers
 {
     public static class TileHelper
     {
-        public static IEnumerable<IEnumerable<Dto.Tile>> TileEnumerableModel2Dto(Game game, CategoryCacheService categoryCacheService)
-        {
-            var tiles = game.Tiles.OrderBy(t => t.MapIndex);
-            return Enumerable.Range(0, game.MapHeight)
-                .Select(yCoord =>
-                    tiles.Skip(yCoord * game.MapWidth)
-                        .Take(game.MapWidth)
-                        // inaccessible tiles are represented as `null`
-                        .Select(async t => t.IsAccessible ? await Dto.Tile.FromModelAsync(t, categoryCacheService) : null)
-                        .Select(t => t.Result)
-                );
-        }
-
         /// <summary>
         /// Returns 3 categories for a tile. The categories that are returned are
         /// stable and depend on the tile id.
@@ -30,19 +17,18 @@ namespace WikidataGame.Backend.Helpers
         /// <param name="categoryService"></param>
         /// <param name="tileId"></param>
         /// <returns></returns>
-        public static async Task<IEnumerable<Category>> GetCategoriesForTileAsync(CategoryCacheService categoryService, Guid tileId)
+        public static IEnumerable<Category> GetCategoriesForTile(CategoryCacheService categoryService, Guid tileId)
         {
             // we get all categories, draw 3 distinct random ints in
             // [i, categories.Count()[ and return the categories for
             // these draws
             var rnd = new Random(tileId.GetHashCode());
-            var categories = await categoryService.GetCategoriesAsync();
 
             var draws = new HashSet<Category>();
             while (draws.Count() < 3)
             {
-                var pick = rnd.Next(categories.Count());
-                draws.Add(categories.ElementAt(pick));
+                var pick = rnd.Next(categoryService.Categories.Count());
+                draws.Add(categoryService.Categories.ElementAt(pick));
             }
 
             return draws;

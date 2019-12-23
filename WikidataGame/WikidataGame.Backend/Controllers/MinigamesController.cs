@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -30,7 +31,8 @@ namespace WikidataGame.Backend.Controllers
             IMinigameRepository minigameRepo,
             IQuestionRepository questionRepo,
             INotificationService notificationService,
-            CategoryCacheService categoryCacheService) : base(dataContext, userManager, gameRepo, notificationService)
+            IMapper mapper,
+            CategoryCacheService categoryCacheService) : base(dataContext, userManager, gameRepo, notificationService, mapper)
         {
             _minigameRepo = minigameRepo;
             _questionRepo = questionRepo;
@@ -44,7 +46,7 @@ namespace WikidataGame.Backend.Controllers
         /// <param name="minigameParams">minigame information containing category and tile identifier</param>
         /// <returns>The created minigame</returns>
         [HttpPost]
-        [ProducesResponseType(typeof(MiniGame), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MiniGame), StatusCodes.Status201Created)]
         public async Task<ActionResult<MiniGame>> InitalizeMinigame(Guid gameId, MiniGameInit minigameParams)
         {
             if (!await IsUserGameParticipantAsync(gameId) || minigameParams == null ||
@@ -60,7 +62,7 @@ namespace WikidataGame.Backend.Controllers
 
             var minigame = await service.GenerateMiniGameAsync(gameId, (await GetCurrentUserAsync()).Id, question, minigameParams.TileId);
 
-            return Ok(minigame);
+            return Created(string.Empty, _mapper.Map<MiniGame>(minigame));
         }
 
         /// <summary>
@@ -78,7 +80,7 @@ namespace WikidataGame.Backend.Controllers
 
             var minigame = await _minigameRepo.GetAsync(minigameId);
 
-            return Ok(MiniGame.FromModel(minigame));
+            return Ok(_mapper.Map<MiniGame>(minigame));
         }
 
         /// <summary>
@@ -147,7 +149,7 @@ namespace WikidataGame.Backend.Controllers
             }
             await _dataContext.SaveChangesAsync();
 
-            return Ok(MiniGameResult.FromModel(minigame, game, _categoryCacheService));
+            return Ok(_mapper.Map<MiniGameResult>(minigame));
         }
 
         private async Task<bool> IsItPlayersTurnAsync(Guid gameId)
@@ -180,7 +182,7 @@ namespace WikidataGame.Backend.Controllers
             var game = await _gameRepo.GetAsync(gameId);
             var tile = game.Tiles.SingleOrDefault(t => t.Id == tileId);
             return (!tile.ChosenCategoryId.HasValue || tile.ChosenCategoryId == categoryId) && 
-                (await TileHelper.GetCategoriesForTileAsync(_categoryCacheService, tileId)).SingleOrDefault(c => c.Id == categoryId) != null;
+                TileHelper.GetCategoriesForTile(_categoryCacheService, tileId).SingleOrDefault(c => c.Id == categoryId) != null;
         }
 
         private async Task<IEnumerable<Guid>> WinningPlayerIdsAsync(Guid gameId)

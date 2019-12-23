@@ -21,5 +21,7 @@ namespace WikidataGame.Backend.Repos
 
         void Update(TEntity entity);
         void UpdateRange(IEnumerable<TEntity> entities);
+
+        Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate = null);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using AutoMapper;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -15,7 +16,7 @@ namespace WikidataGame.Backend.Helpers
 {
     public class JwtTokenHelper
     {
-        public static AuthInfo CreateJwtToken(User user)
+        public static AuthInfo CreateJwtToken(User user, IMapper mapper)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(Startup.Configuration.GetValue<string>("AuthSecret"));
@@ -32,7 +33,7 @@ namespace WikidataGame.Backend.Helpers
             return new AuthInfo {
                 Bearer = tokenHandler.WriteToken(token),
                 Expires = tokenDescriptor.Expires.Value,
-                User = Player.FromModel(user)
+                User = mapper.Map<Player>(user)
             };
         }
     }

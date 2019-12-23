@@ -76,6 +76,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("a4b7c4ba-6acb-4f9a-821b-7a44aa7b6761"),
                     CategoryId = CategoryGeography.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "What is the name of the capital of {0}?",
                     SparqlQuery = @"SELECT DISTINCT ?answer ?question WHERE {
                       ?state wdt:P31/wdt:P279* wd:Q3624078;
@@ -108,6 +109,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("aca0f5f7-b000-42fb-b713-f5fe43748761"),
                     CategoryId = CategoryGeography.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Which continent has {0} countries?",
                     SparqlQuery = @"SELECT ?continent ?answer ?question WHERE {
                         { SELECT ?continent ?answer (COUNT(?item) AS ?question) WHERE {
@@ -128,6 +130,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("9a70639b-3447-475a-905a-e866a0c98a1c"),
                     CategoryId = CategoryGeography.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Which country is a part of {0}?",
                     SparqlQuery = @"SELECT ?answer ?question
                         WITH {
@@ -185,6 +188,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("46679c4f-ef97-445d-9a70-d95a5337720f"),
                     CategoryId = CategoryGeography.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Which country is not a basin country of the Baltic Sea?",
                     SparqlQuery = @"SELECT DISTINCT ?question ?answer
                         WITH {
@@ -233,6 +237,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("4f6c477e-7025-44b4-a3b0-f3ebd8902902"),
                     CategoryId = CategoryGeography.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Which country is not a basin country of the Caribbean Sea?",
                     SparqlQuery = @"# Which country is no basin country of the Caribbean Sea?
                         SELECT DISTINCT ?question ?answer
@@ -296,6 +301,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("a6a470de-9efb-4fde-9388-6eb20f2ff1f4"),
                     CategoryId = CategoryGeography.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Which country is not a basin country of the Mediterranean Sea?",
                     SparqlQuery = @"# Which country is no basin country of the Mediterranean Sea?
                         SELECT DISTINCT ?question ?answer
@@ -343,6 +349,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("29fed1d0-d306-4946-8109-63b8aaf0262e"),
                     CategoryId = CategoryGeography.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "What is the longest river in {0}?",
                     SparqlQuery = @"# What is the longest river in {continent}?
                         SELECT DISTINCT ?answer ?question 
@@ -403,6 +410,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("bc7a22ee-4985-44c3-9388-5c7dd6b8762e"),
                     CategoryId = CategoryGeography.Id,
                     MiniGameType = MiniGameType.Sort,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Sort countries by {0} (ascending).",
                     SparqlQuery = @"# sort countries by number of inhabitants (ascending)
                         SELECT (?stateLabel AS ?answer) ?question
@@ -455,6 +463,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("a4a7289a-3053-4ad7-9c60-c75a18305243"),
                     CategoryId = CategorySpace.Id,
                     MiniGameType = MiniGameType.Sort,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Sort planets by {0} (ascending).",
                     SparqlQuery = @"# sort planets by average distance to sun
                         # NOTE: there are only three planets with apoapsis and periapsis in AU; 4 planets in total
@@ -483,6 +492,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("2ed01768-9ab6-4895-8cbf-09dbc6f957e0"),
                     CategoryId = CategorySpace.Id,
                     MiniGameType = MiniGameType.Sort,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Sort planets by {0} (ascending).",
                     SparqlQuery = @"# sort planets by radius
                         SELECT ?answer ?question WHERE {
@@ -505,6 +515,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("14d93797-c61c-4415-b1ed-359d180237ff"),
                     CategoryId = CategorySpace.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Which of these moons belongs to {0}?",
                     SparqlQuery = @"#Which of these moons belongs to the planet {0}?
                         SELECT ?question ?answer 
@@ -588,6 +599,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("5f7e813a-3cfa-4617-86d1-514b481b37a8"),
                     CategoryId = CategoryChemistry.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "What's the chemical symbol for {0}?",
                     SparqlQuery = @"# What's the chemical symbol for {element}?
                         SELECT ?question ?answer WHERE {
@@ -609,6 +621,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("40677b0f-9d5f-46d2-ab85-a6c40afb5f87"),
                     CategoryId = CategoryChemistry.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Which element has the chemical symbol {0}?",
                     SparqlQuery = @"SELECT ?question ?answer WHERE {
                       ?element wdt:P31 wd:Q11344;
@@ -629,6 +642,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("e8f99165-baa3-47b2-be35-c42ab2d5f0a0"),
                     CategoryId = CategoryChemistry.Id,
                     MiniGameType = MiniGameType.Sort,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Sort chemical elements by {0} (ascending).",
                     SparqlQuery = @"#sort chemical elements by number in period system
                         SELECT ?question ?answer WHERE {
@@ -657,6 +671,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("d9011896-04e5-4d32-8d3a-02a6d2b0bdb6"),
                     CategoryId = CategoryHistory.Id,
                     MiniGameType = MiniGameType.Sort,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Sort these US presidents by {0} (ascending).",
                     SparqlQuery = @"
                          # US presidents by start of their presidency
@@ -704,6 +719,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("909182d1-4ae6-46ea-bd9b-8c4323ea53fa"),
                     CategoryId = CategoryHistory.Id,
                     MiniGameType = MiniGameType.Sort,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Sort the countries by {0} (ascending).",
                     SparqlQuery = @"# sort EU countries by the date they joined
                         SELECT ?date (SAMPLE(?answer) AS ?answer) (SAMPLE(?question) AS ?question) 
@@ -742,6 +758,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("86b64102-8074-4c4e-8f3e-71a0e52bb261"),
                     CategoryId = CategoryHistory.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Who was Federal Chancellor of Germany from {0}?",
                     SparqlQuery = @"# German Chancellors
                         SELECT ?answer (CONCAT(STR(?startYear), ' to ', STR(?endYear)) AS ?question) WHERE {
@@ -766,6 +783,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("d135088c-e062-4016-8eb4-1d68c72915ea"),
                     CategoryId = CategoryHistory.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Which colony belonged to the {0}?",
                     SparqlQuery = @"# empires and colonies
                         SELECT DISTINCT ?empire (?empireLabel as ?question) ?colony (?colonyLabel as ?answer)
@@ -844,6 +862,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("0d218830-55d2-4d66-8d8f-d402514e9202"),
                     CategoryId = CategoryHistory.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Which of these wars started in {0}?",
                     SparqlQuery = @"# wars of the 20th century
                         SELECT (SAMPLE(?itemLabel) AS ?answer) (YEAR(MAX(?startdate)) AS ?question) WHERE {
@@ -868,6 +887,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("8273acfe-c278-4cd4-92f5-07dd73a22577"),
                     CategoryId = CategoryChemistry.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Which chemical compound has the formula {0}?",
                     SparqlQuery = @"# Which chemical compound has the formula {0}?
                         SELECT DISTINCT ?chemicalCompound ?answer (?chemical_formula AS ?question) ?sitelinks WHERE {
@@ -886,6 +906,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("bba18c92-47a6-4541-9305-d6453ad8477a"),
                     CategoryId = CategoryChemistry.Id,
                     MiniGameType = MiniGameType.Sort,
+                    Status = QuestionStatus.Approved,
                     TaskDescription = "Sort these chemical elements by {0} (ascending)!",
                     SparqlQuery = @"
                         # Sort these chemical elements by their melting point

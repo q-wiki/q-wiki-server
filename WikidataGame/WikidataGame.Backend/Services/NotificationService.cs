@@ -168,7 +168,7 @@ namespace WikidataGame.Backend.Services
                 await _hub.CreateOrUpdateRegistrationAsync(registration);
                 return registrationId;
             }
-            catch (MessagingException e)
+            catch (MessagingException)
             {
                 //TODO: Handle properly
                 return string.Empty;

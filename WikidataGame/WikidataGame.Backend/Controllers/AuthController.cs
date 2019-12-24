@@ -1,37 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using WikidataGame.Backend.Dto;
 using WikidataGame.Backend.Helpers;
-using WikidataGame.Backend.Repos;
 using WikidataGame.Backend.Services;
 
 namespace WikidataGame.Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : CustomControllerBase
+    public class AuthController : ControllerBase
     {
-        private readonly AuthService _authService;
         public const string AnonPrefix = "anon";
-
-        public AuthController(
-            DataContext dataContext,
-            UserManager<Models.User> userManager,
-            IGameRepository gameRepo,
-            INotificationService notificationService,
-            IMapper mapper,
-            AuthService authService) : base(dataContext, userManager, gameRepo, notificationService, mapper)
-        {
-            _authService = authService;
-        }
 
         /// <summary>
         /// Authenticates a player using username/password
@@ -45,41 +29,46 @@ namespace WikidataGame.Backend.Controllers
         public async Task<ActionResult<AuthInfo>> Authenticate(
             [FromHeader(Name = "X-Username")] string username,
             [FromHeader(Name = "X-Password")] string password,
-            [FromHeader(Name = "X-Push-Token")] string pushToken)
+            [FromHeader(Name = "X-Push-Token")] string pushToken,
+#pragma warning disable CS1573 // no xml comments for service injection
+            [FromServices] UserManager<Models.User> userManager,
+            [FromServices] IMapper mapper,
+            [FromServices] INotificationService notificationService)
+#pragma warning restore CS1573
         {
-            if(!username.StartsWith(AnonPrefix))
+            if (!username.StartsWith(AnonPrefix))
             {
                 username = $"{AnonPrefix}-{username}";
             }
             try
             {
-                var user = await _userManager.FindByNameAsync(username);
+                var user = await userManager.FindByNameAsync(username);
                 if (user == null)
                 {
                     //create
                     var userToCreate = new Models.User { UserName = username };
-                    var idresult = await _userManager.CreateAsync(userToCreate, password);
+                    var idresult = await userManager.CreateAsync(userToCreate, password);
                     if (!idresult.Succeeded)
                     {
                         throw new IdentityErrorException(idresult.Errors);
                     }
-                    user = await _userManager.FindByIdAsync(userToCreate.Id.ToString());
+                    user = await userManager.FindByIdAsync(userToCreate.Id.ToString());
                 }
                 else
                 {
                     //login
-                    if (!await _userManager.CheckPasswordAsync(user, password))
+                    if (!await userManager.CheckPasswordAsync(user, password))
                         return Unauthorized();
 
-                    var idresult = await _userManager.UpdateAsync(user);
+                    var idresult = await userManager.UpdateAsync(user);
                     if (!idresult.Succeeded)
                     {
                         throw new IdentityErrorException(idresult.Errors);
                     }
                 }
 
-                await RegisterPushForUserAsync(user, pushToken);
-                var authInfo = JwtTokenHelper.CreateJwtToken(user, _mapper);
+                await RegisterPushForUserAsync(user, pushToken, userManager, notificationService);
+                var authInfo = JwtTokenHelper.CreateJwtToken(user, mapper);
                 Response.Headers.Add("WWW-Authenticate", $"Bearer {authInfo.Bearer}");
                 return Ok(authInfo);
             }
@@ -102,12 +91,18 @@ namespace WikidataGame.Backend.Controllers
         public async Task<ActionResult<AuthInfo>> AuthenticateGooglePlay(
             [FromHeader(Name = "X-Username")] string username,
             [FromHeader(Name = "X-Auth-Code")] string authCode,
-            [FromHeader(Name = "X-Push-Token")] string pushToken)
+            [FromHeader(Name = "X-Push-Token")] string pushToken,
+#pragma warning disable CS1573 // no xml comments for service injection
+            [FromServices] AuthService authService,
+            [FromServices] UserManager<Models.User> userManager,
+            [FromServices] INotificationService notificationService,
+            [FromServices] IMapper mapper)
+#pragma warning restore CS1573
         {
             if (string.IsNullOrWhiteSpace(authCode))
                 return BadRequest(new { message = "Authentication token needs to be supplied" });
 
-            var verificationResponse = await _authService.VerifyAuthCodeAsync(authCode);
+            var verificationResponse = await authService.VerifyAuthCodeAsync(authCode);
             if (!verificationResponse.Success)
             {
                 return Unauthorized();
@@ -117,11 +112,13 @@ namespace WikidataGame.Backend.Controllers
             {
                 var user = await CreateOrUpdateUserWithLoginProviderAsync(
                     "Google",
-                    pushToken,
                     username,
-                    verificationResponse.Response);
+                    verificationResponse.Response,
+                    userManager);
 
-                var authInfo = JwtTokenHelper.CreateJwtToken(user, _mapper);
+                await RegisterPushForUserAsync(user, pushToken, userManager, notificationService);
+
+                var authInfo = JwtTokenHelper.CreateJwtToken(user, mapper);
                 Response.Headers.Add("WWW-Authenticate", $"Bearer {authInfo.Bearer}");
                 return Ok(authInfo);
             }
@@ -133,22 +130,22 @@ namespace WikidataGame.Backend.Controllers
 
         private async Task<Models.User> CreateOrUpdateUserWithLoginProviderAsync(
             string provider,
-            string pushToken,
             string username,
-            GoogleResponse response)
+            GoogleResponse response,
+            UserManager<Models.User> userManager)
         {
-            var user = await _userManager.FindByLoginAsync(provider, response.GooglePlayId);
+            var user = await userManager.FindByLoginAsync(provider, response.GooglePlayId);
             if (user == null)
             {
                 //create
                 var userToCreate = new Models.User { UserName = username, ProfileImageUrl = response.GooglePlayProfileImage };
-                var idresult = await _userManager.CreateAsync(userToCreate);
+                var idresult = await userManager.CreateAsync(userToCreate);
                 if (!idresult.Succeeded)
                 {
                     throw new IdentityErrorException(idresult.Errors);
                 }
-                user = await _userManager.FindByIdAsync(userToCreate.Id.ToString());
-                idresult = await _userManager.AddLoginAsync(user, new UserLoginInfo(provider, response.GooglePlayId, string.Empty));
+                user = await userManager.FindByIdAsync(userToCreate.Id.ToString());
+                idresult = await userManager.AddLoginAsync(user, new UserLoginInfo(provider, response.GooglePlayId, string.Empty));
                 if (!idresult.Succeeded)
                 {
                     throw new IdentityErrorException(idresult.Errors);
@@ -159,7 +156,7 @@ namespace WikidataGame.Backend.Controllers
                 //update
                 user.UserName = username;
                 user.ProfileImageUrl = response.GooglePlayProfileImage;
-                var idresult = await _userManager.UpdateAsync(user);
+                var idresult = await userManager.UpdateAsync(user);
                 if (!idresult.Succeeded)
                 {
                     throw new IdentityErrorException(idresult.Errors);
@@ -176,31 +173,29 @@ namespace WikidataGame.Backend.Controllers
 
             foreach (var additionalToken in tokens)
             {
-                var idresult = await _userManager.SetAuthenticationTokenAsync(user, provider, additionalToken.Key, additionalToken.Value);
+                var idresult = await userManager.SetAuthenticationTokenAsync(user, provider, additionalToken.Key, additionalToken.Value);
                 if (!idresult.Succeeded)
                 {
                     throw new IdentityErrorException(idresult.Errors);
                 }
             }
             
-
-            await RegisterPushForUserAsync(user, pushToken);
             return user;
         }
 
-        private async Task RegisterPushForUserAsync(Models.User user, string pushToken)
+        private async Task RegisterPushForUserAsync(Models.User user, string pushToken, UserManager<Models.User> userManager, INotificationService notificationService)
         {
             if (string.IsNullOrWhiteSpace(pushToken))
             {
                 if (!string.IsNullOrEmpty(user.PushRegistrationId)) //remove push registration
                 {
-                    await _notificationService.DeleteUserAsync(user);
+                    await notificationService.DeleteUserAsync(user);
                     user.PushRegistrationId = string.Empty;
                 }
             }
             else
             {
-                var registrationId = await _notificationService.RegisterOrUpdatePushChannelAsync(user, new DeviceRegistration
+                var registrationId = await notificationService.RegisterOrUpdatePushChannelAsync(user, new DeviceRegistration
                 {
                     Handle = pushToken,
                     Platform = "fcm",
@@ -208,7 +203,7 @@ namespace WikidataGame.Backend.Controllers
                 });
                 user.PushRegistrationId = registrationId;
             }
-            await _userManager.UpdateAsync(user);
+            await userManager.UpdateAsync(user);
         }
     }
 }

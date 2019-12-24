@@ -17,5 +17,12 @@ namespace WikidataGame.Backend.Repos
         Game JoinGame(Game game, User player);
 
         Task<IEnumerable<Game>> RunningGamesForPlayerAsync(User player);
+        Task<bool> IsUserGameParticipantAsync(User user, Guid gameId);
+        Task<bool> IsItPlayersTurnAsync(User user, Guid gameId);
+        Task<bool> IsTileInGameAsync(Guid gameId, Guid tileId);
+        Task<bool> IsCategoryAllowedForTileAsync(Services.CategoryCacheService ccs, Guid gameId, Guid tileId, Guid categoryId);
+        Task<IEnumerable<Guid>> WinningPlayerIdsAsync(Guid gameId);
+        Task<bool> AllTilesConqueredAsync(User user, Guid gameId);
+        Task SetGameWonAsync(Game game, Services.INotificationService notificationService);
     }
 }

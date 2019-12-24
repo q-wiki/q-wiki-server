@@ -18,31 +18,22 @@ namespace WikidataGame.Backend.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class FriendsController : CustomControllerBase
+    public class FriendsController : ControllerBase
     {
-        private readonly IRepository<Models.Friend, Guid> _friendsRepo;
-        public FriendsController(
-            DataContext dataContext,
-            UserManager<Models.User> userManager,
-            IGameRepository gameRepo,
-            IRepository<Models.Friend, Guid> friendsRepo,
-            INotificationService notificationService,
-            IMapper mapper) : base(dataContext, userManager, gameRepo, notificationService, mapper)
-        {
-            _friendsRepo = friendsRepo;
-        }
-
         /// <summary>
         /// Retrieves the friendlist for the signed in user
         /// </summary>
         /// <returns>List of friends</returns>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<Player>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Player>>> GetFriends()
+        public async Task<ActionResult<IEnumerable<Player>>> GetFriends(
+            [FromServices] IRepository<Models.Friend, Guid> friendsRepo,
+            [FromServices] UserManager<Models.User> userManager,
+            [FromServices] IMapper mapper)
         {
-            var user = await GetCurrentUserAsync();
-            var friends = await _friendsRepo.FindAsync(f => f.UserId == user.Id);
-            return Ok(friends.Select(f => _mapper.Map<Player>(f.FriendUser)).ToList());
+            var user = await userManager.GetUserAsync(User);
+            var friends = await friendsRepo.FindAsync(f => f.UserId == user.Id);
+            return Ok(friends.Select(f => mapper.Map<Player>(f.FriendUser)).ToList());
         }
         
 
@@ -53,17 +44,24 @@ namespace WikidataGame.Backend.Controllers
         /// <returns>Details of the added user</returns>
         [HttpPost]
         [ProducesResponseType(typeof(Player), StatusCodes.Status201Created)]
-        public async Task<ActionResult<Player>> PostFriend(Guid friendId)
+        public async Task<ActionResult<Player>> PostFriend(
+            Guid friendId,
+#pragma warning disable CS1573 // no xml comments for service injection
+            [FromServices] IRepository<Models.Friend, Guid> friendsRepo,
+            [FromServices] UserManager<Models.User> userManager,
+            [FromServices] DataContext dataContext,
+            [FromServices] IMapper mapper)
+#pragma warning restore CS1573
         {
-            var user = await GetCurrentUserAsync();
-            var friendUser = await _userManager.FindByIdAsync(friendId.ToString());
+            var user = await userManager.GetUserAsync(User);
+            var friendUser = await userManager.FindByIdAsync(friendId.ToString());
             if(friendUser == null) //user does not exist
             {
                 return NotFound("User not found");
             }
 
             if(friendUser.Id == user.Id || //cannot be friends with oneself
-                (await _friendsRepo.SingleOrDefaultAsync(f => f.UserId == user.Id && f.FriendId == friendId)) != null) // already friends 
+                (await friendsRepo.SingleOrDefaultAsync(f => f.UserId == user.Id && f.FriendId == friendId)) != null) // already friends 
             {
                 return BadRequest("Already friends!");
             }
@@ -73,10 +71,10 @@ namespace WikidataGame.Backend.Controllers
                 UserId = user.Id,
                 FriendId = friendId,
             };
-            await _friendsRepo.AddAsync(friend);
-            await _dataContext.SaveChangesAsync();
+            await friendsRepo.AddAsync(friend);
+            await dataContext.SaveChangesAsync();
 
-            return Created(string.Empty, _mapper.Map<Player>(friendUser));
+            return Created(string.Empty, mapper.Map<Player>(friendUser));
         }
 
         /// <summary>
@@ -86,17 +84,23 @@ namespace WikidataGame.Backend.Controllers
         /// <returns></returns>
         [HttpDelete("{friendId}")]
         [ProducesResponseType(typeof(Player), StatusCodes.Status204NoContent)]
-        public async Task<ActionResult> DeleteFriend(Guid friendId)
+        public async Task<ActionResult> DeleteFriend(
+            Guid friendId,
+#pragma warning disable CS1573 // no xml comments for service injection
+            [FromServices] IRepository<Models.Friend, Guid> friendsRepo,
+            [FromServices] UserManager<Models.User> userManager,
+            [FromServices] DataContext dataContext)
+#pragma warning restore CS1573
         {
-            var user = await GetCurrentUserAsync();
-            var friendship = await _friendsRepo.SingleOrDefaultAsync(f => f.UserId == user.Id && f.FriendId == friendId);
+            var user = await userManager.GetUserAsync(User);
+            var friendship = await friendsRepo.SingleOrDefaultAsync(f => f.UserId == user.Id && f.FriendId == friendId);
             if (friendship == null) // not friends
             {
                 return BadRequest("No friendship to delete");
             }
 
-            _friendsRepo.Remove(friendship);
-            await _dataContext.SaveChangesAsync();
+            friendsRepo.Remove(friendship);
+            await dataContext.SaveChangesAsync();
 
             return NoContent();
         }
@@ -108,14 +112,19 @@ namespace WikidataGame.Backend.Controllers
         /// <returns>List of users</returns>
         [HttpGet("Find")]
         [ProducesResponseType(typeof(IEnumerable<Player>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Player>>> GetFindFriends(string query)
+        public async Task<ActionResult<IEnumerable<Player>>> GetFindFriends(
+            string query,
+#pragma warning disable CS1573 // no xml comments for service injection
+            [FromServices] UserManager<Models.User> userManager,
+            [FromServices] IMapper mapper)
+#pragma warning restore CS1573
         {
             if (query.Length < 3)
                 return BadRequest();
 
-            var user = await GetCurrentUserAsync();
-            var users = await _userManager.Users.Where(u => u.Id != user.Id && EF.Functions.Like(u.UserName, $"%{query.Replace("%","")}%")).Take(10).ToListAsync();
-            return Ok(users.Select(f => _mapper.Map<Player>(f)).ToList());
+            var user = await userManager.GetUserAsync(User);
+            var users = await userManager.Users.Where(u => u.Id != user.Id && EF.Functions.Like(u.UserName, $"%{query.Replace("%","")}%")).Take(10).ToListAsync();
+            return Ok(users.Select(f => mapper.Map<Player>(f)).ToList());
         }
     }
 }

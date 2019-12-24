@@ -9,5 +9,7 @@ namespace WikidataGame.Backend.Repos
     public interface IMinigameRepository : IRepository<MiniGame, Guid>
     {
         Task<MiniGame> CreateMiniGameAsync(Guid gameId, Guid playerId, Guid tileId, Question question, MiniGameType type);
+        Task<bool> HasPlayerAnOpenMinigameAsync(User user, Guid gameId);
+        Task<bool> IsUserMinigamePlayerAsync(User user, Guid gameId, Guid minigameId);
     }
 }

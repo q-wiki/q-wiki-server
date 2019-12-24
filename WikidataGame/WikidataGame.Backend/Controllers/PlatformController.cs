@@ -16,42 +16,22 @@ namespace WikidataGame.Backend.Controllers
     [ApiController]
     public class PlatformController : ControllerBase
     {
-        private readonly DataContext _dataContext;
-        private readonly IGameRepository _gameRepo;
-        private readonly IRepository<Models.Category, Guid> _categoryRepo;
-        private readonly IQuestionRepository _questionRepo;
-        private readonly IMinigameRepository _miniGameRepo;
-        private readonly IMapper _mapper;
-
-        public PlatformController(
-            DataContext dataContext,
-            IGameRepository gameRepo,
-            IRepository<Models.Category, Guid> categoryRepo,
-            IQuestionRepository questionRepo,
-            IMinigameRepository miniGameRepo,
-            IMapper mapper)
-        {
-            _dataContext = dataContext;
-            _gameRepo = gameRepo;
-            _categoryRepo = categoryRepo;
-            _questionRepo = questionRepo;
-            _miniGameRepo = miniGameRepo;
-            _mapper = mapper;
-        }
-
         /// <summary>
         /// Retrieves statistics containing the number of categories, games played and questions added
         /// </summary>
         /// <returns>Current statistics</returns>
         [HttpGet("Stats")]
         [ProducesResponseType(typeof(PlatformStats), StatusCodes.Status200OK)]
-        public async Task<ActionResult<PlatformStats>> GetPlatformStats()
+        public async Task<ActionResult<PlatformStats>> GetPlatformStats(
+            [FromServices] IRepository<Models.Category, Guid> categoryRepo,
+            [FromServices] IGameRepository gameRepo,
+            [FromServices] IQuestionRepository questionRepo)
         {
             return Ok(new PlatformStats
             {
-                NumberOfCategories = await _categoryRepo.CountAsync(),
-                NumberOfGamesPlayed = await _gameRepo.CountAsync(),
-                NumberOfQuestions = await _questionRepo.CountAsync(q => q.Status == Models.QuestionStatus.Approved),
+                NumberOfCategories = await categoryRepo.CountAsync(),
+                NumberOfGamesPlayed = await gameRepo.CountAsync(),
+                NumberOfQuestions = await questionRepo.CountAsync(q => q.Status == Models.QuestionStatus.Approved),
                 NumberOfContributions = 0 //TODO: Add contributions ability and handle count here
             });
         }
@@ -63,13 +43,18 @@ namespace WikidataGame.Backend.Controllers
         /// <returns>Detailed minigame information</returns>
         [HttpGet("Minigame/{minigameId}")]
         [ProducesResponseType(typeof(DetailedMiniGame), StatusCodes.Status200OK)]
-        public async Task<ActionResult<DetailedMiniGame>> GetPlatformMinigameById(Guid minigameId)
+        public async Task<ActionResult<DetailedMiniGame>> GetPlatformMinigameById(
+            Guid minigameId,
+#pragma warning disable CS1573 // no xml comments for service injection
+            [FromServices] IMinigameRepository miniGameRepo,
+            [FromServices] IMapper mapper)
+#pragma warning restore CS1573
         {
-            var minigame = await _miniGameRepo.GetAsync(minigameId);
+            var minigame = await miniGameRepo.GetAsync(minigameId);
             if (minigame == null || minigame.Status == Models.MiniGameStatus.Unknown)
                 return NotFound();
 
-            return Ok(_mapper.Map<DetailedMiniGame>(minigame));
+            return Ok(mapper.Map<DetailedMiniGame>(minigame));
         }
 
         /// <summary>
@@ -78,10 +63,12 @@ namespace WikidataGame.Backend.Controllers
         /// <returns>list of questions</returns>
         [HttpGet("Question")]
         [ProducesResponseType(typeof(IEnumerable<Question>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Question>>> GetPlatformQuestions()
+        public async Task<ActionResult<IEnumerable<Question>>> GetPlatformQuestions(
+            [FromServices] IQuestionRepository questionRepo,
+            [FromServices] IMapper mapper)
         {
-            var questions = await _questionRepo.GetAllAsync();
-            return Ok(questions.Select(q => _mapper.Map<Question>(q)).ToList());
+            var questions = await questionRepo.GetAllAsync();
+            return Ok(questions.Select(q => mapper.Map<Question>(q)).ToList());
         }
 
         /// <summary>
@@ -94,9 +81,14 @@ namespace WikidataGame.Backend.Controllers
         [ProducesResponseType(typeof(Question), StatusCodes.Status200OK)]
         public async Task<ActionResult<Question>> AddPlatformQuestionRating(
             Guid questionId,
-            [Required, Range(1,5)] int rating)
+            [Required, Range(1,5)] int rating,
+#pragma warning disable CS1573 // no xml comments for service injection
+            [FromServices] IQuestionRepository questionRepo,
+            [FromServices] DataContext dataContext,
+            [FromServices] IMapper mapper)
+#pragma warning restore CS1573
         {
-            var question = await _questionRepo.GetAsync(questionId);
+            var question = await questionRepo.GetAsync(questionId);
             if (question == null)
                 return NotFound();
 
@@ -105,27 +97,39 @@ namespace WikidataGame.Backend.Controllers
                 Rating = rating
             });
 
-            await _dataContext.SaveChangesAsync();
+            await dataContext.SaveChangesAsync();
 
-            return Ok(_mapper.Map<Question>(question));
+            return Ok(mapper.Map<Question>(question));
         }
 
+        /// <summary>
+        /// Adds the specified question to the question catalogue (with status pending)
+        /// </summary>
+        /// <param name="question">question to add</param>
+        /// <returns>created question</returns>
         [HttpPost("Question")]
         [ProducesResponseType(typeof(Question), StatusCodes.Status201Created)]
-        public async Task<ActionResult<Question>> AddPlatformQuestion([FromBody] Question question)
+        public async Task<ActionResult<Question>> AddPlatformQuestion(
+            [FromBody] Question question,
+#pragma warning disable CS1573 // no xml comments for service injection
+            [FromServices] IQuestionRepository questionRepo,
+            [FromServices] IRepository<Models.Category, Guid> categoryRepo,
+            [FromServices] DataContext dataContext,
+            [FromServices] IMapper mapper)
+#pragma warning restore CS1573
         {
-            var questionModel = _mapper.Map<Models.Question>(question);
-            var category =  await _categoryRepo.GetAsync(question.Category.Id);
+            var questionModel = mapper.Map<Models.Question>(question);
+            var category =  await categoryRepo.GetAsync(question.Category.Id);
             if (category == null)
                 return BadRequest("Unknown category");
 
             questionModel.Category = category;
             questionModel.Status = Models.QuestionStatus.Pending;
 
-            await _questionRepo.AddAsync(questionModel);
-            await _dataContext.SaveChangesAsync();
+            await questionRepo.AddAsync(questionModel);
+            await dataContext.SaveChangesAsync();
 
-            return Created(string.Empty, _mapper.Map<Question>(questionModel));            
+            return Created(string.Empty, mapper.Map<Question>(questionModel));            
         }
 
         /// <summary>
@@ -134,10 +138,12 @@ namespace WikidataGame.Backend.Controllers
         /// <returns>list of categories</returns>
         [HttpGet("Category")]
         [ProducesResponseType(typeof(IEnumerable<Category>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Category>>> GetPlatformCategories()
+        public async Task<ActionResult<IEnumerable<Category>>> GetPlatformCategories(
+            [FromServices] IRepository<Models.Category, Guid> categoryRepo,
+            [FromServices] IMapper mapper)
         {
-            var categories = await _categoryRepo.GetAllAsync();
-            return Ok(categories.Select(c => _mapper.Map<Category>(c)).ToList());
+            var categories = await categoryRepo.GetAllAsync();
+            return Ok(categories.Select(c => mapper.Map<Category>(c)).ToList());
         }
 
 

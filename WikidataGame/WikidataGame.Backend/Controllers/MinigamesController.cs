@@ -18,27 +18,8 @@ namespace WikidataGame.Backend.Controllers
     [Route("api/games/{gameId}/minigames")]
     [Authorize]
     [ApiController]
-    public class MinigamesController : CustomControllerBase
+    public class MinigamesController : ControllerBase
     {
-        private readonly IMinigameRepository _minigameRepo;
-        private readonly IQuestionRepository _questionRepo;
-        private readonly CategoryCacheService _categoryCacheService;
-
-        public MinigamesController(
-            DataContext dataContext,
-            UserManager<Models.User> userManager,
-            IGameRepository gameRepo,
-            IMinigameRepository minigameRepo,
-            IQuestionRepository questionRepo,
-            INotificationService notificationService,
-            IMapper mapper,
-            CategoryCacheService categoryCacheService) : base(dataContext, userManager, gameRepo, notificationService, mapper)
-        {
-            _minigameRepo = minigameRepo;
-            _questionRepo = questionRepo;
-            _categoryCacheService = categoryCacheService;
-        }
-
         /// <summary>
         /// Initializes a new minigame
         /// </summary>
@@ -47,22 +28,33 @@ namespace WikidataGame.Backend.Controllers
         /// <returns>The created minigame</returns>
         [HttpPost]
         [ProducesResponseType(typeof(MiniGame), StatusCodes.Status201Created)]
-        public async Task<ActionResult<MiniGame>> InitalizeMinigame(Guid gameId, MiniGameInit minigameParams)
+        public async Task<ActionResult<MiniGame>> InitalizeMinigame(
+            Guid gameId,
+            MiniGameInit minigameParams,
+#pragma warning disable CS1573 // no xml comments for service injection
+            [FromServices] CategoryCacheService ccs,
+            [FromServices] IMinigameRepository minigameRepo,
+            [FromServices] IQuestionRepository questionRepo,
+            [FromServices] IGameRepository gameRepo,
+            [FromServices] UserManager<Models.User> userManager,
+            [FromServices] IMapper mapper)
+#pragma warning restore CS1573
         {
-            if (!await IsUserGameParticipantAsync(gameId) || minigameParams == null ||
-                !await IsTileInGameAsync(gameId, minigameParams.TileId) ||
-                !await IsCategoryAllowedForTileAsync(gameId, minigameParams.TileId, minigameParams.CategoryId) ||
-                !await IsItPlayersTurnAsync(gameId) ||
-                await HasPlayerAnOpenMinigameAsync(gameId))
+            var user = await userManager.GetUserAsync(User);
+            if (!await gameRepo.IsUserGameParticipantAsync(user, gameId) || minigameParams == null ||
+                !await gameRepo.IsTileInGameAsync(gameId, minigameParams.TileId) ||
+                !await gameRepo.IsCategoryAllowedForTileAsync(ccs, gameId, minigameParams.TileId, minigameParams.CategoryId) ||
+                !await gameRepo.IsItPlayersTurnAsync(user, gameId) ||
+                await minigameRepo.HasPlayerAnOpenMinigameAsync(user, gameId))
                     return Forbid();
 
             var minigameServices = ControllerContext.HttpContext.RequestServices.GetServices<IMinigameService>();
-            var question = await _questionRepo.GetRandomQuestionForCategoryAsync(minigameParams.CategoryId);
+            var question = await questionRepo.GetRandomQuestionForCategoryAsync(minigameParams.CategoryId);
             var service = minigameServices.SingleOrDefault(s => s.MiniGameType == question.MiniGameType);
 
-            var minigame = await service.GenerateMiniGameAsync(gameId, (await GetCurrentUserAsync()).Id, question, minigameParams.TileId);
+            var minigame = await service.GenerateMiniGameAsync(gameId, user.Id, question, minigameParams.TileId);
 
-            return Created(string.Empty, _mapper.Map<MiniGame>(minigame));
+            return Created(string.Empty, mapper.Map<MiniGame>(minigame));
         }
 
         /// <summary>
@@ -73,14 +65,24 @@ namespace WikidataGame.Backend.Controllers
         /// <returns>The request minigame</returns>
         [HttpGet("{minigameId}")]
         [ProducesResponseType(typeof(MiniGame), StatusCodes.Status200OK)]
-        public async Task<ActionResult<MiniGame>> RetrieveMinigameInfo(Guid gameId, Guid minigameId)
+        public async Task<ActionResult<MiniGame>> RetrieveMinigameInfo(
+            Guid gameId,
+            Guid minigameId,
+#pragma warning disable CS1573 // no xml comments for service injection
+            [FromServices] IGameRepository gameRepo,
+            [FromServices] IMinigameRepository minigameRepo,
+            [FromServices] UserManager<Models.User> userManager,
+            [FromServices] IMapper mapper)
+#pragma warning restore CS1573
         {
-            if (!await IsUserGameParticipantAsync(gameId) || !await IsUserMinigamePlayerAsync(gameId, minigameId))
+            var user = await userManager.GetUserAsync(User);
+            if (!await gameRepo.IsUserGameParticipantAsync(user, gameId) ||
+                !await minigameRepo.IsUserMinigamePlayerAsync(user, gameId, minigameId))
                 return Forbid();
 
-            var minigame = await _minigameRepo.GetAsync(minigameId);
+            var minigame = await minigameRepo.GetAsync(minigameId);
 
-            return Ok(_mapper.Map<MiniGame>(minigame));
+            return Ok(mapper.Map<MiniGame>(minigame));
         }
 
         /// <summary>
@@ -92,12 +94,25 @@ namespace WikidataGame.Backend.Controllers
         /// <returns></returns>
         [HttpPost("{minigameId}")]
         [ProducesResponseType(typeof(MiniGameResult), StatusCodes.Status200OK)]
-        public async Task<ActionResult<MiniGameResult>> AnswerMinigame(Guid gameId, Guid minigameId, IEnumerable<string> answers)
+        public async Task<ActionResult<MiniGameResult>> AnswerMinigame(
+            Guid gameId,
+            Guid minigameId,
+            IEnumerable<string> answers,
+#pragma warning disable CS1573 // no xml comments for service injection
+            [FromServices] IGameRepository gameRepo,
+            [FromServices] IMinigameRepository minigameRepo,
+            [FromServices] UserManager<Models.User> userManager,
+            [FromServices] IMapper mapper,
+            [FromServices] INotificationService notificationService,
+            [FromServices] DataContext dataContext)
+#pragma warning restore CS1573
         {
-            if (!await IsUserGameParticipantAsync(gameId) || !await IsUserMinigamePlayerAsync(gameId, minigameId))
+            var user = await userManager.GetUserAsync(User);
+            if (!await gameRepo.IsUserGameParticipantAsync(user, gameId) ||
+                !await minigameRepo.IsUserMinigamePlayerAsync(user, gameId, minigameId))
                 return Forbid();
 
-            var minigame = await _minigameRepo.GetAsync(minigameId);
+            var minigame = await minigameRepo.GetAsync(minigameId);
             if (minigame.Status !=  Models.MiniGameStatus.Unknown)
                 return Forbid();
 
@@ -123,11 +138,11 @@ namespace WikidataGame.Backend.Controllers
                 }
             }
 
-            var game = await _gameRepo.GetAsync(gameId);
+            var game = await gameRepo.GetAsync(gameId);
             game.StepsLeftWithinMove--;
-            if(await AllTilesConqueredAsync(gameId))
+            if(await gameRepo.AllTilesConqueredAsync(user, gameId))
             {
-                await SetGameWonAsync(game);
+                await gameRepo.SetGameWonAsync(game, notificationService);
             }
 
             if(game.StepsLeftWithinMove < 1)
@@ -135,7 +150,7 @@ namespace WikidataGame.Backend.Controllers
                 game.MoveCount++;
                 if (game.MoveCount / game.GameUsers.Count >= Models.Game.MaxRounds)
                 {
-                    await SetGameWonAsync(game);
+                    await gameRepo.SetGameWonAsync(game, notificationService);
                 }
                 else
                 {
@@ -144,92 +159,12 @@ namespace WikidataGame.Backend.Controllers
                     game.NextMovePlayerId = nextPlayer.UserId;
                     game.MoveStartedAt = DateTime.UtcNow;
                     game.StepsLeftWithinMove = Models.Game.StepsPerPlayer;
-                    await _notificationService.SendNotificationAsync(PushType.YourTurn, nextPlayer.User, await GetCurrentUserAsync(), game.Id);
+                    await notificationService.SendNotificationAsync(PushType.YourTurn, nextPlayer.User, user, game.Id);
                 }
             }
-            await _dataContext.SaveChangesAsync();
+            await dataContext.SaveChangesAsync();
 
-            return Ok(_mapper.Map<MiniGameResult>(minigame));
-        }
-
-        private async Task<bool> IsItPlayersTurnAsync(Guid gameId)
-        {
-            var game = await _gameRepo.GetAsync(gameId);
-            return game.NextMovePlayerId == (await GetCurrentUserAsync()).Id;
-        }
-
-        private async Task<bool> IsUserMinigamePlayerAsync(Guid gameId, Guid minigameId)
-        {
-            var user = await GetCurrentUserAsync();
-            var minigame = await _minigameRepo.GetAsync(minigameId);
-            return minigame != null && minigame.GameId == gameId && minigame.Player == user;
-        }
-
-        private async Task<bool> HasPlayerAnOpenMinigameAsync(Guid gameId)
-        {
-            var user = await GetCurrentUserAsync();
-            return await _minigameRepo.SingleOrDefaultAsync(m => m.PlayerId == user.Id && m.GameId == gameId && m.Status == Models.MiniGameStatus.Unknown) != null;
-        }
-
-        private async Task<bool> IsTileInGameAsync(Guid gameId, Guid tileId)
-        {
-            var game = await _gameRepo.GetAsync(gameId);
-            return game.Tiles.SingleOrDefault(t => t.Id == tileId) != null;
-        }
-
-        private async Task<bool> IsCategoryAllowedForTileAsync(Guid gameId, Guid tileId, Guid categoryId)
-        {
-            var game = await _gameRepo.GetAsync(gameId);
-            var tile = game.Tiles.SingleOrDefault(t => t.Id == tileId);
-            return (!tile.ChosenCategoryId.HasValue || tile.ChosenCategoryId == categoryId) && 
-                TileHelper.GetCategoriesForTile(_categoryCacheService, tileId).SingleOrDefault(c => c.Id == categoryId) != null;
-        }
-
-        private async Task<IEnumerable<Guid>> WinningPlayerIdsAsync(Guid gameId)
-        {
-            var game = await _gameRepo.GetAsync(gameId);
-            var result = game.GameUsers.ToDictionary(gu => gu.UserId, gu => 0);
-            var tiles = game.Tiles.ToList();
-            foreach (var tile in tiles)
-            {
-                if (tile.OwnerId.HasValue)
-                {
-                    result[tile.OwnerId.Value] += tile.Difficulty + 1;
-                }
-            }
-            var rankedPlayers = result.OrderByDescending(r => r.Value);
-            return rankedPlayers.Where(p => p.Value >= rankedPlayers.First().Value).Select(p => p.Key).ToList();
-        }
-
-        private async Task<bool> AllTilesConqueredAsync(Guid gameId)
-        {
-            var game = await _gameRepo.GetAsync(gameId);
-            var currentUserId = (await GetCurrentUserAsync()).Id;
-            var opponentId = game.GameUsers.SingleOrDefault(gu => gu.UserId != currentUserId).UserId;
-            return game.Tiles.Count(t => t.OwnerId == opponentId) < 1;
-        }
-
-        private async Task SetGameWonAsync(Models.Game game)
-        {
-            var winningPlayerIds = await WinningPlayerIdsAsync(game.Id);
-            foreach (var winnerId in winningPlayerIds)
-            {
-                var user = game.GameUsers.SingleOrDefault(gu => gu.UserId == winnerId);
-                user.IsWinner = true;
-                await _notificationService.SendNotificationAsync(
-                    PushType.YouWon,
-                    user.User,
-                    game.GameUsers.SingleOrDefault(gu => gu.UserId != winnerId)?.User,
-                    game.Id);
-            }
-            foreach (var looser in game.GameUsers.Where(gu => !winningPlayerIds.Contains(gu.UserId)))
-            {
-                await _notificationService.SendNotificationAsync(
-                    PushType.YouLost,
-                    looser.User,
-                    game.GameUsers.SingleOrDefault(gu => winningPlayerIds.Contains(gu.UserId))?.User,
-                    game.Id);
-            }
+            return Ok(mapper.Map<MiniGameResult>(minigame));
         }
     }
 }

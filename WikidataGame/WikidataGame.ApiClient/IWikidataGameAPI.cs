@@ -328,7 +328,12 @@ namespace WikidataGame
         /// </param>
         Task<HttpOperationResponse<IList<Question>>> GetPlatformQuestionsWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
+        /// <summary>
+        /// Adds the specified question to the question catalogue (with status
+        /// pending)
+        /// </summary>
         /// <param name='question'>
+        /// question to add
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.

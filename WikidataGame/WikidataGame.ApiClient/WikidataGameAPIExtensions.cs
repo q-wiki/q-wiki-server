@@ -705,20 +705,28 @@ namespace WikidataGame
                 }
             }
 
+            /// <summary>
+            /// Adds the specified question to the question catalogue (with status pending)
+            /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='question'>
+            /// question to add
             /// </param>
             public static Question AddPlatformQuestion(this IWikidataGameAPI operations, Question question = default(Question))
             {
                 return operations.AddPlatformQuestionAsync(question).GetAwaiter().GetResult();
             }
 
+            /// <summary>
+            /// Adds the specified question to the question catalogue (with status pending)
+            /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='question'>
+            /// question to add
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.

@@ -3067,7 +3067,11 @@ namespace WikidataGame
             return _result;
         }
 
+        /// <summary>
+        /// Adds the specified question to the question catalogue (with status pending)
+        /// </summary>
         /// <param name='question'>
+        /// question to add
         /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.

@@ -807,5 +807,39 @@ namespace WikidataGame
                 }
             }
 
+            /// <summary>
+            /// Creates a new report for mistakes/errors within a minigame
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='report'>
+            /// Report to be created
+            /// </param>
+            public static Report AddPlatformReport(this IWikidataGameAPI operations, Report report = default(Report))
+            {
+                return operations.AddPlatformReportAsync(report).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Creates a new report for mistakes/errors within a minigame
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='report'>
+            /// Report to be created
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<Report> AddPlatformReportAsync(this IWikidataGameAPI operations, Report report = default(Report), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.AddPlatformReportWithHttpMessagesAsync(report, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
     }
 }

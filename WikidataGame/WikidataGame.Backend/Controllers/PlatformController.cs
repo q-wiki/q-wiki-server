@@ -146,6 +146,34 @@ namespace WikidataGame.Backend.Controllers
             return Ok(categories.Select(c => mapper.Map<Category>(c)).ToList());
         }
 
+        /// <summary>
+        /// Creates a new report for mistakes/errors within a minigame
+        /// </summary>
+        /// <param name="report">Report to be created</param>
+        /// <returns>Created report</returns>
+        [HttpPost("Report")]
+        [ProducesResponseType(typeof(Report), StatusCodes.Status201Created)]
+        public async Task<ActionResult<Report>> AddPlatformReport(
+            [FromBody] Report report,
+#pragma warning disable CS1573 // no xml comments for service injection
+            [FromServices] IRepository<Models.Report, Guid> reportRepo,
+            [FromServices] IMinigameRepository minigameRepo,
+            [FromServices] DataContext dataContext,
+            [FromServices] IMapper mapper)
+#pragma warning restore CS1573
+        {
+            var reportModel = mapper.Map<Models.Report>(report);
+            if (report.MinigameId.HasValue)
+            {
+                var minigame = await minigameRepo.GetAsync(report.MinigameId.Value);
+                if (minigame == null)
+                    return BadRequest();
+            }
 
+            await reportRepo.AddAsync(reportModel);
+            await dataContext.SaveChangesAsync();
+
+            return Created(string.Empty, reportModel);
+        }
     }
 }

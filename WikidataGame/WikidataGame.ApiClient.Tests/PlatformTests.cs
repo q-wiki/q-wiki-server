@@ -109,5 +109,28 @@ namespace WikidataGame.ApiClient.Tests
             Assert.Equal(0, createdQuestion.Rating);
             Assert.Equal(0, createdQuestion.Status); //pending
         }
+
+        [Fact]
+        public async void AddReport_FromFixedValues_ReturnsCreatedReport()
+        {
+            var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials("no-auth"));
+            var report = new Models.Report
+            {
+                MinigameType = 0,
+                ProblemType = 1,
+                TaskDescription = "What is x?",
+                ProvidedAnswers = "x, y, z",
+                AdditionalInformation = "please mind y"
+            };
+            var createdReport = await apiClient.AddPlatformReportAsync(report);
+            ModelAssertion.AssertReport(createdReport);
+            Assert.Equal(report.MinigameType, createdReport.MinigameType);
+            Assert.Equal(report.ProblemType, createdReport.ProblemType);
+            Assert.Equal(report.TaskDescription, createdReport.TaskDescription);
+            Assert.Equal(report.ProvidedAnswers, createdReport.ProvidedAnswers);
+            Assert.Equal(report.AdditionalInformation, createdReport.AdditionalInformation);
+            Assert.True(string.IsNullOrEmpty(createdReport.MinigameId));
+        }
+
     }
 }

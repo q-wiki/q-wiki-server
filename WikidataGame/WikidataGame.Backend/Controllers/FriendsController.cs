@@ -116,6 +116,7 @@ namespace WikidataGame.Backend.Controllers
             string query,
 #pragma warning disable CS1573 // no xml comments for service injection
             [FromServices] UserManager<Models.User> userManager,
+            [FromServices] IRepository<Models.Friend, Guid> friendsRepo,
             [FromServices] IMapper mapper)
 #pragma warning restore CS1573
         {
@@ -123,7 +124,9 @@ namespace WikidataGame.Backend.Controllers
                 return BadRequest();
 
             var user = await userManager.GetUserAsync(User);
-            var users = await userManager.Users.Where(u => u.Id != user.Id && EF.Functions.Like(u.UserName, $"%{query.Replace("%","")}%")).Take(10).ToListAsync();
+            var friends = await friendsRepo.FindAsync(f => f.UserId == user.Id);
+            var friendUserIds = friends.Select(f => f.FriendId);
+            var users = await userManager.Users.Where(u => u.Id != user.Id && !friendUserIds.Contains(u.Id) && EF.Functions.Like(u.UserName, $"%{query.Replace("%","")}%")).Take(10).ToListAsync();
             return Ok(users.Select(f => mapper.Map<Player>(f)).ToList());
         }
     }

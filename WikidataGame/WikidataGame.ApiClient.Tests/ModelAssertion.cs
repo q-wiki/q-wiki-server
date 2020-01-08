@@ -134,11 +134,20 @@ namespace WikidataGame.ApiClient.Tests
             AssertQuestion(dmg.Question);
         }
 
+        public static void AssertReport(Report report)
+        {
+            Assert.NotNull(report);
+            AssertGuid(report.Id);
+            Assert.False(string.IsNullOrEmpty(report.TaskDescription));
+            Assert.False(string.IsNullOrEmpty(report.ProvidedAnswers));
+        }
+
         private static void AssertGuid(string id)
         {
             Assert.False(string.IsNullOrEmpty(id));
             Assert.True(Guid.TryParse(id, out var guid));
             Assert.False(guid == default);
         }
+
     }
 }

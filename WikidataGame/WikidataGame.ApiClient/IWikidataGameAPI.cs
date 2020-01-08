@@ -371,5 +371,19 @@ namespace WikidataGame
         /// </param>
         Task<HttpOperationResponse<IList<Category>>> GetPlatformCategoriesWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
+        /// <summary>
+        /// Creates a new report for mistakes/errors within a minigame
+        /// </summary>
+        /// <param name='report'>
+        /// Report to be created
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<Report>> AddPlatformReportWithHttpMessagesAsync(Report report = default(Report), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
     }
 }

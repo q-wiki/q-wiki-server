@@ -85,6 +85,17 @@ namespace WikidataGame.Backend.Helpers
             CreateMap<Models.GameRequest, Dto.GameRequest>()
                 .ForMember(dto => dto.Sender, opt => opt.MapFrom(model => model.Sender))
                 .ForMember(dto => dto.Recipient, opt => opt.MapFrom(model => model.Recipient));
+
+            CreateMap<Models.Report, Dto.Report>()
+                .ForMember(dto => dto.MinigameType, opt => opt.MapFrom(
+                    model => (Dto.MiniGameType)Enum.Parse(typeof(Dto.MiniGameType), model.MinigameType.ToString())))
+                .ForMember(dto => dto.ProblemType, opt => opt.MapFrom(
+                    model => (Dto.ProblemType)Enum.Parse(typeof(Dto.ProblemType), model.ProblemType.ToString())))
+                .ReverseMap()
+                .ForMember(model => model.MinigameType, opt => opt.MapFrom(
+                    dto => (Models.MiniGameType)Enum.Parse(typeof(Models.MiniGameType), dto.MinigameType.ToString())))
+                .ForMember(model => model.ProblemType, opt => opt.MapFrom(
+                    dto => (Models.ProblemType)Enum.Parse(typeof(Models.ProblemType), dto.ProblemType.ToString())));
         }
     }
 }

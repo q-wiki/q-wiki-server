@@ -53,7 +53,7 @@ namespace WikidataGame.Backend.Controllers
             
 
             await dataContext.SaveChangesAsync();
-            return Created(string.Empty, mapper.Map<GameInfo>(game));
+            return Created(string.Empty, mapper.Map<GameInfo>(game, opt => opt.Items[nameof(Models.GameUser.UserId)] = user.Id));
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace WikidataGame.Backend.Controllers
             }
 
             await dataContext.SaveChangesAsync();
-            return Created(string.Empty, mapper.Map<GameInfo>(game));
+            return Created(string.Empty, mapper.Map<GameInfo>(game, opt => opt.Items[nameof(Models.GameUser.UserId)] = user.Id));
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace WikidataGame.Backend.Controllers
         {
             var user = await userManager.GetUserAsync(User);
             var games = await gameRepo.RunningGamesForPlayerAsync(user);
-            return Ok(games.Select(g => mapper.Map<GameInfo>(g)).ToList());
+            return Ok(games.Select(g => mapper.Map<GameInfo>(g, opt => opt.Items[nameof(Models.GameUser.UserId)] = user.Id)).ToList());
         }
 
         /// <summary>

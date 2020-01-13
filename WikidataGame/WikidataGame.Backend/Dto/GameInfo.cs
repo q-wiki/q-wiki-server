@@ -11,5 +11,7 @@ namespace WikidataGame.Backend.Dto
         public Guid GameId { get; set; }
         public bool IsAwaitingOpponentToJoin { get; set; }
         public string Message { get; set; }
+        public Guid? NextMovePlayerId { get; set; }
+        public Player Opponent { get; set; }
     }
 }

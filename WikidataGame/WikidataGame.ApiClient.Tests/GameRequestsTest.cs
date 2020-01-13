@@ -88,6 +88,9 @@ namespace WikidataGame.ApiClient.Tests
             var gameInfo = await apiClient2.CreateNewGameByRequestAsync(request.Id);
 
             ModelAssertion.AssertGameInfo(gameInfo);
+            ModelAssertion.AssertPlayer(gameInfo.Opponent);
+            Assert.Equal(gameInfo.Opponent.Id, authInfo.User.Id);
+            Assert.False(string.IsNullOrEmpty(gameInfo.NextMovePlayerId));
 
             //cleanup
             await apiClient2.DeleteGameAsync(gameInfo.GameId);

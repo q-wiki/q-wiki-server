@@ -22,6 +22,10 @@ namespace WikidataGame.Backend.Helpers
                 .ForMember(dto => dto.GameId, opt => opt.MapFrom(model => model.Id))
                 .ForMember(dto => dto.IsAwaitingOpponentToJoin, opt => opt.MapFrom(
                     model => model.GameUsers.Count() < 2))
+                .ForMember(dto => dto.Opponent, opt => opt.MapFrom(
+                    (model, dto, player, resContext) =>
+                        model.GameUsers.SingleOrDefault(gu => gu.UserId != ((Guid)resContext.Items[nameof(Models.GameUser.UserId)]))
+                    ?.User))
                 .ForMember(dto => dto.Message, opt => opt.MapFrom(
                     model => model.GameUsers.Count() < 2 ? "Waiting for opponent to join." : "You matched with someone else!"));
 

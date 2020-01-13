@@ -22,11 +22,13 @@ namespace WikidataGame.Models
         /// <summary>
         /// Initializes a new instance of the GameInfo class.
         /// </summary>
-        public GameInfo(string gameId = default(string), bool? isAwaitingOpponentToJoin = default(bool?), string message = default(string))
+        public GameInfo(string gameId = default(string), bool? isAwaitingOpponentToJoin = default(bool?), string message = default(string), string nextMovePlayerId = default(string), Player opponent = default(Player))
         {
             GameId = gameId;
             IsAwaitingOpponentToJoin = isAwaitingOpponentToJoin;
             Message = message;
+            NextMovePlayerId = nextMovePlayerId;
+            Opponent = opponent;
             CustomInit();
         }
 
@@ -49,6 +51,16 @@ namespace WikidataGame.Models
         /// </summary>
         [JsonProperty(PropertyName = "message")]
         public string Message { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "nextMovePlayerId")]
+        public string NextMovePlayerId { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "opponent")]
+        public Player Opponent { get; set; }
 
     }
 }

@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WikidataGame.Backend.Helpers;
 
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20200115173906_AddGroupID")]
+    partial class AddGroupID
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -731,19 +733,19 @@ namespace WikidataGame.Backend.Migrations
                             SELECT ?question ?answer ?image
                             WITH{
                             SELECT ?tes (CONCAT( ?ans, '(', ?country, ')' ) as ?answer) WHERE {
-                              { SELECT DISTINCT(?answer as ?ans)(MAX(?image) as ?tes) ?country WHERE { 
+                              { SELECT DISTINCT(?answer as ? ans)(MAX(?image) as ?tes) ?country WHERE { 
                                 ?landmark wdt:P31 / wdt:P279 * wd:Q2319498;
-                                    wikibase:sitelinks ?sitelinks;
-                                    wdt:P18 ?image;
-                                    wdt:P17 ?cntr.
-                                ?landmark wdt:P1435 ?type.
+                                    wikibase: sitelinks ?sitelinks;
+                                    wdt: P18? image;
+                                    wdt: P17? cntr.
+                                ?landmark wdt:P1435? type.
                                 FILTER(?sitelinks >= 10)
-                                    ?landmark rdfs:label ?answer
+                                    ?landmark rdfs:label? answer
 
                                     filter(lang(?answer) = 'en').
-                                    ?cntr rdfs:label ?country filter(lang(?country) = 'en').
+                                    ?cntr rdfs:label? country filter(lang(?country) = 'en').
                                 }
-                                GROUP BY ?answer ?country
+                                GROUP BY ?answer? country
                                 ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
                               }
                             }
@@ -1037,7 +1039,8 @@ namespace WikidataGame.Backend.Migrations
                                  INCLUDE %presidents
                                  BIND(?personLabel AS ?answer)
                                  BIND('their first election period' AS ?question)
-                             } 
+                             }
+                         
                              ORDER BY ?firstElectionPeriod
                            ",
                             Status = 2,
@@ -1234,7 +1237,7 @@ namespace WikidataGame.Backend.Migrations
 		                        filter(lang(?answer) = 'en').
 	                        }
                           }
-                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                          ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
                         } as %allPresidents
 
                         WITH{
@@ -1257,7 +1260,7 @@ namespace WikidataGame.Backend.Migrations
                           {INCLUDE %selectedPresident}
                           UNION
                           {INCLUDE %decoyPresidents}
-                          BIND('Whose presidents signature is this?' as ?question)
+                          BIND('Whose pressidents signature is this?' as ?question)
                         }
                         ORDER BY DESC(?image)
                         ",
@@ -1870,7 +1873,7 @@ namespace WikidataGame.Backend.Migrations
                             #seperated animals in variables befor unionizing for performance/quicker response
  
                             WITH{
-                                SELECT DISTINCT (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?item); SEPARATOR=', ')) as ?item) ?biteForce (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', '))as ?name)
+                                SELECT DISTINCT ?empty (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?item); SEPARATOR=', ')) as ?item) ?biteForce (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', '))as?name)
                                 WHERE{
                                   ?item wdt:P31 wd:Q16521;
                                         wdt:P3485 ?biteForce.
@@ -1883,16 +1886,16 @@ namespace WikidataGame.Backend.Migrations
        
                                    filter(lang(?name) = 'en').
                                 }
-                              GROUP BY ?biteForce
-                              ORDER BY MD5(CONCAT(STR(?biteForce), STR(NOW())))
+                              GROUP BY ?biteForce ?empty
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
                             } as %allTaxons
         
                             WITH{
-                              SELECT ?name ?biteForce
+                              SELECT ?name ?biteForce ?empty
                               WHERE{
                                {Include %allTaxons}  
                               }
-                              ORDER BY MD5(CONCAT(STR(?biteForce), STR(NOW())))
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
                               LIMIT 4
                             } as %selectedTaxons
 
@@ -3332,7 +3335,6 @@ namespace WikidataGame.Backend.Migrations
                                         ?inventor rdfs:label ?answer.
                                                          }
                                     }
-                                  ORDER BY (MD5(CONCAT(STR(?inventor), STR(NOW())))) 
                                   LIMIT 1
                                  } as %selectedInventor
 
@@ -3460,7 +3462,7 @@ namespace WikidataGame.Backend.Migrations
                                 {INCLUDE %decoyPainting}
 
                                 BIND(?paintingLabel as ?answer)
-                                BIND('What is the name of the painting?' as ?question)
+                                BIND('What's the name of the painting?' as ?question)
                             }
                               order by DESC(?image)
                             ",
@@ -3689,7 +3691,6 @@ namespace WikidataGame.Backend.Migrations
                               WHERE { 
                                 INCLUDE %allDishes
                               }
-                              ORDER BY MD5(CONCAT(STR(?dish), STR(NOW())))
                               LIMIT 1
                             } as %selectedDish
 
@@ -3699,7 +3700,6 @@ namespace WikidataGame.Backend.Migrations
                                 INCLUDE %allDishes
                                 FILTER NOT EXISTS{INCLUDE %selectedDish}
                               }
-                              ORDER BY MD5(CONCAT(STR(?dish), STR(NOW())))
                               LIMIT 3
                             } as %decoyDishes
 
@@ -3992,7 +3992,7 @@ namespace WikidataGame.Backend.Migrations
                                                                  ?sport rdfs:label ?answer.
                                        }
                                  }
-                                 ORDER BY MD5(CONCAT(STR(?playerCount), STR(NOW())))
+                                 ORDER BY MD5(CONCAT(STR(?answer), STR(NOW())))
                             } as %sports
                         
                             WITH{
@@ -4000,7 +4000,7 @@ namespace WikidataGame.Backend.Migrations
                                     WHERE {
                                             INCLUDE %sports.
                                     }
-                                    ORDER BY MD5(CONCAT(STR(?playerCount), STR(NOW())))
+                                    ORDER BY MD5(CONCAT(STR(?answer), STR(NOW())))
                                     LIMIT 4
                                     } AS %fourSports
 

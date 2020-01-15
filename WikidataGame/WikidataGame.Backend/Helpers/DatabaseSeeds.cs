@@ -80,6 +80,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("a4b7c4ba-6acb-4f9a-821b-7a44aa7b6761"),
                     CategoryId = CategoryGeography.Id,
+                    GroupId = new Guid("e6ec8ea0-39ee-476c-81f5-b17bd99e715f"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "What is the name of the capital of {0}?",
@@ -113,6 +114,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("aca0f5f7-b000-42fb-b713-f5fe43748761"),
                     CategoryId = CategoryGeography.Id,
+                    GroupId = new Guid("ffd0f0da-b31d-4c01-b946-8b81fa30b00e"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which continent has {0} countries?",
@@ -135,6 +137,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("9a70639b-3447-475a-905a-e866a0c98a1c"),
                     CategoryId = CategoryGeography.Id,
                     MiniGameType = MiniGameType.MultipleChoice,
+                    GroupId = new Guid("e1a1fbf7-850f-4fdb-878c-9e8190b54d6b"),
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which country is a part of {0}?",
                     SparqlQuery = @"SELECT ?answer ?question
@@ -192,6 +195,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("46679c4f-ef97-445d-9a70-d95a5337720f"),
                     CategoryId = CategoryGeography.Id,
+                    GroupId = new Guid("3c750fe4-4980-46cf-b6e9-876e8228945b"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which country is not a basin country of the Baltic Sea?",
@@ -241,6 +245,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("4f6c477e-7025-44b4-a3b0-f3ebd8902902"),
                     CategoryId = CategoryGeography.Id,
+                    GroupId = new Guid("3c750fe4-4980-46cf-b6e9-876e8228945b"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which country is not a basin country of the Caribbean Sea?",
@@ -305,6 +310,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("a6a470de-9efb-4fde-9388-6eb20f2ff1f4"),
                     CategoryId = CategoryGeography.Id,
+                    GroupId = new Guid("3c750fe4-4980-46cf-b6e9-876e8228945b"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which country is not a basin country of the Mediterranean Sea?",
@@ -353,6 +359,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("29fed1d0-d306-4946-8109-63b8aaf0262e"),
                     CategoryId = CategoryGeography.Id,
+                    GroupId = new Guid("f88bb7ba-a1dc-45c1-8c6f-1c918bf87217"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "What is the longest river in {0}?",
@@ -414,6 +421,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("bc7a22ee-4985-44c3-9388-5c7dd6b8762e"),
                     CategoryId = CategoryGeography.Id,
+                    GroupId = new Guid("15f9b57e-118a-4448-b24f-b66806197ff8"),
                     MiniGameType = MiniGameType.Sort,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Sort countries by {0} (ascending).",
@@ -466,36 +474,37 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("f64d3784-3584-4f19-be07-aa44fd9a4086"),
                     CategoryId = CategoryGeography.Id,
+                    GroupId = new Guid("848e9590-10f6-4d16-b2cd-ca282adaee99"),
                     MiniGameType = MiniGameType.BlurryImage,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Where are we?",
                     SparqlQuery = @"
                             # Based on the example question 'Former capitals''
 
-                            SELECT ? question ? answer(SAMPLE(?image) AS ? image)
+                            SELECT ?question ?answer(SAMPLE(?image) AS ?image)
                             WHERE
                             {
                               # Fetches capitals from current or former members of the U.N.
                               # Capital is always the most recent capital, states are always only existing states
                               ?country wdt:P463 wd:Q1065.
-                              ? country p:P36 ? stat.
-                              ? stat ps : P36 ? capital.
+                              ?country p:P36 ?stat.
+                              ?stat ps:P36 ?capital.
 
 
-                              ? country rdfs : label ? countryLabel.
-                              ? capital rdfs : label ? capitalLabel.
+                              ?country rdfs:label ?countryLabel.
+                              ?capital rdfs:label ?capitalLabel.
 
 
-                              ? capital wdt : P18 ? image.
+                              ?capital wdt:P18 ?image.
 
                               OPTIONAL {
-                                ?country wdt:P582 | wdt:P576 ? ended.
+                                ?country wdt:P582|wdt:P576 ?ended.
                               }
                               OPTIONAL {
-                                ?capital wdt:P582 | wdt:P576 ? ended.
+                                ?capital wdt:P582|wdt:P576 ?ended.
                               }
                               OPTIONAL {
-                                ?stat pq:P582 ? ended.
+                                ?stat pq:P582 ?ended.
                               }
 
 
@@ -503,11 +512,11 @@ namespace WikidataGame.Backend.Helpers
                               FILTER(LANG(?countryLabel) = 'en').
                               FILTER(LANG(?capitalLabel) = 'en').
 
-                              BIND(CONCAT(?capitalLabel, ', ', ? countryLabel) as ? answer).
-                              BIND('Where are we?' AS ? question).
+                              BIND(CONCAT(?capitalLabel, ', ', ?countryLabel) as ?answer).
+                              BIND('Where are we?' AS ?question).
                             }
-                            GROUP BY ? question ? answer
-                            ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) # order by random
+                            GROUP BY ?question ?answer
+                            ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) #order by random
                             LIMIT 4
                             "
                 },
@@ -515,29 +524,29 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("6a5c5b99-f1ce-49ee-a220-429c1fb54d7c"),
                     CategoryId = CategoryGeography.Id,
+                    GroupId = new Guid("848e9590-10f6-4d16-b2cd-ca282adaee99"),
                     MiniGameType = MiniGameType.BlurryImage,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which famous landmark is this?",
                     SparqlQuery = @"
-                            # Which famous landmark is this: {image}
+                            #Which famous landmark is this: {image}
                             SELECT ?question ?answer ?image
                             WITH{
                             SELECT ?tes (CONCAT( ?ans, '(', ?country, ')' ) as ?answer) WHERE {
-                              { SELECT DISTINCT(?answer as ? ans)(MAX(?image) as ? tes) ? country WHERE { 
+                              { SELECT DISTINCT(?answer as ?ans)(MAX(?image) as ?tes) ?country WHERE { 
                                 ?landmark wdt:P31 / wdt:P279 * wd:Q2319498;
-                                    wikibase: sitelinks? sitelinks;
-                                    wdt: P18? image;
-                                    wdt: P17? cntr.
-                                ?landmark wdt:P1435? type.
+                                    wikibase:sitelinks ?sitelinks;
+                                    wdt:P18 ?image;
+                                    wdt:P17 ?cntr.
+                                ?landmark wdt:P1435 ?type.
                                 FILTER(?sitelinks >= 10)
-
-                                    ? landmark rdfs:label? answer
+                                    ?landmark rdfs:label ?answer
 
                                     filter(lang(?answer) = 'en').
-                                    ? cntr rdfs:label? country filter(lang(?country) = 'en').
+                                    ?cntr rdfs:label ?country filter(lang(?country) = 'en').
                                 }
-                                    GROUP BY ?answer? country
-                                ORDER BY MD5(CONCAT(STR(? name), STR(NOW())))
+                                GROUP BY ?answer ?country
+                                ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
                               }
                             }
                             } as %allMonuments
@@ -547,29 +556,29 @@ namespace WikidataGame.Backend.Helpers
                                 SELECT ?tes ?answer
                               WHERE
                                 {
-                                    Include % allMonuments
+                                    Include %allMonuments
                               }
                                 Limit 1
                             } as %selectedMonument
 
                             WITH
                             {
-                                SELECT  ?tes ?answer
+                                SELECT ?tes ?answer
                             WHERE
                                 {
-                                    Include % allMonuments
-                                 FILTER NOT EXISTS { INCLUDE % selectedMonument}
+                                 Include %allMonuments
+                                 FILTER NOT EXISTS { INCLUDE %selectedMonument}
                                 }
                                 Limit 3
                             } as %decoyMonuments
 
                             WHERE
                             {
-                              { INCLUDE % selectedMonument}
+                              { INCLUDE %selectedMonument}
                                 UNION
-                                { INCLUDE % decoyMonuments}
+                                { INCLUDE %decoyMonuments}
                                 Bind(?tes as ?image)
-                              BIND('Which famous landmark is this' as ?question)
+                                BIND('Which famous landmark is this' as ?question)
                             }
                             ORDER BY DESC(?question)
                             "
@@ -579,6 +588,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("a4a7289a-3053-4ad7-9c60-c75a18305243"),
                     CategoryId = CategorySpace.Id,
+                    GroupId = new Guid("6cfc621c-7a35-464a-80cd-3937a6d2af3d"),
                     MiniGameType = MiniGameType.Sort,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Sort planets by {0} (ascending).",
@@ -608,6 +618,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("2ed01768-9ab6-4895-8cbf-09dbc6f957e0"),
                     CategoryId = CategorySpace.Id,
+                    GroupId = new Guid("3de1256d-f8d2-4418-a932-d459d5ee44d6"),
                     MiniGameType = MiniGameType.Sort,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Sort planets by {0} (ascending).",
@@ -631,6 +642,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("14d93797-c61c-4415-b1ed-359d180237ff"),
                     CategoryId = CategorySpace.Id,
+                    GroupId = new Guid("98a751f6-eee0-4d79-9401-992417283aa9"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which of these moons belongs to {0}?",
@@ -715,6 +727,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("5f7e813a-3cfa-4617-86d1-514b481b37a8"),
                     CategoryId = CategoryChemistry.Id,
+                    GroupId = new Guid("72b3fa13-3526-4bd5-964c-442a3f3a5d31"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "What's the chemical symbol for {0}?",
@@ -737,6 +750,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("40677b0f-9d5f-46d2-ab85-a6c40afb5f87"),
                     CategoryId = CategoryChemistry.Id,
+                    GroupId = new Guid("289b9977-07e8-4540-9f06-bfcd147b5063"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which element has the chemical symbol {0}?",
@@ -758,6 +772,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("e8f99165-baa3-47b2-be35-c42ab2d5f0a0"),
                     CategoryId = CategoryChemistry.Id,
+                    GroupId = new Guid("62f3426e-6c47-43de-b9fc-db3e8d988986"),
                     MiniGameType = MiniGameType.Sort,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Sort chemical elements by {0} (ascending).",
@@ -787,6 +802,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("d9011896-04e5-4d32-8d3a-02a6d2b0bdb6"),
                     CategoryId = CategoryHistory.Id,
+                    GroupId = new Guid("184f3c3b-a831-4a0b-8c01-a846608f139b"),
                     MiniGameType = MiniGameType.Sort,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Sort these US presidents by {0} (ascending).",
@@ -826,8 +842,7 @@ namespace WikidataGame.Backend.Helpers
                                  INCLUDE %presidents
                                  BIND(?personLabel AS ?answer)
                                  BIND('their first election period' AS ?question)
-                             }
-                         
+                             } 
                              ORDER BY ?firstElectionPeriod
                            "
                 },
@@ -835,6 +850,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("909182d1-4ae6-46ea-bd9b-8c4323ea53fa"),
                     CategoryId = CategoryHistory.Id,
+                    GroupId = new Guid("2af47804-eeaa-4bcd-98e3-f515aeaf30b5"),
                     MiniGameType = MiniGameType.Sort,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Sort the countries by {0} (ascending).",
@@ -874,6 +890,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("86b64102-8074-4c4e-8f3e-71a0e52bb261"),
                     CategoryId = CategoryHistory.Id,
+                    GroupId = new Guid("976e1e61-3b95-43bf-8e4c-1963b6795113"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Who was Federal Chancellor of Germany from {0}?",
@@ -899,6 +916,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("d135088c-e062-4016-8eb4-1d68c72915ea"),
                     CategoryId = CategoryHistory.Id,
+                    GroupId = new Guid("fc74c29e-b4a9-428b-96c9-b41127869a31"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which colony belonged to the {0}?",
@@ -978,6 +996,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("0d218830-55d2-4d66-8d8f-d402514e9202"),
                     CategoryId = CategoryHistory.Id,
+                    GroupId = new Guid("d375ff0f-cb79-4eac-84e6-c4bf65c2382a"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which of these wars started in {0}?",
@@ -1003,6 +1022,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("3ad7e147-5862-48f1-aa7a-62d5df7f1222"),
                     CategoryId = CategoryHistory.Id,
+                    GroupId = new Guid("26333055-8b72-4b65-b622-1bfac80e0adc"),
                     MiniGameType = MiniGameType.BlurryImage,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which of presidents signature is this?",
@@ -1019,7 +1039,7 @@ namespace WikidataGame.Backend.Helpers
 		                        filter(lang(?answer) = 'en').
 	                        }
                           }
-                          ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
+                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
                         } as %allPresidents
 
                         WITH{
@@ -1042,7 +1062,7 @@ namespace WikidataGame.Backend.Helpers
                           {INCLUDE %selectedPresident}
                           UNION
                           {INCLUDE %decoyPresidents}
-                          BIND('Whose pressidents signature is this?' as ?question)
+                          BIND('Whose presidents signature is this?' as ?question)
                         }
                         ORDER BY DESC(?image)
                         "
@@ -1051,6 +1071,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("8273acfe-c278-4cd4-92f5-07dd73a22577"),
                     CategoryId = CategoryChemistry.Id,
+                    GroupId = new Guid("ba587fa0-9601-4d99-a56b-7e92a5ccbe13"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which chemical compound has the formula {0}?",
@@ -1070,6 +1091,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("bba18c92-47a6-4541-9305-d6453ad8477a"),
                     CategoryId = CategoryChemistry.Id,
+                    GroupId = new Guid("f5d0100f-a7bf-4d6d-9767-b5a4463daeb5"),
                     MiniGameType = MiniGameType.Sort,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Sort these chemical elements by {0} (ascending)!",
@@ -1112,6 +1134,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("e9ab8641-23b7-428f-b8d6-d96ae7d17e6f"),
                     CategoryId = CategoryNature.Id,
+                    GroupId = new Guid("be6894ce-de74-4f73-9cb9-0a5edd6d9249"),
                     MiniGameType = MiniGameType.Sort,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Sort these animals by gestation period (ascending)",
@@ -1247,6 +1270,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("6ba60225-d7be-4c97-ad19-eaf895a14734"),
                     CategoryId = CategoryNature.Id,
+                    GroupId = new Guid("be6894ce-de74-4f73-9cb9-0a5edd6d9249"),
                     MiniGameType = MiniGameType.Sort,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Sort these animals by gestation period (ascending)",
@@ -1368,6 +1392,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("9fd3f504-eb96-42f3-91bc-606a17759e45"),
                     CategoryId = CategoryNature.Id,
+                    GroupId = new Guid("be6894ce-de74-4f73-9cb9-0a5edd6d9249"),
                     MiniGameType = MiniGameType.Sort,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Sort these animals by gestation period (ascending)",
@@ -1504,6 +1529,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("9d630c39-6606-49ff-8cef-b34695d8ed91"),
                     CategoryId = CategoryNature.Id,
+                    GroupId = new Guid("be6894ce-de74-4f73-9cb9-0a5edd6d9249"),
                     MiniGameType = MiniGameType.Sort,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Sort these animals by gestation period (ascending)",
@@ -1639,6 +1665,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("72cd4102-718e-4d5b-adcc-f1e86e8d7cd6"),
                     CategoryId = CategoryNature.Id,
+                    GroupId = new Guid("bce51234-32b7-4629-b65a-d23beb8b43c3"),
                     MiniGameType = MiniGameType.Sort,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Order these animals by bite force quotient (Ascending)",
@@ -1649,7 +1676,7 @@ namespace WikidataGame.Backend.Helpers
                             #seperated animals in variables befor unionizing for performance/quicker response
  
                             WITH{
-                                SELECT DISTINCT ?empty (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?item); SEPARATOR=', ')) as ?item) ?biteForce (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', '))as?name)
+                                SELECT DISTINCT (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?item); SEPARATOR=', ')) as ?item) ?biteForce (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', '))as ?name)
                                 WHERE{
                                   ?item wdt:P31 wd:Q16521;
                                         wdt:P3485 ?biteForce.
@@ -1662,16 +1689,16 @@ namespace WikidataGame.Backend.Helpers
        
                                    filter(lang(?name) = 'en').
                                 }
-                              GROUP BY ?biteForce ?empty
-                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
+                              GROUP BY ?biteForce
+                              ORDER BY MD5(CONCAT(STR(?biteForce), STR(NOW())))
                             } as %allTaxons
         
                             WITH{
-                              SELECT ?name ?biteForce ?empty
+                              SELECT ?name ?biteForce
                               WHERE{
                                {Include %allTaxons}  
                               }
-                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
+                              ORDER BY MD5(CONCAT(STR(?biteForce), STR(NOW())))
                               LIMIT 4
                             } as %selectedTaxons
 
@@ -1693,6 +1720,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("1f2679f4-db27-47db-af4c-d2cf25708254"),
                     CategoryId = CategoryNature.Id,
+                    GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which animal is {0}",
@@ -1746,6 +1774,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("b3778c74-3284-4518-a8f0-deea5a2b8363"),
                     CategoryId = CategoryNature.Id,
+                    GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which animal is {0}",
@@ -1798,6 +1827,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("428ac495-541e-48a9-82a2-f94a503a4f26"),
                     CategoryId = CategoryNature.Id,
+                    GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which animal is {0}",
@@ -1851,6 +1881,7 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("d15f9f1c-9433-4964-a5e3-4e69ed0b45a9"),
                     CategoryId = CategoryNature.Id,
+                    GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which animal is {0}",
@@ -1904,12 +1935,13 @@ namespace WikidataGame.Backend.Helpers
                 {
                     Id = new Guid("5ab7c050-06c1-4307-b100-32237f5c0429"),
                     CategoryId = CategoryNature.Id,
-                    MiniGameType = MiniGameType.MultipleChoice,
+                    GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                    MiniGameType = MiniGameType.BlurryImage,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which animal is {0}",
+                    TaskDescription = "Which animal is is this?",
                     SparqlQuery = @"
                             # This query includes: artiodactyla, primates, marsupials
-                            SELECT DISTINCT ?question (?name as ?answer)
+                            SELECT DISTINCT ?question (?name as ?answer) ?image
                             #seperated animals in variables befor unionizing for performance/quicker response
                             WITH{
                                 SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
@@ -1992,20 +2024,21 @@ namespace WikidataGame.Backend.Helpers
                                {INCLUDE %selectedAnimal} 
                                UNION 
                                {INCLUDE %decoyAnimals}       
-                               BIND(?image as ?question)
-                             } ORDER BY DESC(?question)
+                               BIND('Which animal is in the image?' as ?question)
+                             } ORDER BY DESC(?image)
                             "
                 },
                  new Question
                  {
                      Id = new Guid("b5f2a986-4f0d-43e2-9f73-9fc22e76c2ab"),
                      CategoryId = CategoryNature.Id,
-                     MiniGameType = MiniGameType.MultipleChoice,
+                     GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                     MiniGameType = MiniGameType.BlurryImage,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is {0}",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
                             # This query includes: rodentia, carnivora, marsupial
-                            SELECT DISTINCT ?question (?name as ?answer)
+                            SELECT DISTINCT ?question (?name as ?answer) ?image
 
                             #seperated animals in variables befor unionizing for performance/quicker response
                             WITH{
@@ -2088,20 +2121,21 @@ namespace WikidataGame.Backend.Helpers
                                {INCLUDE %selectedAnimal} 
                                UNION 
                                {INCLUDE %decoyAnimals}       
-                               BIND(?image as ?question)
-                             } ORDER BY DESC(?question)
+                               BIND('Which animal is in the image?' as ?question)
+                             } ORDER BY DESC(?image)
                             "
                  },
-                  new Question
-                  {
-                      Id = new Guid("50120520-4441-48c1-b387-1c923a038194"),
-                      CategoryId = CategoryNature.Id,
-                      MiniGameType = MiniGameType.MultipleChoice,
-                      Status = QuestionStatus.Approved,
-                      TaskDescription = "Which animal is {0}",
-                      SparqlQuery = @"
+                 new Question
+                 {
+                     Id = new Guid("50120520-4441-48c1-b387-1c923a038194"),
+                     CategoryId = CategoryNature.Id,
+                     GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                     MiniGameType = MiniGameType.BlurryImage,
+                     Status = QuestionStatus.Approved,
+                     TaskDescription = "Which animal is this?",
+                     SparqlQuery = @"
                               # This query includes: carnivore, artiodactyla, primates
-                              SELECT DISTINCT ?question (?name as ?answer)
+                              SELECT DISTINCT ?question (?name as ?answer) ?image
                                 #seperated animals in variables befor unionizing for performance/quicker response
                                 WITH{
                                     SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
@@ -2184,20 +2218,21 @@ namespace WikidataGame.Backend.Helpers
                                    {INCLUDE %selectedAnimal} 
                                    UNION 
                                    {INCLUDE %decoyAnimals}       
-                                   BIND(?image as ?question)
-                                 } ORDER BY DESC(?question)
+                                   BIND('Which animal is in the image?' as ?question)
+                                 } ORDER BY DESC(?image)
                             "
-                  },
-                  new Question
-                  {
-                      Id = new Guid("5abd274b-0826-4a30-832b-9e072a2cd0a4"),
-                      CategoryId = CategoryNature.Id,
-                      MiniGameType = MiniGameType.MultipleChoice,
-                      Status = QuestionStatus.Approved,
-                      TaskDescription = "Which animal is {0}",
-                      SparqlQuery = @"
+                 },
+                 new Question
+                 {
+                     Id = new Guid("5abd274b-0826-4a30-832b-9e072a2cd0a4"),
+                     CategoryId = CategoryNature.Id,
+                     GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                     MiniGameType = MiniGameType.BlurryImage,
+                     Status = QuestionStatus.Approved,
+                     TaskDescription = "Which animal is this",
+                     SparqlQuery = @"
                                 # This query includes: primates + artiodactyla + rodentia
-                                SELECT DISTINCT ?question (?name as ?answer)
+                                SELECT DISTINCT ?question (?name as ?answer) ?image
 
                                 #seperated animals in variables befor unionizing for performance/quicker response
                                 WITH{
@@ -2281,18 +2316,19 @@ namespace WikidataGame.Backend.Helpers
                                    {INCLUDE %selectedAnimal} 
                                    UNION 
                                    {INCLUDE %decoyAnimals}       
-                                   BIND(?image as ?question)
-                                 } ORDER BY DESC(?question)
+                                   BIND('Which animal is in the image?' as ?question)
+                                 } ORDER BY DESC(?image)
                             "
-                  },
-                  new Question
-                  {
-                      Id = new Guid("fd92d683-fa21-4210-93c7-6a99b8968919"),
-                      CategoryId = CategoryNature.Id,
-                      MiniGameType = MiniGameType.BlurryImage,
-                      Status = QuestionStatus.Approved,
-                      TaskDescription = "Which animal is in the image?",
-                      SparqlQuery = @"
+                 },
+                 new Question
+                 {
+                     Id = new Guid("fd92d683-fa21-4210-93c7-6a99b8968919"),
+                     CategoryId = CategoryNature.Id,
+                     GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                     MiniGameType = MiniGameType.BlurryImage,
+                     Status = QuestionStatus.Approved,
+                     TaskDescription = "Which animal is in the image?",
+                     SparqlQuery = @"
                         SELECT DISTINCT ?question (?name as ?answer) ?image
 
                         #seperated animals in variables befor unionizing for performance/quicker response
@@ -2331,15 +2367,16 @@ namespace WikidataGame.Backend.Helpers
                           BIND('Which animal is in the image?' as ?question)
                          } ORDER BY DESC(?image)
                         "
-                  },
-                  new Question
-                  {
-                      Id = new Guid("9ea7b09b-7991-4eb4-b2a1-571e926c5790"),
-                      CategoryId = CategoryNature.Id,
-                      MiniGameType = MiniGameType.BlurryImage,
-                      Status = QuestionStatus.Approved,
-                      TaskDescription = "Which animal is in the image?",
-                      SparqlQuery = @"
+                 },
+                 new Question
+                 {
+                     Id = new Guid("9ea7b09b-7991-4eb4-b2a1-571e926c5790"),
+                     CategoryId = CategoryNature.Id,
+                     GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                     MiniGameType = MiniGameType.BlurryImage,
+                     Status = QuestionStatus.Approved,
+                     TaskDescription = "Which animal is in the image?",
+                     SparqlQuery = @"
                         SELECT DISTINCT ?question (?name as ?answer) ?image
 
                         #seperated animals in variables befor unionizing for performance/quicker response
@@ -2378,15 +2415,16 @@ namespace WikidataGame.Backend.Helpers
                            INCLUDE %selectedFish} UNION {INCLUDE %decoyFish}       
                            BIND('Which animal is in the image?' as ?question)
                          } ORDER BY DESC(?image)"
-                  },
-                  new Question
-                  {
-                      Id = new Guid("4f701ada-11d3-45a7-8251-6745d39ffc9a"),
-                      CategoryId = CategoryNature.Id,
-                      MiniGameType = MiniGameType.BlurryImage,
-                      Status = QuestionStatus.Approved,
-                      TaskDescription = "Which animal is in the image?",
-                      SparqlQuery = @"
+                 },
+                 new Question
+                 {
+                     Id = new Guid("4f701ada-11d3-45a7-8251-6745d39ffc9a"),
+                     CategoryId = CategoryNature.Id,
+                     GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                     MiniGameType = MiniGameType.BlurryImage,
+                     Status = QuestionStatus.Approved,
+                     TaskDescription = "Which animal is in the image?",
+                     SparqlQuery = @"
                         SELECT DISTINCT ?question (?name as ?answer) ?image
 
                         #seperated animals in variables befor unionizing for performance/quicker response
@@ -2426,16 +2464,16 @@ namespace WikidataGame.Backend.Helpers
                            BIND('Which animal is in the image?' as ?question)
                          } ORDER BY DESC(?image)
                         "
-                  },
-
-                  new Question
-                  {
-                      Id = new Guid("3a244446-94f0-4d1f-825e-8bd40e6a5d06"),
-                      CategoryId = CategoryNature.Id,
-                      MiniGameType = MiniGameType.BlurryImage,
-                      Status = QuestionStatus.Approved,
-                      TaskDescription = "Which animal is in the image?",
-                      SparqlQuery = @"
+                 },
+                 new Question
+                 {
+                     Id = new Guid("3a244446-94f0-4d1f-825e-8bd40e6a5d06"),
+                     CategoryId = CategoryNature.Id,
+                     GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                     MiniGameType = MiniGameType.BlurryImage,
+                     Status = QuestionStatus.Approved,
+                     TaskDescription = "Which animal is in the image?",
+                     SparqlQuery = @"
                         SELECT DISTINCT ?question (?name as ?answer) ?image
 
                         #seperated animals in variables befor unionizing for performance/quicker response
@@ -2476,15 +2514,16 @@ namespace WikidataGame.Backend.Helpers
                          }
                         ORDER BY DESC(?image)
                         "
-                  },
-                  new Question
-                  {
-                      Id = new Guid("5272473e-6ef3-4d32-8d64-bb18fa977b29"),
-                      CategoryId = CategoryNature.Id,
-                      MiniGameType = MiniGameType.BlurryImage,
-                      Status = QuestionStatus.Approved,
-                      TaskDescription = "Which animal is in the image?",
-                      SparqlQuery = @"
+                 },
+                 new Question
+                 {
+                    Id = new Guid("5272473e-6ef3-4d32-8d64-bb18fa977b29"),
+                    CategoryId = CategoryNature.Id,
+                    GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                    MiniGameType = MiniGameType.BlurryImage,
+                    Status = QuestionStatus.Approved,
+                    TaskDescription = "Which animal is in the image?",
+                    SparqlQuery = @"
                         # which of these 
                         SELECT DISTINCT ?question (?name as ?answer) ?image
 
@@ -2577,15 +2616,16 @@ namespace WikidataGame.Backend.Helpers
                          }
                         ORDER BY DESC(?image)
                         "
-                  },
-                  new Question
-                  {
-                      Id = new Guid("beb15e73-d985-4322-a1a5-e3dec8ac1d28"),
-                      CategoryId = CategoryNature.Id,
-                      MiniGameType = MiniGameType.BlurryImage,
-                      Status = QuestionStatus.Approved,
-                      TaskDescription = "Which animal is in the image?",
-                      SparqlQuery = @"
+                 },
+                 new Question
+                 {
+                     Id = new Guid("beb15e73-d985-4322-a1a5-e3dec8ac1d28"),
+                     CategoryId = CategoryNature.Id,
+                     GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                     MiniGameType = MiniGameType.BlurryImage,
+                     Status = QuestionStatus.Approved,
+                     TaskDescription = "Which animal is in the image?",
+                     SparqlQuery = @"
                         # which of these 
                         SELECT DISTINCT ?question (?name as ?answer) ?image
 
@@ -2659,16 +2699,17 @@ namespace WikidataGame.Backend.Helpers
                          }
                         ORDER BY DESC(?Image)
                         "
-                  },
-                  new Question
-                  {
-                      Id = new Guid("bae2897b-61c9-448e-bedf-8fc069dd62b0"),
-                      CategoryId = CategoryNature.Id,
-                      MiniGameType = MiniGameType.BlurryImage,
-                      Status = QuestionStatus.Approved,
-                      TaskDescription = "Which animal is in the image?",
-                      SparqlQuery = @"
-                        # which of these 
+                 },
+                 new Question
+                 {
+                    Id = new Guid("bae2897b-61c9-448e-bedf-8fc069dd62b0"),
+                     CategoryId = CategoryNature.Id,
+                     GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                     MiniGameType = MiniGameType.BlurryImage,
+                     Status = QuestionStatus.Approved,
+                     TaskDescription = "Which animal is in the image?",
+                     SparqlQuery = @"
+                       # which of these 
                         SELECT DISTINCT ?question (?name as ?answer)
 
                         #seperated animals in variables befor unionizing for performance/quicker response
@@ -2741,15 +2782,16 @@ namespace WikidataGame.Backend.Helpers
                          }
                         ORDER BY DESC(?image)
                         "
-                  },
-                  new Question
-                  {
-                      Id = new Guid("8f47586c-5a63-401b-88fb-b63f628a3fe4"),
-                      CategoryId = CategoryNature.Id,
-                      MiniGameType = MiniGameType.BlurryImage,
-                      Status = QuestionStatus.Approved,
-                      TaskDescription = "Which animal is in the image?",
-                      SparqlQuery = @"
+                 },
+                 new Question
+                 {
+                     Id = new Guid("8f47586c-5a63-401b-88fb-b63f628a3fe4"),
+                     CategoryId = CategoryNature.Id,
+                     GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                     MiniGameType = MiniGameType.BlurryImage,
+                     Status = QuestionStatus.Approved,
+                     TaskDescription = "Which animal is in the image?",
+                     SparqlQuery = @"
                         SELECT DISTINCT ?question (?name as ?answer) ?image
 
                         #seperated animals in variables befor unionizing for performance/quicker response
@@ -2819,15 +2861,16 @@ namespace WikidataGame.Backend.Helpers
                            BIND('Which animal is in the image?' as ?question)
                          } ORDER BY DESC(?image)
                         "
-                  },
-                  new Question
-                  {
-                      Id = new Guid("1687d325-eda8-43ab-9821-711be8d1fea6"),
-                      CategoryId = CategoryNature.Id,
-                      MiniGameType = MiniGameType.BlurryImage,
-                      Status = QuestionStatus.Approved,
-                      TaskDescription = "Which animal is in the image?",
-                      SparqlQuery = @"
+                 },
+                 new Question
+                 {
+                     Id = new Guid("1687d325-eda8-43ab-9821-711be8d1fea6"),
+                     CategoryId = CategoryNature.Id,
+                     GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                     MiniGameType = MiniGameType.BlurryImage,
+                     Status = QuestionStatus.Approved,
+                     TaskDescription = "Which animal is in the image?",
+                     SparqlQuery = @"
                             SELECT DISTINCT ?question (?name as ?answer) ?image
 
                             #seperated animals in variables befor unionizing for performance/quicker response
@@ -2902,6 +2945,7 @@ namespace WikidataGame.Backend.Helpers
                   {
                       Id = new Guid("374a02cb-037d-4720-9952-1e3cb96f22ae"),
                       CategoryId = CategoryNature.Id,
+                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                       MiniGameType = MiniGameType.BlurryImage,
                       Status = QuestionStatus.Approved,
                       TaskDescription = "Which animal is in the image?",
@@ -2980,6 +3024,7 @@ namespace WikidataGame.Backend.Helpers
                   {
                       Id = new Guid("025286ac-d6d1-4e9f-954c-f659e83d7d6d"),
                       CategoryId = CategoryNature.Id,
+                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                       MiniGameType = MiniGameType.BlurryImage,
                       Status = QuestionStatus.Approved,
                       TaskDescription = "Which animal is in the image",
@@ -3077,6 +3122,7 @@ namespace WikidataGame.Backend.Helpers
                   {
                       Id = new Guid("b95607f9-8cd6-48e8-bc99-c9c305e812be"),
                       CategoryId = CategoryCulture.Id,
+                      GroupId = new Guid("acc3d752-2880-4882-ba16-e3deb3ee9cee"),
                       MiniGameType = MiniGameType.Sort,
                       Status = QuestionStatus.Approved,
                       TaskDescription = "Who invented {0}?",
@@ -3094,6 +3140,7 @@ namespace WikidataGame.Backend.Helpers
                                         ?inventor rdfs:label ?answer.
                                                          }
                                     }
+                                  ORDER BY (MD5(CONCAT(STR(?inventor), STR(NOW())))) 
                                   LIMIT 1
                                  } as %selectedInventor
 
@@ -3126,6 +3173,7 @@ namespace WikidataGame.Backend.Helpers
                   {
                       Id = new Guid("30556891-ae34-4151-b55f-cd5a8b814235"),
                       CategoryId = CategoryCulture.Id,
+                      GroupId = new Guid("70a291e1-4513-4e41-87c5-2746f40a4e0c"),
                       MiniGameType = MiniGameType.MultipleChoice,
                       Status = QuestionStatus.Approved,
                       TaskDescription = "Sort artist by release of first painting.",
@@ -3177,6 +3225,7 @@ namespace WikidataGame.Backend.Helpers
                   {
                       Id = new Guid("b32fe12c-4016-4eed-a6d6-0bbb505553a0"),
                       CategoryId = CategoryCulture.Id,
+                      GroupId = new Guid("d834932d-1203-4039-9baf-68322b176bae"),
                       MiniGameType = MiniGameType.BlurryImage,
                       Status = QuestionStatus.Approved,
                       TaskDescription = "What is the name of the painting?",
@@ -3219,7 +3268,7 @@ namespace WikidataGame.Backend.Helpers
                                 {INCLUDE %decoyPainting}
 
                                 BIND(?paintingLabel as ?answer)
-                                BIND('What's the name of the painting?' as ?question)
+                                BIND('What is the name of the painting?' as ?question)
                             }
                               order by DESC(?image)
                             "
@@ -3228,6 +3277,7 @@ namespace WikidataGame.Backend.Helpers
                   {
                       Id = new Guid("ac86282f-1fa1-48ba-a088-f4c202ea0177"),
                       CategoryId = CategoryFood.Id,
+                      GroupId = new Guid("f20a404e-4d02-4d45-a2bf-cd152b2cbf43"),
                       MiniGameType = MiniGameType.MultipleChoice,
                       Status = QuestionStatus.Approved,
                       TaskDescription = "Where is {0} from?",
@@ -3304,6 +3354,7 @@ namespace WikidataGame.Backend.Helpers
                    {
                        Id = new Guid("3609a5f7-c90a-4ecf-a713-0224fa8a4215"),
                        CategoryId = CategoryFood.Id,
+                       GroupId = new Guid("0ef8c0e0-640b-49b4-8aee-b5ab8f1a6773"),
                        MiniGameType = MiniGameType.MultipleChoice,
                        Status = QuestionStatus.Approved,
                        TaskDescription = "Where is {0} from?",
@@ -3373,6 +3424,7 @@ namespace WikidataGame.Backend.Helpers
                    {
                        Id = new Guid("4f42f192-1dc7-44b2-b648-1fee97766b98"),
                        CategoryId = CategoryFood.Id,
+                       GroupId = new Guid("984112bc-d178-4ac5-8940-3e4fd2fc3105"),
                        MiniGameType = MiniGameType.Sort,
                        Status = QuestionStatus.Approved,
                        TaskDescription = "Sort these softdrinks by inception",
@@ -3420,6 +3472,7 @@ namespace WikidataGame.Backend.Helpers
                    {
                        Id = new Guid("15679f96-27bd-4e88-b367-4eb05e5f6d95"),
                        CategoryId = CategoryFood.Id,
+                       GroupId = new Guid("fee91818-2fb5-4845-affa-2504d4191ee1"),
                        MiniGameType = MiniGameType.BlurryImage,
                        Status = QuestionStatus.Approved,
                        TaskDescription = "What dish is this?",
@@ -3444,6 +3497,7 @@ namespace WikidataGame.Backend.Helpers
                               WHERE { 
                                 INCLUDE %allDishes
                               }
+                              ORDER BY MD5(CONCAT(STR(?dish), STR(NOW())))
                               LIMIT 1
                             } as %selectedDish
 
@@ -3453,6 +3507,7 @@ namespace WikidataGame.Backend.Helpers
                                 INCLUDE %allDishes
                                 FILTER NOT EXISTS{INCLUDE %selectedDish}
                               }
+                              ORDER BY MD5(CONCAT(STR(?dish), STR(NOW())))
                               LIMIT 3
                             } as %decoyDishes
 
@@ -3469,6 +3524,7 @@ namespace WikidataGame.Backend.Helpers
                    {
                        Id = new Guid("3803ddc5-f8ea-4bd6-93a2-855407f8178f"),
                        CategoryId = CategoryEntertainment.Id,
+                       GroupId = new Guid("f8717bdd-75df-4064-9394-af163034a1c0"),
                        MiniGameType = MiniGameType.Sort,
                        Status = QuestionStatus.Approved,
                        TaskDescription = "Sort these actors by the number of movies they appeared in",
@@ -3531,6 +3587,7 @@ namespace WikidataGame.Backend.Helpers
                    {
                        Id = new Guid("d0fcf5ac-3215-4355-9090-b6a49cf66cc3"),
                        CategoryId = CategoryEntertainment.Id,
+                       GroupId = new Guid("ac3e0a15-376e-4dbc-a8f8-6df4c9fe39e7"),
                        MiniGameType = MiniGameType.MultipleChoice,
                        Status = QuestionStatus.Approved,
                        TaskDescription = "Who won the Academy Award for for the movie {0}?",
@@ -3588,6 +3645,7 @@ namespace WikidataGame.Backend.Helpers
                    {
                        Id = new Guid("3fb180e6-99ae-466b-89e9-16ac0101daed"),
                        CategoryId = CategoryEntertainment.Id,
+                       GroupId = new Guid("9417595a-641b-4ce9-9219-b9c14e65621e"),
                        MiniGameType = MiniGameType.MultipleChoice,
                        Status = QuestionStatus.Approved,
                        TaskDescription = "Where is the character {0} from?",
@@ -3644,6 +3702,7 @@ namespace WikidataGame.Backend.Helpers
                    {
                        Id = new Guid("a79cb648-dbfd-4e03-a5a4-315fd4146120"),
                        CategoryId = CategorySport.Id,
+                       GroupId = new Guid("039acc70-30d3-40fe-a28a-0b44964d49e7"),
                        MiniGameType = MiniGameType.MultipleChoice,
                        Status = QuestionStatus.Approved,
                        TaskDescription = "Who is the trainer of {0} ?",
@@ -3724,6 +3783,7 @@ namespace WikidataGame.Backend.Helpers
                    {
                        Id = new Guid("edeefc69-f882-46f6-96cd-ae9212fdb0df"),
                        CategoryId = CategorySport.Id,
+                       GroupId = new Guid("0b1ff760-e02f-4ddc-8f32-5161931ebcbe"),
                        MiniGameType = MiniGameType.MultipleChoice,
                        Status = QuestionStatus.Approved,
                        TaskDescription = "Who is the trainer of {0} ?",
@@ -3740,7 +3800,7 @@ namespace WikidataGame.Backend.Helpers
                                                                  ?sport rdfs:label ?answer.
                                        }
                                  }
-                                 ORDER BY MD5(CONCAT(STR(?answer), STR(NOW())))
+                                 ORDER BY MD5(CONCAT(STR(?playerCount), STR(NOW())))
                             } as %sports
                         
                             WITH{
@@ -3748,7 +3808,7 @@ namespace WikidataGame.Backend.Helpers
                                     WHERE {
                                             INCLUDE %sports.
                                     }
-                                    ORDER BY MD5(CONCAT(STR(?answer), STR(NOW())))
+                                    ORDER BY MD5(CONCAT(STR(?playerCount), STR(NOW())))
                                     LIMIT 4
                                     } AS %fourSports
 

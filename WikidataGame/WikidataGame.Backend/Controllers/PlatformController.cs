@@ -121,7 +121,8 @@ namespace WikidataGame.Backend.Controllers
 #pragma warning restore CS1573
         {
             var questionModel = mapper.Map<Models.Question>(question);
-            var category =  await categoryRepo.GetAsync(question.Category.Id);
+            questionModel.GroupId = Guid.NewGuid();
+            var category = await categoryRepo.GetAsync(question.Category.Id);
             if (category == null)
                 return BadRequest("Unknown category");
 

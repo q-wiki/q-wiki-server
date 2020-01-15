@@ -30,6 +30,9 @@ namespace WikidataGame.Backend.Models
         [Required]
         public QuestionStatus Status { get; set; }
 
+        [Required]
+        public Guid GroupId { get; set; }
+
         public virtual ICollection<QuestionRating> Ratings { get; set; }
     }
 

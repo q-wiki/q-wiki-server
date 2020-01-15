@@ -27,7 +27,10 @@
     <PackageReference Include="dotNetRDF" Version="2.2.0" />
     <PackageReference Include="Google.Apis.Auth" Version="1.42.0" />
     <PackageReference Include="Google.Apis.Games.v1" Version="1.42.0.1771" />
-    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.App">
+      <PrivateAssets Condition="'%(PackageReference.Version)' == ''">all</PrivateAssets>
+      <Publish Condition="'%(PackageReference.Version)' == ''">true</Publish>
+    </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="3.1.0" />

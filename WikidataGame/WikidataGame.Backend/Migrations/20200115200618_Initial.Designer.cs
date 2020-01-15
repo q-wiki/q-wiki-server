@@ -9,14 +9,14 @@ using WikidataGame.Backend.Helpers;
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200115143443_ImageQueryNature")]
-    partial class ImageQueryNature
+    [Migration("20200115200618_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
@@ -155,6 +155,31 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("1b9185c0-c46b-4abf-bf82-e464f5116c7d"),
                             Title = "Space"
+                        },
+                        new
+                        {
+                            Id = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            Title = "Nature"
+                        },
+                        new
+                        {
+                            Id = new Guid("ddd333f7-ef45-4e13-a2ca-fb4494dce324"),
+                            Title = "Culture"
+                        },
+                        new
+                        {
+                            Id = new Guid("4871ba53-b2a6-4687-9da4-1b8e50ba793f"),
+                            Title = "Food"
+                        },
+                        new
+                        {
+                            Id = new Guid("2a388146-e32c-4a08-a246-472eff12849a"),
+                            Title = "Entertainment"
+                        },
+                        new
+                        {
+                            Id = new Guid("3d6c54d3-0fda-4923-a00e-e930640430b3"),
+                            Title = "Sports"
                         });
                 });
 
@@ -285,6 +310,8 @@ namespace WikidataGame.Backend.Migrations
 
                     b.Property<Guid>("CategoryId");
 
+                    b.Property<Guid>("GroupId");
+
                     b.Property<int>("MiniGameType");
 
                     b.Property<string>("SparqlQuery")
@@ -306,6 +333,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("a4b7c4ba-6acb-4f9a-821b-7a44aa7b6761"),
                             CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
+                            GroupId = new Guid("e6ec8ea0-39ee-476c-81f5-b17bd99e715f"),
                             MiniGameType = 2,
                             SparqlQuery = @"SELECT DISTINCT ?answer ?question WHERE {
                           ?state wdt:P31/wdt:P279* wd:Q3624078;
@@ -339,6 +367,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("aca0f5f7-b000-42fb-b713-f5fe43748761"),
                             CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
+                            GroupId = new Guid("ffd0f0da-b31d-4c01-b946-8b81fa30b00e"),
                             MiniGameType = 2,
                             SparqlQuery = @"SELECT ?continent ?answer ?question WHERE {
                             { SELECT ?continent ?answer (COUNT(?item) AS ?question) WHERE {
@@ -360,6 +389,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("9a70639b-3447-475a-905a-e866a0c98a1c"),
                             CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
+                            GroupId = new Guid("e1a1fbf7-850f-4fdb-878c-9e8190b54d6b"),
                             MiniGameType = 2,
                             SparqlQuery = @"SELECT ?answer ?question
                             WITH {
@@ -418,6 +448,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("46679c4f-ef97-445d-9a70-d95a5337720f"),
                             CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
+                            GroupId = new Guid("3c750fe4-4980-46cf-b6e9-876e8228945b"),
                             MiniGameType = 2,
                             SparqlQuery = @"SELECT DISTINCT ?question ?answer
                             WITH {
@@ -467,6 +498,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("4f6c477e-7025-44b4-a3b0-f3ebd8902902"),
                             CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
+                            GroupId = new Guid("3c750fe4-4980-46cf-b6e9-876e8228945b"),
                             MiniGameType = 2,
                             SparqlQuery = @"# Which country is no basin country of the Caribbean Sea?
                             SELECT DISTINCT ?question ?answer
@@ -531,6 +563,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("a6a470de-9efb-4fde-9388-6eb20f2ff1f4"),
                             CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
+                            GroupId = new Guid("3c750fe4-4980-46cf-b6e9-876e8228945b"),
                             MiniGameType = 2,
                             SparqlQuery = @"# Which country is no basin country of the Mediterranean Sea?
                             SELECT DISTINCT ?question ?answer
@@ -579,6 +612,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("29fed1d0-d306-4946-8109-63b8aaf0262e"),
                             CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
+                            GroupId = new Guid("f88bb7ba-a1dc-45c1-8c6f-1c918bf87217"),
                             MiniGameType = 2,
                             SparqlQuery = @"# What is the longest river in {continent}?
                             SELECT DISTINCT ?answer ?question 
@@ -614,6 +648,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("bc7a22ee-4985-44c3-9388-5c7dd6b8762e"),
                             CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
+                            GroupId = new Guid("15f9b57e-118a-4448-b24f-b66806197ff8"),
                             MiniGameType = 0,
                             SparqlQuery = @"# sort countries by number of inhabitants (ascending)
                             SELECT (?stateLabel AS ?answer) ?question
@@ -664,8 +699,122 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
+                            Id = new Guid("f64d3784-3584-4f19-be07-aa44fd9a4086"),
+                            CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
+                            GroupId = new Guid("848e9590-10f6-4d16-b2cd-ca282adaee99"),
+                            MiniGameType = 1,
+                            SparqlQuery = @"
+                            # Based on the example question 'Former capitals''
+
+                            SELECT ?question ?answer(SAMPLE(?image) AS ?image)
+                            WHERE
+                            {
+                              # Fetches capitals from current or former members of the U.N.
+                              # Capital is always the most recent capital, states are always only existing states
+                              ?country wdt:P463 wd:Q1065.
+                              ?country p:P36 ?stat.
+                              ?stat ps:P36 ?capital.
+
+
+                              ?country rdfs:label ?countryLabel.
+                              ?capital rdfs:label ?capitalLabel.
+
+
+                              ?capital wdt:P18 ?image.
+
+                              OPTIONAL {
+                                ?country wdt:P582|wdt:P576 ?ended.
+                              }
+                              OPTIONAL {
+                                ?capital wdt:P582|wdt:P576 ?ended.
+                              }
+                              OPTIONAL {
+                                ?stat pq:P582 ?ended.
+                              }
+
+
+                              FILTER(!BOUND(?ended)).
+                              FILTER(LANG(?countryLabel) = 'en').
+                              FILTER(LANG(?capitalLabel) = 'en').
+
+                              BIND(CONCAT(?capitalLabel, ', ', ?countryLabel) as ?answer).
+                              BIND('Where are we?' AS ?question).
+                            }
+                            GROUP BY ?question ?answer
+                            ORDER BY MD5(CONCAT(STR(?answer), STR(NOW()))) #order by random
+                            LIMIT 4
+                            ",
+                            Status = 2,
+                            TaskDescription = "Where are we?"
+                        },
+                        new
+                        {
+                            Id = new Guid("6a5c5b99-f1ce-49ee-a220-429c1fb54d7c"),
+                            CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
+                            GroupId = new Guid("848e9590-10f6-4d16-b2cd-ca282adaee99"),
+                            MiniGameType = 1,
+                            SparqlQuery = @"
+                            #Which famous landmark is this: {image}
+                            SELECT ?question ?answer ?image
+                            WITH{
+                            SELECT ?tes (CONCAT( ?ans, '(', ?country, ')' ) as ?answer) WHERE {
+                              { SELECT DISTINCT(?answer as ?ans)(MAX(?image) as ?tes) ?country WHERE { 
+                                ?landmark wdt:P31 / wdt:P279 * wd:Q2319498;
+                                    wikibase:sitelinks ?sitelinks;
+                                    wdt:P18 ?image;
+                                    wdt:P17 ?cntr.
+                                ?landmark wdt:P1435 ?type.
+                                FILTER(?sitelinks >= 10)
+                                    ?landmark rdfs:label ?answer
+
+                                    filter(lang(?answer) = 'en').
+                                    ?cntr rdfs:label ?country filter(lang(?country) = 'en').
+                                }
+                                GROUP BY ?answer ?country
+                                ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
+                              }
+                            }
+                            } as %allMonuments
+
+                            WITH
+                            {
+                                SELECT ?tes ?answer
+                              WHERE
+                                {
+                                    Include %allMonuments
+                              }
+                                Limit 1
+                            } as %selectedMonument
+
+                            WITH
+                            {
+                                SELECT ?tes ?answer
+                            WHERE
+                                {
+                                 Include %allMonuments
+                                 FILTER NOT EXISTS { INCLUDE %selectedMonument}
+                                }
+                                Limit 3
+                            } as %decoyMonuments
+
+                            WHERE
+                            {
+                              { INCLUDE %selectedMonument}
+                                UNION
+                                { INCLUDE %decoyMonuments}
+                                Bind(?tes as ?image)
+                                BIND('Which famous landmark is this' as ?question)
+                            }
+                            ORDER BY DESC(?question)
+                            ",
+                            Status = 2,
+                            TaskDescription = "Which famous landmark is this?"
+                        },
+                        new
+                        {
                             Id = new Guid("a4a7289a-3053-4ad7-9c60-c75a18305243"),
                             CategoryId = new Guid("1b9185c0-c46b-4abf-bf82-e464f5116c7d"),
+                            GroupId = new Guid("6cfc621c-7a35-464a-80cd-3937a6d2af3d"),
                             MiniGameType = 0,
                             SparqlQuery = @"# sort planets by average distance to sun
                             # NOTE: there are only three planets with apoapsis and periapsis in AU; 4 planets in total
@@ -695,6 +844,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("2ed01768-9ab6-4895-8cbf-09dbc6f957e0"),
                             CategoryId = new Guid("1b9185c0-c46b-4abf-bf82-e464f5116c7d"),
+                            GroupId = new Guid("3de1256d-f8d2-4418-a932-d459d5ee44d6"),
                             MiniGameType = 0,
                             SparqlQuery = @"# sort planets by radius
                             SELECT ?answer ?question WHERE {
@@ -718,6 +868,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("14d93797-c61c-4415-b1ed-359d180237ff"),
                             CategoryId = new Guid("1b9185c0-c46b-4abf-bf82-e464f5116c7d"),
+                            GroupId = new Guid("98a751f6-eee0-4d79-9401-992417283aa9"),
                             MiniGameType = 2,
                             SparqlQuery = @"#Which of these moons belongs to the planet {0}?
                             SELECT ?question ?answer 
@@ -801,6 +952,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("5f7e813a-3cfa-4617-86d1-514b481b37a8"),
                             CategoryId = new Guid("6c22af9b-2f45-413b-995d-7ee6c61674e5"),
+                            GroupId = new Guid("72b3fa13-3526-4bd5-964c-442a3f3a5d31"),
                             MiniGameType = 2,
                             SparqlQuery = @"# What's the chemical symbol for {element}?
                             SELECT ?question ?answer WHERE {
@@ -823,6 +975,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("40677b0f-9d5f-46d2-ab85-a6c40afb5f87"),
                             CategoryId = new Guid("6c22af9b-2f45-413b-995d-7ee6c61674e5"),
+                            GroupId = new Guid("289b9977-07e8-4540-9f06-bfcd147b5063"),
                             MiniGameType = 2,
                             SparqlQuery = @"SELECT ?question ?answer WHERE {
                           ?element wdt:P31 wd:Q11344;
@@ -844,6 +997,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("e8f99165-baa3-47b2-be35-c42ab2d5f0a0"),
                             CategoryId = new Guid("6c22af9b-2f45-413b-995d-7ee6c61674e5"),
+                            GroupId = new Guid("62f3426e-6c47-43de-b9fc-db3e8d988986"),
                             MiniGameType = 0,
                             SparqlQuery = @"#sort chemical elements by number in period system
                             SELECT ?question ?answer WHERE {
@@ -872,6 +1026,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("d9011896-04e5-4d32-8d3a-02a6d2b0bdb6"),
                             CategoryId = new Guid("f9c52d1a-9315-423d-a818-94c1769fffe5"),
+                            GroupId = new Guid("184f3c3b-a831-4a0b-8c01-a846608f139b"),
                             MiniGameType = 0,
                             SparqlQuery = @"
                              # US presidents by start of their presidency
@@ -909,8 +1064,7 @@ namespace WikidataGame.Backend.Migrations
                                  INCLUDE %presidents
                                  BIND(?personLabel AS ?answer)
                                  BIND('their first election period' AS ?question)
-                             }
-                         
+                             } 
                              ORDER BY ?firstElectionPeriod
                            ",
                             Status = 2,
@@ -920,6 +1074,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("909182d1-4ae6-46ea-bd9b-8c4323ea53fa"),
                             CategoryId = new Guid("f9c52d1a-9315-423d-a818-94c1769fffe5"),
+                            GroupId = new Guid("2af47804-eeaa-4bcd-98e3-f515aeaf30b5"),
                             MiniGameType = 0,
                             SparqlQuery = @"# sort EU countries by the date they joined
                             SELECT ?date (SAMPLE(?answer) AS ?answer) (SAMPLE(?question) AS ?question) 
@@ -959,6 +1114,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("86b64102-8074-4c4e-8f3e-71a0e52bb261"),
                             CategoryId = new Guid("f9c52d1a-9315-423d-a818-94c1769fffe5"),
+                            GroupId = new Guid("976e1e61-3b95-43bf-8e4c-1963b6795113"),
                             MiniGameType = 2,
                             SparqlQuery = @"# German Chancellors
                             SELECT ?answer (CONCAT(STR(?startYear), ' to ', STR(?endYear)) AS ?question) WHERE {
@@ -984,6 +1140,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("d135088c-e062-4016-8eb4-1d68c72915ea"),
                             CategoryId = new Guid("f9c52d1a-9315-423d-a818-94c1769fffe5"),
+                            GroupId = new Guid("fc74c29e-b4a9-428b-96c9-b41127869a31"),
                             MiniGameType = 2,
                             SparqlQuery = @"# empires and colonies
                             SELECT DISTINCT ?empire (?empireLabel as ?question) ?colony (?colonyLabel as ?answer)
@@ -1063,6 +1220,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("0d218830-55d2-4d66-8d8f-d402514e9202"),
                             CategoryId = new Guid("f9c52d1a-9315-423d-a818-94c1769fffe5"),
+                            GroupId = new Guid("d375ff0f-cb79-4eac-84e6-c4bf65c2382a"),
                             MiniGameType = 2,
                             SparqlQuery = @"# wars of the 20th century
                             SELECT (SAMPLE(?itemLabel) AS ?answer) (YEAR(MAX(?startdate)) AS ?question) WHERE {
@@ -1086,8 +1244,58 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
+                            Id = new Guid("3ad7e147-5862-48f1-aa7a-62d5df7f1222"),
+                            CategoryId = new Guid("f9c52d1a-9315-423d-a818-94c1769fffe5"),
+                            GroupId = new Guid("26333055-8b72-4b65-b622-1bfac80e0adc"),
+                            MiniGameType = 1,
+                            SparqlQuery = @"
+                        # Which U.S. president's signature is this: {question}
+                        SELECT  ?question ?answer ?image
+                        WITH{
+                          SELECT ?answer ?image
+                        WHERE { 
+	                        ?president wdt:P39 wd:Q11696.
+                            ?president wdt:P109 ?image.
+	                        OPTIONAL {
+		                        ?president rdfs:label ?answer
+		                        filter(lang(?answer) = 'en').
+	                        }
+                          }
+                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                        } as %allPresidents
+
+                        WITH{
+                          SELECT ?image ?answer
+                          WHERE{
+                             Include %allPresidents
+                          }
+                          Limit 1
+                        } as %selectedPresident
+                        WITH{
+                          SELECT  ?answer
+                          WHERE{
+                             Include %allPresidents
+                                     FILTER NOT EXISTS {INCLUDE %selectedPresident}
+                          }
+                          Limit 3
+                        } as %decoyPresidents
+
+                        WHERE {
+                          {INCLUDE %selectedPresident}
+                          UNION
+                          {INCLUDE %decoyPresidents}
+                          BIND('Whose presidents signature is this?' as ?question)
+                        }
+                        ORDER BY DESC(?image)
+                        ",
+                            Status = 2,
+                            TaskDescription = "Which of presidents signature is this?"
+                        },
+                        new
+                        {
                             Id = new Guid("8273acfe-c278-4cd4-92f5-07dd73a22577"),
                             CategoryId = new Guid("6c22af9b-2f45-413b-995d-7ee6c61674e5"),
+                            GroupId = new Guid("ba587fa0-9601-4d99-a56b-7e92a5ccbe13"),
                             MiniGameType = 2,
                             SparqlQuery = @"# Which chemical compound has the formula {0}?
                             SELECT DISTINCT ?chemicalCompound ?answer (?chemical_formula AS ?question) ?sitelinks WHERE {
@@ -1107,6 +1315,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("bba18c92-47a6-4541-9305-d6453ad8477a"),
                             CategoryId = new Guid("6c22af9b-2f45-413b-995d-7ee6c61674e5"),
+                            GroupId = new Guid("f5d0100f-a7bf-4d6d-9767-b5a4463daeb5"),
                             MiniGameType = 0,
                             SparqlQuery = @"
                             # Sort these chemical elements by their melting point
@@ -1148,6 +1357,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("e9ab8641-23b7-428f-b8d6-d96ae7d17e6f"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("be6894ce-de74-4f73-9cb9-0a5edd6d9249"),
                             MiniGameType = 0,
                             SparqlQuery = @"
                             # Sort animals by gestation time (days)? (onlycarnivores, artiodactyla and rodents)
@@ -1283,6 +1493,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("6ba60225-d7be-4c97-ad19-eaf895a14734"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("be6894ce-de74-4f73-9cb9-0a5edd6d9249"),
                             MiniGameType = 0,
                             SparqlQuery = @"
                             # Sort animals by gestation time (days)? (only marsupials, artiodactyla, primates)
@@ -1404,6 +1615,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("9fd3f504-eb96-42f3-91bc-606a17759e45"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("be6894ce-de74-4f73-9cb9-0a5edd6d9249"),
                             MiniGameType = 0,
                             SparqlQuery = @"
                             # Sort animals by gestation time (days)? (only rodentia, carnivora, marsupial)
@@ -1540,6 +1752,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("9d630c39-6606-49ff-8cef-b34695d8ed91"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("be6894ce-de74-4f73-9cb9-0a5edd6d9249"),
                             MiniGameType = 0,
                             SparqlQuery = @"
                             # Sort animals by gestation time (days)? (only primates, rodents, carnivora)
@@ -1675,6 +1888,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("72cd4102-718e-4d5b-adcc-f1e86e8d7cd6"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("bce51234-32b7-4629-b65a-d23beb8b43c3"),
                             MiniGameType = 0,
                             SparqlQuery = @"
                             # sort animals by bite force quotient?
@@ -1683,7 +1897,7 @@ namespace WikidataGame.Backend.Migrations
                             #seperated animals in variables befor unionizing for performance/quicker response
  
                             WITH{
-                                SELECT DISTINCT ?empty (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?item); SEPARATOR=', ')) as ?item) ?biteForce (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', '))as?name)
+                                SELECT DISTINCT (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?item); SEPARATOR=', ')) as ?item) ?biteForce (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', '))as ?name)
                                 WHERE{
                                   ?item wdt:P31 wd:Q16521;
                                         wdt:P3485 ?biteForce.
@@ -1696,16 +1910,16 @@ namespace WikidataGame.Backend.Migrations
        
                                    filter(lang(?name) = 'en').
                                 }
-                              GROUP BY ?biteForce ?empty
-                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
+                              GROUP BY ?biteForce
+                              ORDER BY MD5(CONCAT(STR(?biteForce), STR(NOW())))
                             } as %allTaxons
         
                             WITH{
-                              SELECT ?name ?biteForce ?empty
+                              SELECT ?name ?biteForce
                               WHERE{
                                {Include %allTaxons}  
                               }
-                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
+                              ORDER BY MD5(CONCAT(STR(?biteForce), STR(NOW())))
                               LIMIT 4
                             } as %selectedTaxons
 
@@ -1727,6 +1941,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("1f2679f4-db27-47db-af4c-d2cf25708254"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                             MiniGameType = 2,
                             SparqlQuery = @"
                             SELECT DISTINCT ?question ?item (?name as ?answer)
@@ -1780,6 +1995,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("b3778c74-3284-4518-a8f0-deea5a2b8363"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                             MiniGameType = 2,
                             SparqlQuery = @"
                            SELECT DISTINCT ?question ?item (?name as ?answer)
@@ -1832,6 +2048,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("428ac495-541e-48a9-82a2-f94a503a4f26"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                             MiniGameType = 2,
                             SparqlQuery = @"
                            SELECT DISTINCT ?question ?item (?name as ?answer)
@@ -1885,6 +2102,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("d15f9f1c-9433-4964-a5e3-4e69ed0b45a9"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                             MiniGameType = 2,
                             SparqlQuery = @"
                            SELECT DISTINCT ?question ?item (?name as ?answer)
@@ -1938,10 +2156,11 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("5ab7c050-06c1-4307-b100-32237f5c0429"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
-                            MiniGameType = 2,
+                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                            MiniGameType = 1,
                             SparqlQuery = @"
                             # This query includes: artiodactyla, primates, marsupials
-                            SELECT DISTINCT ?question (?name as ?answer)
+                            SELECT DISTINCT ?question (?name as ?answer) ?image
                             #seperated animals in variables befor unionizing for performance/quicker response
                             WITH{
                                 SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
@@ -2024,20 +2243,21 @@ namespace WikidataGame.Backend.Migrations
                                {INCLUDE %selectedAnimal} 
                                UNION 
                                {INCLUDE %decoyAnimals}       
-                               BIND(?image as ?question)
-                             } ORDER BY DESC(?question)
+                               BIND('Which animal is in the image?' as ?question)
+                             } ORDER BY DESC(?image)
                             ",
                             Status = 2,
-                            TaskDescription = "Which animal is {0}"
+                            TaskDescription = "Which animal is is this?"
                         },
                         new
                         {
                             Id = new Guid("b5f2a986-4f0d-43e2-9f73-9fc22e76c2ab"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
-                            MiniGameType = 2,
+                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                            MiniGameType = 1,
                             SparqlQuery = @"
                             # This query includes: rodentia, carnivora, marsupial
-                            SELECT DISTINCT ?question (?name as ?answer)
+                            SELECT DISTINCT ?question (?name as ?answer) ?image
 
                             #seperated animals in variables befor unionizing for performance/quicker response
                             WITH{
@@ -2120,20 +2340,21 @@ namespace WikidataGame.Backend.Migrations
                                {INCLUDE %selectedAnimal} 
                                UNION 
                                {INCLUDE %decoyAnimals}       
-                               BIND(?image as ?question)
-                             } ORDER BY DESC(?question)
+                               BIND('Which animal is in the image?' as ?question)
+                             } ORDER BY DESC(?image)
                             ",
                             Status = 2,
-                            TaskDescription = "Which animal is {0}"
+                            TaskDescription = "Which animal is this?"
                         },
                         new
                         {
                             Id = new Guid("50120520-4441-48c1-b387-1c923a038194"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
-                            MiniGameType = 2,
+                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                            MiniGameType = 1,
                             SparqlQuery = @"
                               # This query includes: carnivore, artiodactyla, primates
-                              SELECT DISTINCT ?question (?name as ?answer)
+                              SELECT DISTINCT ?question (?name as ?answer) ?image
                                 #seperated animals in variables befor unionizing for performance/quicker response
                                 WITH{
                                     SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
@@ -2216,20 +2437,21 @@ namespace WikidataGame.Backend.Migrations
                                    {INCLUDE %selectedAnimal} 
                                    UNION 
                                    {INCLUDE %decoyAnimals}       
-                                   BIND(?image as ?question)
-                                 } ORDER BY DESC(?question)
+                                   BIND('Which animal is in the image?' as ?question)
+                                 } ORDER BY DESC(?image)
                             ",
                             Status = 2,
-                            TaskDescription = "Which animal is {0}"
+                            TaskDescription = "Which animal is this?"
                         },
                         new
                         {
                             Id = new Guid("5abd274b-0826-4a30-832b-9e072a2cd0a4"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
-                            MiniGameType = 2,
+                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                            MiniGameType = 1,
                             SparqlQuery = @"
                                 # This query includes: primates + artiodactyla + rodentia
-                                SELECT DISTINCT ?question (?name as ?answer)
+                                SELECT DISTINCT ?question (?name as ?answer) ?image
 
                                 #seperated animals in variables befor unionizing for performance/quicker response
                                 WITH{
@@ -2313,19 +2535,20 @@ namespace WikidataGame.Backend.Migrations
                                    {INCLUDE %selectedAnimal} 
                                    UNION 
                                    {INCLUDE %decoyAnimals}       
-                                   BIND(?image as ?question)
-                                 } ORDER BY DESC(?question)
+                                   BIND('Which animal is in the image?' as ?question)
+                                 } ORDER BY DESC(?image)
                             ",
                             Status = 2,
-                            TaskDescription = "Which animal is {0}"
+                            TaskDescription = "Which animal is this"
                         },
                         new
                         {
                             Id = new Guid("fd92d683-fa21-4210-93c7-6a99b8968919"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        SELECT DISTINCT ?question (?name as ?answer)
+                        SELECT DISTINCT ?question (?name as ?answer) ?image
 
                         #seperated animals in variables befor unionizing for performance/quicker response
                         WITH{
@@ -2360,19 +2583,20 @@ namespace WikidataGame.Backend.Migrations
 
                         WHERE {
                           {INCLUDE %selectedBird} UNION {INCLUDE %decoyBirds}       
-                           BIND(?image as ?question)
-                         } ORDER BY DESC(?question)
+                          BIND('Which animal is in the image?' as ?question)
+                         } ORDER BY DESC(?image)
                         ",
                             Status = 2,
-                            TaskDescription = "Which animal is on the image?"
+                            TaskDescription = "Which animal is in the image?"
                         },
                         new
                         {
                             Id = new Guid("9ea7b09b-7991-4eb4-b2a1-571e926c5790"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        SELECT DISTINCT ?question (?name as ?answer)
+                        SELECT DISTINCT ?question (?name as ?answer) ?image
 
                         #seperated animals in variables befor unionizing for performance/quicker response
                         WITH{
@@ -2406,19 +2630,21 @@ namespace WikidataGame.Backend.Migrations
                         } as %decoyFish
 
                         WHERE {
-                          {INCLUDE %selectedFish} UNION {INCLUDE %decoyFish}       
-                           BIND(?image as ?question)
-                         } ORDER BY DESC(?question)",
+                          {
+                           INCLUDE %selectedFish} UNION {INCLUDE %decoyFish}       
+                           BIND('Which animal is in the image?' as ?question)
+                         } ORDER BY DESC(?image)",
                             Status = 2,
-                            TaskDescription = "Which animal is on the image?"
+                            TaskDescription = "Which animal is in the image?"
                         },
                         new
                         {
                             Id = new Guid("4f701ada-11d3-45a7-8251-6745d39ffc9a"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        SELECT DISTINCT ?question (?name as ?answer)
+                        SELECT DISTINCT ?question (?name as ?answer) ?image
 
                         #seperated animals in variables befor unionizing for performance/quicker response
                         WITH{
@@ -2452,20 +2678,22 @@ namespace WikidataGame.Backend.Migrations
                         } as %decoyAmphibia
 
                         WHERE {
-                          {INCLUDE %selectedAmphibia} UNION {INCLUDE %decoyAmphibia}       
-                           BIND(?image as ?question)
-                         } ORDER BY DESC(?question)
+                          {
+                           INCLUDE %selectedAmphibia} UNION {INCLUDE %decoyAmphibia}       
+                           BIND('Which animal is in the image?' as ?question)
+                         } ORDER BY DESC(?image)
                         ",
                             Status = 2,
-                            TaskDescription = "Which animal is on the image?"
+                            TaskDescription = "Which animal is in the image?"
                         },
                         new
                         {
                             Id = new Guid("3a244446-94f0-4d1f-825e-8bd40e6a5d06"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        SELECT DISTINCT ?question (?name as ?answer)
+                        SELECT DISTINCT ?question (?name as ?answer) ?image
 
                         #seperated animals in variables befor unionizing for performance/quicker response
                         WITH{
@@ -2499,21 +2727,24 @@ namespace WikidataGame.Backend.Migrations
                         } as %decoyReptiles
 
                         WHERE {
-                          {INCLUDE %selectedReptile} UNION {INCLUDE %decoyReptiles}       
-                           BIND(?image as ?question)
-                         } ORDER BY DESC(?question)
+                          {
+                           INCLUDE %selectedReptile} UNION {INCLUDE %decoyReptiles}       
+                           BIND('Which animal is in the image?' as ?question)
+                         }
+                        ORDER BY DESC(?image)
                         ",
                             Status = 2,
-                            TaskDescription = "Which animal is on the image?"
+                            TaskDescription = "Which animal is in the image?"
                         },
                         new
                         {
                             Id = new Guid("5272473e-6ef3-4d32-8d64-bb18fa977b29"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
                         # which of these 
-                        SELECT DISTINCT ?question (?name as ?answer)
+                        SELECT DISTINCT ?question (?name as ?answer) ?image
 
                         #seperated animals in variables befor unionizing for performance/quicker response
                         WITH{
@@ -2600,20 +2831,22 @@ namespace WikidataGame.Backend.Migrations
                            {INCLUDE %selectedAnimal} 
                            UNION 
                            {INCLUDE %decoyAnimals}       
-                           BIND(?image as ?question)
-                         } ORDER BY DESC(?question)
+                           BIND('Which animal is in the image?' as ?question)
+                         }
+                        ORDER BY DESC(?image)
                         ",
                             Status = 2,
-                            TaskDescription = "Which animal is on the image?"
+                            TaskDescription = "Which animal is in the image?"
                         },
                         new
                         {
                             Id = new Guid("beb15e73-d985-4322-a1a5-e3dec8ac1d28"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
                         # which of these 
-                        SELECT DISTINCT ?question (?name as ?answer)
+                        SELECT DISTINCT ?question (?name as ?answer) ?image
 
                         #seperated animals in variables befor unionizing for performance/quicker response
                         WITH{
@@ -2681,19 +2914,21 @@ namespace WikidataGame.Backend.Migrations
                            {INCLUDE %selectedAnimal} 
                            UNION 
                            {INCLUDE %decoyAnimals}       
-                           BIND(?image as ?question)
-                         } ORDER BY DESC(?question)
+                           BIND('Which animal is in the image?' as ?question)
+                         }
+                        ORDER BY DESC(?Image)
                         ",
                             Status = 2,
-                            TaskDescription = "Which animal is on the image?"
+                            TaskDescription = "Which animal is in the image?"
                         },
                         new
                         {
                             Id = new Guid("bae2897b-61c9-448e-bedf-8fc069dd62b0"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        # which of these 
+                       # which of these 
                         SELECT DISTINCT ?question (?name as ?answer)
 
                         #seperated animals in variables befor unionizing for performance/quicker response
@@ -2762,19 +2997,21 @@ namespace WikidataGame.Backend.Migrations
                            {INCLUDE %selectedAnimal} 
                            UNION 
                            {INCLUDE %decoyAnimals}       
-                           BIND(?image as ?question)
-                         } ORDER BY DESC(?question)
+                           BIND('Which animal is in the image?' as ?question)
+                         }
+                        ORDER BY DESC(?image)
                         ",
                             Status = 2,
-                            TaskDescription = "Which animal is on the image?"
+                            TaskDescription = "Which animal is in the image?"
                         },
                         new
                         {
                             Id = new Guid("8f47586c-5a63-401b-88fb-b63f628a3fe4"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        SELECT DISTINCT ?question (?name as ?answer)
+                        SELECT DISTINCT ?question (?name as ?answer) ?image
 
                         #seperated animals in variables befor unionizing for performance/quicker response
                         WITH{
@@ -2840,19 +3077,20 @@ namespace WikidataGame.Backend.Migrations
                            {INCLUDE %selectedAnimal} 
                            UNION 
                            {INCLUDE %decoyAnimals}       
-                           BIND(?image as ?question)
-                         } ORDER BY DESC(?question)
+                           BIND('Which animal is in the image?' as ?question)
+                         } ORDER BY DESC(?image)
                         ",
                             Status = 2,
-                            TaskDescription = "Which animal is on the image?"
+                            TaskDescription = "Which animal is in the image?"
                         },
                         new
                         {
                             Id = new Guid("1687d325-eda8-43ab-9821-711be8d1fea6"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                            SELECT DISTINCT ?question (?name as ?answer)
+                            SELECT DISTINCT ?question (?name as ?answer) ?image
 
                             #seperated animals in variables befor unionizing for performance/quicker response
                             WITH{
@@ -2918,19 +3156,20 @@ namespace WikidataGame.Backend.Migrations
                                {INCLUDE %selectedAnimal} 
                                UNION 
                                {INCLUDE %decoyAnimals}       
-                               BIND(?image as ?question)
-                             } ORDER BY DESC(?question)
+                               BIND('Which animal is in the image?' as ?question)
+                             } ORDER BY DESC(?image)
                             ",
                             Status = 2,
-                            TaskDescription = "Which animal is on the image?"
+                            TaskDescription = "Which animal is in the image?"
                         },
                         new
                         {
                             Id = new Guid("374a02cb-037d-4720-9952-1e3cb96f22ae"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                            SELECT DISTINCT ?question (?name as ?answer)
+                            SELECT DISTINCT ?question (?name as ?answer) ?image
 
                             #seperated animals in variables befor unionizing for performance/quicker response
                             WITH{
@@ -2996,20 +3235,21 @@ namespace WikidataGame.Backend.Migrations
                                {INCLUDE %selectedAnimal} 
                                UNION 
                                {INCLUDE %decoyAnimals}       
-                               BIND(?image as ?question)
-                             } ORDER BY DESC(?question)
+                               BIND('Which animal is in the image?' as ?question)
+                             } ORDER BY DESC(?image)
                             ",
                             Status = 2,
-                            TaskDescription = "Which animal is on the image?"
+                            TaskDescription = "Which animal is in the image?"
                         },
                         new
                         {
                             Id = new Guid("025286ac-d6d1-4e9f-954c-f659e83d7d6d"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
-                            MiniGameType = 2,
+                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
+                            MiniGameType = 1,
                             SparqlQuery = @"
                                 # This query includes: primates + artiodactyla + rodentia
-                                SELECT DISTINCT ?question (?name as ?answer)
+                                SELECT DISTINCT ?question (?name as ?answer) ?image
 
                                 #seperated animals in variables befor unionizing for performance/quicker response
                                 WITH{
@@ -3093,16 +3333,17 @@ namespace WikidataGame.Backend.Migrations
                                    {INCLUDE %selectedAnimal} 
                                    UNION 
                                    {INCLUDE %decoyAnimals}       
-                                   BIND(?image as ?question)
-                                 } ORDER BY DESC(?question)
+                                   BIND('Which animal is in the image?' as ?question)
+                                 } ORDER BY DESC(?image)
                             ",
                             Status = 2,
-                            TaskDescription = "Which animal is {0}"
+                            TaskDescription = "Which animal is in the image"
                         },
                         new
                         {
                             Id = new Guid("b95607f9-8cd6-48e8-bc99-c9c305e812be"),
                             CategoryId = new Guid("ddd333f7-ef45-4e13-a2ca-fb4494dce324"),
+                            GroupId = new Guid("acc3d752-2880-4882-ba16-e3deb3ee9cee"),
                             MiniGameType = 0,
                             SparqlQuery = @"
                                 SELECT DISTINCT ?question ?answer 
@@ -3118,6 +3359,7 @@ namespace WikidataGame.Backend.Migrations
                                         ?inventor rdfs:label ?answer.
                                                          }
                                     }
+                                  ORDER BY (MD5(CONCAT(STR(?inventor), STR(NOW())))) 
                                   LIMIT 1
                                  } as %selectedInventor
 
@@ -3152,6 +3394,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("30556891-ae34-4151-b55f-cd5a8b814235"),
                             CategoryId = new Guid("ddd333f7-ef45-4e13-a2ca-fb4494dce324"),
+                            GroupId = new Guid("70a291e1-4513-4e41-87c5-2746f40a4e0c"),
                             MiniGameType = 2,
                             SparqlQuery = @"
                                SELECT ?question ?answer
@@ -3203,9 +3446,10 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("b32fe12c-4016-4eed-a6d6-0bbb505553a0"),
                             CategoryId = new Guid("ddd333f7-ef45-4e13-a2ca-fb4494dce324"),
+                            GroupId = new Guid("d834932d-1203-4039-9baf-68322b176bae"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                            SELECT ?question ?answer ?painting
+                            SELECT ?question ?answer ?painting ?image
                             WITH{
                             SELECT DISTINCT ?creator ?painting ?image ?paintingLabel
                               WHERE 
@@ -3243,17 +3487,18 @@ namespace WikidataGame.Backend.Migrations
                                 {INCLUDE %decoyPainting}
 
                                 BIND(?paintingLabel as ?answer)
-                                BIND(?image as ?question)
+                                BIND('What is the name of the painting?' as ?question)
                             }
-                              order by DESC(?question)
+                              order by DESC(?image)
                             ",
                             Status = 2,
-                            TaskDescription = "Which painting is this?"
+                            TaskDescription = "What is the name of the painting?"
                         },
                         new
                         {
                             Id = new Guid("ac86282f-1fa1-48ba-a088-f4c202ea0177"),
                             CategoryId = new Guid("4871ba53-b2a6-4687-9da4-1b8e50ba793f"),
+                            GroupId = new Guid("f20a404e-4d02-4d45-a2bf-cd152b2cbf43"),
                             MiniGameType = 2,
                             SparqlQuery = @"
                                     SELECT ?question ?answer 
@@ -3330,6 +3575,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("3609a5f7-c90a-4ecf-a713-0224fa8a4215"),
                             CategoryId = new Guid("4871ba53-b2a6-4687-9da4-1b8e50ba793f"),
+                            GroupId = new Guid("0ef8c0e0-640b-49b4-8aee-b5ab8f1a6773"),
                             MiniGameType = 2,
                             SparqlQuery = @"
                              SELECT DISTINCT(?foodLabel as ?question) (?dishOfLabel as ?answer)
@@ -3399,6 +3645,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("4f42f192-1dc7-44b2-b648-1fee97766b98"),
                             CategoryId = new Guid("4871ba53-b2a6-4687-9da4-1b8e50ba793f"),
+                            GroupId = new Guid("984112bc-d178-4ac5-8940-3e4fd2fc3105"),
                             MiniGameType = 0,
                             SparqlQuery = @"
                         #Structure is important to get only one drink of a inception year and avoid duplicates
@@ -3444,8 +3691,61 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
+                            Id = new Guid("15679f96-27bd-4e88-b367-4eb05e5f6d95"),
+                            CategoryId = new Guid("4871ba53-b2a6-4687-9da4-1b8e50ba793f"),
+                            GroupId = new Guid("fee91818-2fb5-4845-affa-2504d4191ee1"),
+                            MiniGameType = 1,
+                            SparqlQuery = @"
+                            SELECT ?question (?dishLabel as ?answer) ?image
+                            WITH{
+                              SELECT DISTINCT ?dish ?dishLabel (SAMPLE(?image)as ?image)
+                              WHERE{
+                                 ?dish wdt:P279 wd:Q746549.
+                                 ?dish wdt:P18 ?image.
+                                FILTER NOT EXISTS{?dish wdt:P31 wd:Q19861951}
+                                 SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. 
+                                                        ?dish rdfs:label ?dishLabel}
+                                 filter(lang(?dishLabel) = 'en').
+                              }
+                              group by ?dish ?dishLabel
+                              ORDER BY MD5(CONCAT(STR(?dish), STR(NOW())))
+                            } as %allDishes
+
+                            WITH{
+                              SELECT ?dishLabel ?image ?dish
+                              WHERE { 
+                                INCLUDE %allDishes
+                              }
+                              ORDER BY MD5(CONCAT(STR(?dish), STR(NOW())))
+                              LIMIT 1
+                            } as %selectedDish
+
+                            WITH{
+                              SELECT ?dishLabel ?dish
+                              WHERE{
+                                INCLUDE %allDishes
+                                FILTER NOT EXISTS{INCLUDE %selectedDish}
+                              }
+                              ORDER BY MD5(CONCAT(STR(?dish), STR(NOW())))
+                              LIMIT 3
+                            } as %decoyDishes
+
+                            WHERE{
+                              {INCLUDE %selectedDish}
+                              UNION
+                              {INCLUDE %decoyDishes}
+                              BIND('What dish is this?' as ?question)
+                            }
+                            ORDER BY DESC(?image)
+                            ",
+                            Status = 2,
+                            TaskDescription = "What dish is this?"
+                        },
+                        new
+                        {
                             Id = new Guid("3803ddc5-f8ea-4bd6-93a2-855407f8178f"),
                             CategoryId = new Guid("2a388146-e32c-4a08-a246-472eff12849a"),
+                            GroupId = new Guid("f8717bdd-75df-4064-9394-af163034a1c0"),
                             MiniGameType = 0,
                             SparqlQuery = @"
                             # Fetch how many successful (measured by box office revenue) movies an actor played in
@@ -3508,6 +3808,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("d0fcf5ac-3215-4355-9090-b6a49cf66cc3"),
                             CategoryId = new Guid("2a388146-e32c-4a08-a246-472eff12849a"),
+                            GroupId = new Guid("ac3e0a15-376e-4dbc-a8f8-6df4c9fe39e7"),
                             MiniGameType = 2,
                             SparqlQuery = @"
                            SELECT DISTINCT ?question ?answer
@@ -3565,6 +3866,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("3fb180e6-99ae-466b-89e9-16ac0101daed"),
                             CategoryId = new Guid("2a388146-e32c-4a08-a246-472eff12849a"),
+                            GroupId = new Guid("9417595a-641b-4ce9-9219-b9c14e65621e"),
                             MiniGameType = 2,
                             SparqlQuery = @"
                             SELECT ?question ?answer
@@ -3621,6 +3923,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("a79cb648-dbfd-4e03-a5a4-315fd4146120"),
                             CategoryId = new Guid("3d6c54d3-0fda-4923-a00e-e930640430b3"),
+                            GroupId = new Guid("039acc70-30d3-40fe-a28a-0b44964d49e7"),
                             MiniGameType = 2,
                             SparqlQuery = @"
                             SELECT  (SAMPLE(?question) AS ?question)(SAMPLE(?answer) AS ?answer) (SAMPLE(?teamLabel) AS ?team) ?soccerTeam 
@@ -3701,6 +4004,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("edeefc69-f882-46f6-96cd-ae9212fdb0df"),
                             CategoryId = new Guid("3d6c54d3-0fda-4923-a00e-e930640430b3"),
+                            GroupId = new Guid("0b1ff760-e02f-4ddc-8f32-5161931ebcbe"),
                             MiniGameType = 2,
                             SparqlQuery = @"
                             SELECT (Sample(GROUP_CONCAT( DISTINCT ?question; SEPARATOR=', ')) AS ?question) (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?answer); SEPARATOR=', ')) AS ?answer) 
@@ -3715,7 +4019,7 @@ namespace WikidataGame.Backend.Migrations
                                                                  ?sport rdfs:label ?answer.
                                        }
                                  }
-                                 ORDER BY MD5(CONCAT(STR(?answer), STR(NOW())))
+                                 ORDER BY MD5(CONCAT(STR(?playerCount), STR(NOW())))
                             } as %sports
                         
                             WITH{
@@ -3723,7 +4027,7 @@ namespace WikidataGame.Backend.Migrations
                                     WHERE {
                                             INCLUDE %sports.
                                     }
-                                    ORDER BY MD5(CONCAT(STR(?answer), STR(NOW())))
+                                    ORDER BY MD5(CONCAT(STR(?playerCount), STR(NOW())))
                                     LIMIT 4
                                     } AS %fourSports
 

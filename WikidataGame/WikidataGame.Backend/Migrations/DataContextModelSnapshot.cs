@@ -14,7 +14,7 @@ namespace WikidataGame.Backend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
@@ -153,6 +153,31 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("1b9185c0-c46b-4abf-bf82-e464f5116c7d"),
                             Title = "Space"
+                        },
+                        new
+                        {
+                            Id = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            Title = "Nature"
+                        },
+                        new
+                        {
+                            Id = new Guid("ddd333f7-ef45-4e13-a2ca-fb4494dce324"),
+                            Title = "Culture"
+                        },
+                        new
+                        {
+                            Id = new Guid("4871ba53-b2a6-4687-9da4-1b8e50ba793f"),
+                            Title = "Food"
+                        },
+                        new
+                        {
+                            Id = new Guid("2a388146-e32c-4a08-a246-472eff12849a"),
+                            Title = "Entertainment"
+                        },
+                        new
+                        {
+                            Id = new Guid("3d6c54d3-0fda-4923-a00e-e930640430b3"),
+                            Title = "Sports"
                         });
                 });
 

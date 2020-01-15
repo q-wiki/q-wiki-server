@@ -12,10 +12,15 @@ namespace WikidataGame.Backend.Repos
     {
         public QuestionRepository(DataContext context) : base(context){}
 
-        public async Task<Question> GetRandomQuestionForCategoryAsync(Guid categoryId)
+        public Question GetRandomQuestionForCategory(Guid categoryId)
         {
-            return await Context.Set<Question>().Where(q => q.Status == QuestionStatus.Approved && q.CategoryId == categoryId)
-                .OrderBy(q => Guid.NewGuid()).FirstOrDefaultAsync();
+            return Context.Set<Question>()
+                .Where(q => q.Status == QuestionStatus.Approved && q.CategoryId == categoryId)
+                .GroupBy(q => q.GroupId)
+                .OrderBy(q => Guid.NewGuid())
+                .First()
+                .OrderBy(q => Guid.NewGuid())
+                .First();
         }
     }
 }

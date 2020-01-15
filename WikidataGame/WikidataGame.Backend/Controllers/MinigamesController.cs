@@ -49,7 +49,7 @@ namespace WikidataGame.Backend.Controllers
                     return Forbid();
 
             var minigameServices = ControllerContext.HttpContext.RequestServices.GetServices<IMinigameService>();
-            var question = await questionRepo.GetRandomQuestionForCategoryAsync(minigameParams.CategoryId);
+            var question = questionRepo.GetRandomQuestionForCategory(minigameParams.CategoryId);
             var service = minigameServices.SingleOrDefault(s => s.MiniGameType == question.MiniGameType);
 
             var minigame = await service.GenerateMiniGameAsync(gameId, user.Id, question, minigameParams.TileId);

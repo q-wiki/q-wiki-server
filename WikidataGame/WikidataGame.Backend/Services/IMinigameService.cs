@@ -9,6 +9,6 @@ namespace WikidataGame.Backend.Services
     public interface IMinigameService
     {
         MiniGameType MiniGameType { get; }
-        Task<MiniGame> GenerateMiniGameAsync(Guid gameId, Guid playerId, Question category, Guid tileId);
+        Task<MiniGame> GenerateMiniGameAsync(Guid gameId, Guid playerId, Question question, Guid tileId);
     }
 }

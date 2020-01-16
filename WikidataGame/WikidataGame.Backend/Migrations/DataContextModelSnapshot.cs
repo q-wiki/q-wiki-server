@@ -704,7 +704,7 @@ namespace WikidataGame.Backend.Migrations
                             SparqlQuery = @"
                             # Based on the example question 'Former capitals''
 
-                            SELECT ?question ?answer(SAMPLE(?image) AS ?image)
+                            SELECT (SAMPLE(?image) AS ?question) ?answer
                             WHERE
                             {
                               # Fetches capitals from current or former members of the U.N.
@@ -753,7 +753,7 @@ namespace WikidataGame.Backend.Migrations
                             MiniGameType = 1,
                             SparqlQuery = @"
                             #Which famous landmark is this: {image}
-                            SELECT ?question ?answer ?image
+                            SELECT ?question ?answer
                             WITH{
                             SELECT ?tes (CONCAT( ?ans, '(', ?country, ')' ) as ?answer) WHERE {
                               { SELECT DISTINCT(?answer as ?ans)(MAX(?image) as ?tes) ?country WHERE { 
@@ -801,7 +801,7 @@ namespace WikidataGame.Backend.Migrations
                                 UNION
                                 { INCLUDE %decoyMonuments}
                                 Bind(?tes as ?image)
-                                BIND('Which famous landmark is this' as ?question)
+                                BIND(?image as ?question)
                             }
                             ORDER BY DESC(?question)
                             ",
@@ -1248,7 +1248,7 @@ namespace WikidataGame.Backend.Migrations
                             MiniGameType = 1,
                             SparqlQuery = @"
                         # Which U.S. president's signature is this: {question}
-                        SELECT  ?question ?answer ?image
+                        SELECT  ?question ?answer
                         WITH{
                           SELECT ?answer ?image
                         WHERE { 
@@ -1282,9 +1282,9 @@ namespace WikidataGame.Backend.Migrations
                           {INCLUDE %selectedPresident}
                           UNION
                           {INCLUDE %decoyPresidents}
-                          BIND('Whose presidents signature is this?' as ?question)
+                          BIND(?image as ?question)
                         }
-                        ORDER BY DESC(?image)
+                        ORDER BY DESC(?question)
                         ",
                             Status = 2,
                             TaskDescription = "Which of presidents signature is this?"
@@ -2158,7 +2158,7 @@ namespace WikidataGame.Backend.Migrations
                             MiniGameType = 1,
                             SparqlQuery = @"
                             # This query includes: artiodactyla, primates, marsupials
-                            SELECT DISTINCT ?question (?name as ?answer) ?image
+                            SELECT DISTINCT ?question (?name as ?answer)
                             #seperated animals in variables befor unionizing for performance/quicker response
                             WITH{
                                 SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
@@ -2241,8 +2241,8 @@ namespace WikidataGame.Backend.Migrations
                                {INCLUDE %selectedAnimal} 
                                UNION 
                                {INCLUDE %decoyAnimals}       
-                               BIND('Which animal is in the image?' as ?question)
-                             } ORDER BY DESC(?image)
+                               BIND(?image as ?question)
+                             } ORDER BY DESC(?question)
                             ",
                             Status = 2,
                             TaskDescription = "Which animal is is this?"
@@ -2255,7 +2255,7 @@ namespace WikidataGame.Backend.Migrations
                             MiniGameType = 1,
                             SparqlQuery = @"
                             # This query includes: rodentia, carnivora, marsupial
-                            SELECT DISTINCT ?question (?name as ?answer) ?image
+                            SELECT DISTINCT ?question (?name as ?answer)
 
                             #seperated animals in variables befor unionizing for performance/quicker response
                             WITH{
@@ -2338,8 +2338,8 @@ namespace WikidataGame.Backend.Migrations
                                {INCLUDE %selectedAnimal} 
                                UNION 
                                {INCLUDE %decoyAnimals}       
-                               BIND('Which animal is in the image?' as ?question)
-                             } ORDER BY DESC(?image)
+                               BIND(?image as ?question)
+                             } ORDER BY DESC(?question)
                             ",
                             Status = 2,
                             TaskDescription = "Which animal is this?"
@@ -2352,7 +2352,7 @@ namespace WikidataGame.Backend.Migrations
                             MiniGameType = 1,
                             SparqlQuery = @"
                               # This query includes: carnivore, artiodactyla, primates
-                              SELECT DISTINCT ?question (?name as ?answer) ?image
+                              SELECT DISTINCT ?question (?name as ?answer)
                                 #seperated animals in variables befor unionizing for performance/quicker response
                                 WITH{
                                     SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
@@ -2435,8 +2435,8 @@ namespace WikidataGame.Backend.Migrations
                                    {INCLUDE %selectedAnimal} 
                                    UNION 
                                    {INCLUDE %decoyAnimals}       
-                                   BIND('Which animal is in the image?' as ?question)
-                                 } ORDER BY DESC(?image)
+                                   BIND(?image as ?question)
+                                 } ORDER BY DESC(?question)
                             ",
                             Status = 2,
                             TaskDescription = "Which animal is this?"
@@ -2449,7 +2449,7 @@ namespace WikidataGame.Backend.Migrations
                             MiniGameType = 1,
                             SparqlQuery = @"
                                 # This query includes: primates + artiodactyla + rodentia
-                                SELECT DISTINCT ?question (?name as ?answer) ?image
+                                SELECT DISTINCT ?question (?name as ?answer)
 
                                 #seperated animals in variables befor unionizing for performance/quicker response
                                 WITH{
@@ -2533,8 +2533,8 @@ namespace WikidataGame.Backend.Migrations
                                    {INCLUDE %selectedAnimal} 
                                    UNION 
                                    {INCLUDE %decoyAnimals}       
-                                   BIND('Which animal is in the image?' as ?question)
-                                 } ORDER BY DESC(?image)
+                                   BIND(?image as ?question)
+                                 } ORDER BY DESC(?question)
                             ",
                             Status = 2,
                             TaskDescription = "Which animal is this"
@@ -2580,9 +2580,9 @@ namespace WikidataGame.Backend.Migrations
                         } as %decoyBirds
 
                         WHERE {
-                          {INCLUDE %selectedBird} UNION {INCLUDE %decoyBirds}       
-                          BIND('Which animal is in the image?' as ?question)
-                         } ORDER BY DESC(?image)
+                           {INCLUDE %selectedBird} UNION {INCLUDE %decoyBirds}       
+                           BIND(?image as ?question)
+                         } ORDER BY DESC(?question)
                         ",
                             Status = 2,
                             TaskDescription = "Which animal is in the image?"
@@ -2594,7 +2594,7 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        SELECT DISTINCT ?question (?name as ?answer) ?image
+                        SELECT DISTINCT ?question (?name as ?answer)
 
                         #seperated animals in variables befor unionizing for performance/quicker response
                         WITH{
@@ -2630,8 +2630,8 @@ namespace WikidataGame.Backend.Migrations
                         WHERE {
                           {
                            INCLUDE %selectedFish} UNION {INCLUDE %decoyFish}       
-                           BIND('Which animal is in the image?' as ?question)
-                         } ORDER BY DESC(?image)",
+                           BIND(?image as ?question)
+                         } ORDER BY DESC(?question)",
                             Status = 2,
                             TaskDescription = "Which animal is in the image?"
                         },
@@ -2642,7 +2642,7 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        SELECT DISTINCT ?question (?name as ?answer) ?image
+                        SELECT DISTINCT ?question (?name as ?answer)
 
                         #seperated animals in variables befor unionizing for performance/quicker response
                         WITH{
@@ -2678,8 +2678,8 @@ namespace WikidataGame.Backend.Migrations
                         WHERE {
                           {
                            INCLUDE %selectedAmphibia} UNION {INCLUDE %decoyAmphibia}       
-                           BIND('Which animal is in the image?' as ?question)
-                         } ORDER BY DESC(?image)
+                           BIND(?image as ?question)
+                         } ORDER BY DESC(?question)
                         ",
                             Status = 2,
                             TaskDescription = "Which animal is in the image?"
@@ -2691,7 +2691,7 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        SELECT DISTINCT ?question (?name as ?answer) ?image
+                        SELECT DISTINCT ?question (?name as ?answer)
 
                         #seperated animals in variables befor unionizing for performance/quicker response
                         WITH{
@@ -2727,9 +2727,9 @@ namespace WikidataGame.Backend.Migrations
                         WHERE {
                           {
                            INCLUDE %selectedReptile} UNION {INCLUDE %decoyReptiles}       
-                           BIND('Which animal is in the image?' as ?question)
+                           BIND(?image as ?question)
                          }
-                        ORDER BY DESC(?image)
+                        ORDER BY DESC(?question)
                         ",
                             Status = 2,
                             TaskDescription = "Which animal is in the image?"
@@ -2742,7 +2742,7 @@ namespace WikidataGame.Backend.Migrations
                             MiniGameType = 1,
                             SparqlQuery = @"
                         # which of these 
-                        SELECT DISTINCT ?question (?name as ?answer) ?image
+                        SELECT DISTINCT ?question (?name as ?answer)
 
                         #seperated animals in variables befor unionizing for performance/quicker response
                         WITH{
@@ -2829,9 +2829,9 @@ namespace WikidataGame.Backend.Migrations
                            {INCLUDE %selectedAnimal} 
                            UNION 
                            {INCLUDE %decoyAnimals}       
-                           BIND('Which animal is in the image?' as ?question)
+                           BIND(?image as ?question)
                          }
-                        ORDER BY DESC(?image)
+                        ORDER BY DESC(?question)
                         ",
                             Status = 2,
                             TaskDescription = "Which animal is in the image?"
@@ -2844,7 +2844,7 @@ namespace WikidataGame.Backend.Migrations
                             MiniGameType = 1,
                             SparqlQuery = @"
                         # which of these 
-                        SELECT DISTINCT ?question (?name as ?answer) ?image
+                        SELECT DISTINCT ?question (?name as ?answer)
 
                         #seperated animals in variables befor unionizing for performance/quicker response
                         WITH{
@@ -2912,9 +2912,9 @@ namespace WikidataGame.Backend.Migrations
                            {INCLUDE %selectedAnimal} 
                            UNION 
                            {INCLUDE %decoyAnimals}       
-                           BIND('Which animal is in the image?' as ?question)
+                           BIND(?image as ?question)
                          }
-                        ORDER BY DESC(?Image)
+                        ORDER BY DESC(?question)
                         ",
                             Status = 2,
                             TaskDescription = "Which animal is in the image?"
@@ -2995,9 +2995,9 @@ namespace WikidataGame.Backend.Migrations
                            {INCLUDE %selectedAnimal} 
                            UNION 
                            {INCLUDE %decoyAnimals}       
-                           BIND('Which animal is in the image?' as ?question)
+                           BIND(?image as ?question)
                          }
-                        ORDER BY DESC(?image)
+                        ORDER BY DESC(?question)
                         ",
                             Status = 2,
                             TaskDescription = "Which animal is in the image?"
@@ -3009,7 +3009,7 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        SELECT DISTINCT ?question (?name as ?answer) ?image
+                        SELECT DISTINCT ?question (?name as ?answer)
 
                         #seperated animals in variables befor unionizing for performance/quicker response
                         WITH{
@@ -3075,8 +3075,8 @@ namespace WikidataGame.Backend.Migrations
                            {INCLUDE %selectedAnimal} 
                            UNION 
                            {INCLUDE %decoyAnimals}       
-                           BIND('Which animal is in the image?' as ?question)
-                         } ORDER BY DESC(?image)
+                           BIND(?image as ?question)
+                         } ORDER BY DESC(?question)
                         ",
                             Status = 2,
                             TaskDescription = "Which animal is in the image?"
@@ -3088,7 +3088,7 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                            SELECT DISTINCT ?question (?name as ?answer) ?image
+                            SELECT DISTINCT ?question (?name as ?answer)
 
                             #seperated animals in variables befor unionizing for performance/quicker response
                             WITH{
@@ -3154,8 +3154,8 @@ namespace WikidataGame.Backend.Migrations
                                {INCLUDE %selectedAnimal} 
                                UNION 
                                {INCLUDE %decoyAnimals}       
-                               BIND('Which animal is in the image?' as ?question)
-                             } ORDER BY DESC(?image)
+                               BIND(?image as ?question)
+                             } ORDER BY DESC(?question)
                             ",
                             Status = 2,
                             TaskDescription = "Which animal is in the image?"
@@ -3167,7 +3167,7 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                            SELECT DISTINCT ?question (?name as ?answer) ?image
+                            SELECT DISTINCT ?question (?name as ?answer)
 
                             #seperated animals in variables befor unionizing for performance/quicker response
                             WITH{
@@ -3233,8 +3233,8 @@ namespace WikidataGame.Backend.Migrations
                                {INCLUDE %selectedAnimal} 
                                UNION 
                                {INCLUDE %decoyAnimals}       
-                               BIND('Which animal is in the image?' as ?question)
-                             } ORDER BY DESC(?image)
+                               BIND(?image as ?question)
+                             } ORDER BY DESC(?question)
                             ",
                             Status = 2,
                             TaskDescription = "Which animal is in the image?"
@@ -3247,7 +3247,7 @@ namespace WikidataGame.Backend.Migrations
                             MiniGameType = 1,
                             SparqlQuery = @"
                                 # This query includes: primates + artiodactyla + rodentia
-                                SELECT DISTINCT ?question (?name as ?answer) ?image
+                                SELECT DISTINCT ?question (?name as ?answer)
 
                                 #seperated animals in variables befor unionizing for performance/quicker response
                                 WITH{
@@ -3331,8 +3331,8 @@ namespace WikidataGame.Backend.Migrations
                                    {INCLUDE %selectedAnimal} 
                                    UNION 
                                    {INCLUDE %decoyAnimals}       
-                                   BIND('Which animal is in the image?' as ?question)
-                                 } ORDER BY DESC(?image)
+                                   BIND(?image as ?question)
+                                 } ORDER BY DESC(?question)
                             ",
                             Status = 2,
                             TaskDescription = "Which animal is in the image"
@@ -3447,7 +3447,7 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("d834932d-1203-4039-9baf-68322b176bae"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                            SELECT ?question ?answer ?painting ?image
+                            SELECT ?question ?answer
                             WITH{
                             SELECT DISTINCT ?creator ?painting ?image ?paintingLabel
                               WHERE 
@@ -3485,9 +3485,9 @@ namespace WikidataGame.Backend.Migrations
                                 {INCLUDE %decoyPainting}
 
                                 BIND(?paintingLabel as ?answer)
-                                BIND('What is the name of the painting?' as ?question)
+                                BIND(?image as ?question)
                             }
-                              order by DESC(?image)
+                              order by DESC(?question)
                             ",
                             Status = 2,
                             TaskDescription = "What is the name of the painting?"
@@ -3694,7 +3694,7 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("fee91818-2fb5-4845-affa-2504d4191ee1"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                            SELECT ?question (?dishLabel as ?answer) ?image
+                            SELECT ?question (?dishLabel as ?answer)
                             WITH{
                               SELECT DISTINCT ?dish ?dishLabel (SAMPLE(?image)as ?image)
                               WHERE{
@@ -3732,9 +3732,9 @@ namespace WikidataGame.Backend.Migrations
                               {INCLUDE %selectedDish}
                               UNION
                               {INCLUDE %decoyDishes}
-                              BIND('What dish is this?' as ?question)
+                              BIND(?image as ?question)
                             }
-                            ORDER BY DESC(?image)
+                            ORDER BY DESC(?question)
                             ",
                             Status = 2,
                             TaskDescription = "What dish is this?"
@@ -3809,9 +3809,9 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("ac3e0a15-376e-4dbc-a8f8-6df4c9fe39e7"),
                             MiniGameType = 2,
                             SparqlQuery = @"
-                           SELECT DISTINCT ?question ?answer
+                            SELECT DISTINCT ?question ?answer ?awardLabel ?movieLabel
                             WITH{
-                              SELECT DISTINCT ?actor ?actorLabel  ?movieLabel ?awardLabel
+                              SELECT DISTINCT ?actor ?actorLabel ?movieLabel ?awardLabel
                             WHERE{
                               ?actor wdt:P31 wd:Q5;
                                      wdt:P106 wd:Q33999;
@@ -3830,10 +3830,10 @@ namespace WikidataGame.Backend.Migrations
                             } as %allWinners
                                        
                             WITH{
-                              SELECT ?actor ?actorLabel ?question
+                              SELECT ?actor ?actorLabel ?question ?movieLabel ?awardLabel
                               WHERE{
                                  INCLUDE %allWinners.
-                                 BIND(CONCAT('Who won the ', CONCAT(STR(?awardLabel), CONCAT(' in the movie ', CONCAT(STR(?movieLabel), '?'))))  as ?question)
+                                 BIND(CONCAT('Who won the ', CONCAT(STR(?awardLabel), CONCAT(' for the movie ', CONCAT(STR(?movieLabel), '?'))))  as ?question)
                               }
                               ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
                               LIMIT 1
@@ -3858,7 +3858,7 @@ namespace WikidataGame.Backend.Migrations
                             ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Who won the Academy Award for for the movie {0}?"
+                            TaskDescription = "Who won the {3} for for the movie {4}?"
                         },
                         new
                         {
@@ -3886,7 +3886,7 @@ namespace WikidataGame.Backend.Migrations
                              } as %emmySeries
 
                             WITH{
-                              SELECT DISTINCT ?characterLabel ?seriesLabel
+                              SELECT DISTINCT ?characterLabel ?seriesLabel ?empty
                               WHERE{
                                 INCLUDE %emmySeries
                               }
@@ -3895,10 +3895,18 @@ namespace WikidataGame.Backend.Migrations
                             } as %selectedSeries
 
                             WITH{
+                              SELECT ?seriesLabel
+                                  WHERE{
+                                    INCLUDE %selectedSeries
+                                  }
+                               LIMIT 1
+                            } as %selectedSeriesLabel
+
+                            WITH{
                               SELECT DISTINCT ?seriesLabel
                               WHERE{
                                 INCLUDE %emmySeries.
-                                FILTER NOT EXISTS {INCLUDE %selectedSeries}
+                                FILTER NOT EXISTS {INCLUDE %selectedSeriesLabel}
                               }
                               ORDER BY MD5(CONCAT(STR(?seriesLabel), STR(NOW())))
                               LIMIT 3

@@ -80,12 +80,15 @@ namespace WikidataGame.Backend.Models
         [ForeignKey(nameof(QuestionId))]
         public virtual Question Question { get; set; }
 
+        public string ImageUrl { get; set; }
+
+        public string LicenseInfo { get; set; }
     }
 
     public enum MiniGameType
     {
         Sort,
-        BlurryImage,
+        Image,
         MultipleChoice
     }
 

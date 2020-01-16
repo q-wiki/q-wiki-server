@@ -203,7 +203,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("3c750fe4-4980-46cf-b6e9-876e8228945b"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which country is not a basin country of the Baltic Sea?",
+                    TaskDescription = "Which country does not border the Baltic Sea?",
                     SparqlQuery = @"SELECT DISTINCT ?question ?answer
                             WITH {
                               SELECT DISTINCT (?state as ?country) WHERE {
@@ -253,8 +253,8 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("3c750fe4-4980-46cf-b6e9-876e8228945b"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which country is not a basin country of the Caribbean Sea?",
-                    SparqlQuery = @"# Which country is no basin country of the Caribbean Sea?
+                    TaskDescription = "Which country does not border the Caribbean Sea?",
+                    SparqlQuery = @"# Which country does not border the Caribbean Sea?
                             SELECT DISTINCT ?question ?answer
                             WITH {
                               SELECT DISTINCT (?state as ?country) WHERE {
@@ -318,8 +318,8 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("3c750fe4-4980-46cf-b6e9-876e8228945b"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which country is not a basin country of the Mediterranean Sea?",
-                    SparqlQuery = @"# Which country is no basin country of the Mediterranean Sea?
+                    TaskDescription = "Which country does not border the Mediterranean Sea?",
+                    SparqlQuery = @"# Which country does not border the Mediterranean Sea?
                             SELECT DISTINCT ?question ?answer
                             WITH {
                               SELECT DISTINCT (?state as ?country) WHERE {
@@ -1030,7 +1030,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("26333055-8b72-4b65-b622-1bfac80e0adc"),
                     MiniGameType = MiniGameType.Image,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which of presidents signature is this?",
+                    TaskDescription = "Which president has this signature?",
                     SparqlQuery = @"
                         # Which U.S. president's signature is this: {question}
                         SELECT  ?question ?answer
@@ -1142,7 +1142,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("be6894ce-de74-4f73-9cb9-0a5edd6d9249"),
                     MiniGameType = MiniGameType.Sort,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Sort these animals by gestation period (ascending)",
+                    TaskDescription = "Sort these animals by duration of pregnancy (ascending).",
                     SparqlQuery = @"
                             # Sort animals by gestation time (days)? (onlycarnivores, artiodactyla and rodents)
                             SELECT DISTINCT ?question (?name as ?answer) ?gestationTime ?item
@@ -1278,7 +1278,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("be6894ce-de74-4f73-9cb9-0a5edd6d9249"),
                     MiniGameType = MiniGameType.Sort,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Sort these animals by gestation period (ascending)",
+                    TaskDescription = "Sort these animals by duration of pregnancy (ascending).",
                     SparqlQuery = @"
                             # Sort animals by gestation time (days)? (only marsupials, artiodactyla, primates)
                             # Sort animals by gestation time (days)?
@@ -1400,7 +1400,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("be6894ce-de74-4f73-9cb9-0a5edd6d9249"),
                     MiniGameType = MiniGameType.Sort,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Sort these animals by gestation period (ascending)",
+                    TaskDescription = "Sort these animals by duration of pregnancy (ascending).",
                     SparqlQuery = @"
                             # Sort animals by gestation time (days)? (only rodentia, carnivora, marsupial)
                             # Sort animals by gestation time (days)?
@@ -1537,7 +1537,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("be6894ce-de74-4f73-9cb9-0a5edd6d9249"),
                     MiniGameType = MiniGameType.Sort,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Sort these animals by gestation period (ascending)",
+                    TaskDescription = "Sort these animals by duration of pregnancy (ascending).",
                     SparqlQuery = @"
                             # Sort animals by gestation time (days)? (only primates, rodents, carnivora)
                             SELECT DISTINCT ?question (?name as ?answer) ?gestationTime ?item
@@ -1673,7 +1673,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("bce51234-32b7-4629-b65a-d23beb8b43c3"),
                     MiniGameType = MiniGameType.Sort,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Order these animals by bite force quotient (Ascending)",
+                    TaskDescription = "Order these animals by bite force quotient (ascending).",
                     SparqlQuery = @"
                             # sort animals by bite force quotient?
                             SELECT DISTINCT ?question (?name as ?answer) ?biteForce
@@ -3128,7 +3128,7 @@ namespace WikidataGame.Backend.Helpers
                       Id = new Guid("b95607f9-8cd6-48e8-bc99-c9c305e812be"),
                       CategoryId = CategoryCulture.Id,
                       GroupId = new Guid("acc3d752-2880-4882-ba16-e3deb3ee9cee"),
-                      MiniGameType = MiniGameType.Sort,
+                      MiniGameType = MiniGameType.MultipleChoice,
                       Status = QuestionStatus.Approved,
                       TaskDescription = "Who invented {0}?",
                       SparqlQuery = @"
@@ -3233,7 +3233,7 @@ namespace WikidataGame.Backend.Helpers
                       GroupId = new Guid("d834932d-1203-4039-9baf-68322b176bae"),
                       MiniGameType = MiniGameType.Image,
                       Status = QuestionStatus.Approved,
-                      TaskDescription = "What is the name of the painting?",
+                      TaskDescription = "What is the name of this painting?",
                       SparqlQuery = @"
                             SELECT ?question ?answer
                             WITH{
@@ -3432,7 +3432,7 @@ namespace WikidataGame.Backend.Helpers
                        GroupId = new Guid("984112bc-d178-4ac5-8940-3e4fd2fc3105"),
                        MiniGameType = MiniGameType.Sort,
                        Status = QuestionStatus.Approved,
-                       TaskDescription = "Sort these softdrinks by inception",
+                       TaskDescription = "Sort these softdrinks by inception.",
                        SparqlQuery = @"
                         #Structure is important to get only one drink of a inception year and avoid duplicates
                         SELECT DISTINCT ?question  ?answer ?year
@@ -3595,7 +3595,7 @@ namespace WikidataGame.Backend.Helpers
                        GroupId = new Guid("ac3e0a15-376e-4dbc-a8f8-6df4c9fe39e7"),
                        MiniGameType = MiniGameType.MultipleChoice,
                        Status = QuestionStatus.Approved,
-                       TaskDescription = "Who won the {3} for for the movie {4}?",
+                       TaskDescription = "{0}",
                        SparqlQuery = @"
                             SELECT DISTINCT ?question ?answer ?awardLabel ?movieLabel
                             WITH{
@@ -3621,7 +3621,7 @@ namespace WikidataGame.Backend.Helpers
                               SELECT ?actor ?actorLabel ?question ?movieLabel ?awardLabel
                               WHERE{
                                  INCLUDE %allWinners.
-                                 BIND(CONCAT('Who won the ', CONCAT(STR(?awardLabel), CONCAT(' for the movie ', CONCAT(STR(?movieLabel), '?'))))  as ?question)
+                                 BIND(CONCAT('Who won the ', CONCAT(STR(?awardLabel), CONCAT(' for ', CONCAT(STR(?movieLabel), '?'))))  as ?question)
                               }
                               ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
                               LIMIT 1
@@ -3718,7 +3718,7 @@ namespace WikidataGame.Backend.Helpers
                        GroupId = new Guid("039acc70-30d3-40fe-a28a-0b44964d49e7"),
                        MiniGameType = MiniGameType.MultipleChoice,
                        Status = QuestionStatus.Approved,
-                       TaskDescription = "Who is the trainer of {0} ?",
+                       TaskDescription = "Who is the trainer of {0}?",
                        SparqlQuery = @"
                             SELECT  (SAMPLE(?question) AS ?question)(SAMPLE(?answer) AS ?answer) (SAMPLE(?teamLabel) AS ?team) ?soccerTeam 
                             WITH{
@@ -3799,7 +3799,7 @@ namespace WikidataGame.Backend.Helpers
                        GroupId = new Guid("0b1ff760-e02f-4ddc-8f32-5161931ebcbe"),
                        MiniGameType = MiniGameType.MultipleChoice,
                        Status = QuestionStatus.Approved,
-                       TaskDescription = "Who is the trainer of {0} ?",
+                       TaskDescription = "Who is the trainer of {0}?",
                        SparqlQuery = @"
                             SELECT (Sample(GROUP_CONCAT( DISTINCT ?question; SEPARATOR=', ')) AS ?question) (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?answer); SEPARATOR=', ')) AS ?answer) 
                             ?playerCount

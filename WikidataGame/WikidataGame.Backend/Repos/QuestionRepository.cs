@@ -15,7 +15,7 @@ namespace WikidataGame.Backend.Repos
         public Question GetRandomQuestionForCategory(Guid categoryId)
         {
             return Context.Set<Question>()
-                .Where(q => q.Status == QuestionStatus.Approved && q.MiniGameType == MiniGameType.Image) //q.CategoryId == categoryId
+                .Where(q => q.Status == QuestionStatus.Approved && q.CategoryId == categoryId)
                 .GroupBy(q => q.GroupId)
                 .OrderBy(q => Guid.NewGuid())
                 .First()

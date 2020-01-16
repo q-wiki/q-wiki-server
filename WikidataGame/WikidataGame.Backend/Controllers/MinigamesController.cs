@@ -52,9 +52,25 @@ namespace WikidataGame.Backend.Controllers
             var question = questionRepo.GetRandomQuestionForCategory(minigameParams.CategoryId);
             var service = minigameServices.SingleOrDefault(s => s.MiniGameType == question.MiniGameType);
 
-            var minigame = await service.GenerateMiniGameAsync(gameId, user.Id, question, minigameParams.TileId);
+            try
+            {
+                var minigame = await service.GenerateMiniGameAsync(gameId, user.Id, question, minigameParams.TileId);
+                return Created(string.Empty, mapper.Map<MiniGame>(minigame));
+            }
+            catch(Exception)
+            {
+                //second try
+                try
+                {
+                    var minigame = await service.GenerateMiniGameAsync(gameId, user.Id, question, minigameParams.TileId);
+                    return Created(string.Empty, mapper.Map<MiniGame>(minigame));
+                }
+                catch (Exception)
+                {
+                    return StatusCode(503);
+                }
+            }
 
-            return Created(string.Empty, mapper.Map<MiniGame>(minigame));
         }
 
         /// <summary>

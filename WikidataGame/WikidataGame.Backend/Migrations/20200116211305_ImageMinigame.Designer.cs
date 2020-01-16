@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WikidataGame.Backend.Helpers;
 
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20200116211305_ImageMinigame")]
+    partial class ImageMinigame
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -494,7 +496,7 @@ namespace WikidataGame.Backend.Migrations
                             }
                             order by DESC(?question)",
                             Status = 2,
-                            TaskDescription = "Which country does not border the Baltic Sea?"
+                            TaskDescription = "Which country is not a basin country of the Baltic Sea?"
                         },
                         new
                         {
@@ -502,7 +504,7 @@ namespace WikidataGame.Backend.Migrations
                             CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
                             GroupId = new Guid("3c750fe4-4980-46cf-b6e9-876e8228945b"),
                             MiniGameType = 2,
-                            SparqlQuery = @"# Which country does not border the Caribbean Sea?
+                            SparqlQuery = @"# Which country is no basin country of the Caribbean Sea?
                             SELECT DISTINCT ?question ?answer
                             WITH {
                               SELECT DISTINCT (?state as ?country) WHERE {
@@ -559,7 +561,7 @@ namespace WikidataGame.Backend.Migrations
                             }
                             order by DESC(?noSea)",
                             Status = 2,
-                            TaskDescription = "Which country does not border the Caribbean Sea?"
+                            TaskDescription = "Which country is not a basin country of the Caribbean Sea?"
                         },
                         new
                         {
@@ -567,7 +569,7 @@ namespace WikidataGame.Backend.Migrations
                             CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
                             GroupId = new Guid("3c750fe4-4980-46cf-b6e9-876e8228945b"),
                             MiniGameType = 2,
-                            SparqlQuery = @"# Which country does not border the Mediterranean Sea?
+                            SparqlQuery = @"# Which country is no basin country of the Mediterranean Sea?
                             SELECT DISTINCT ?question ?answer
                             WITH {
                               SELECT DISTINCT (?state as ?country) WHERE {
@@ -608,7 +610,7 @@ namespace WikidataGame.Backend.Migrations
                             }
                             order by DESC(?noSea)",
                             Status = 2,
-                            TaskDescription = "Which country does not border the Mediterranean Sea?"
+                            TaskDescription = "Which country is not a basin country of the Mediterranean Sea?"
                         },
                         new
                         {
@@ -1291,7 +1293,7 @@ namespace WikidataGame.Backend.Migrations
                         ORDER BY DESC(?question)
                         ",
                             Status = 2,
-                            TaskDescription = "Which president has this signature?"
+                            TaskDescription = "Which of presidents signature is this?"
                         },
                         new
                         {
@@ -1489,7 +1491,7 @@ namespace WikidataGame.Backend.Migrations
                             ORDER BY ?gestationTime
                         ",
                             Status = 2,
-                            TaskDescription = "Sort these animals by duration of pregnancy (ascending)."
+                            TaskDescription = "Sort these animals by gestation period (ascending)"
                         },
                         new
                         {
@@ -1611,7 +1613,7 @@ namespace WikidataGame.Backend.Migrations
                             ORDER BY ?gestationTime
                         ",
                             Status = 2,
-                            TaskDescription = "Sort these animals by duration of pregnancy (ascending)."
+                            TaskDescription = "Sort these animals by gestation period (ascending)"
                         },
                         new
                         {
@@ -1748,7 +1750,7 @@ namespace WikidataGame.Backend.Migrations
                             ORDER BY ?gestationTime              
                         ",
                             Status = 2,
-                            TaskDescription = "Sort these animals by duration of pregnancy (ascending)."
+                            TaskDescription = "Sort these animals by gestation period (ascending)"
                         },
                         new
                         {
@@ -1884,7 +1886,7 @@ namespace WikidataGame.Backend.Migrations
                             ORDER BY ?gestationTime             
                         ",
                             Status = 2,
-                            TaskDescription = "Sort these animals by duration of pregnancy (ascending)."
+                            TaskDescription = "Sort these animals by gestation period (ascending)"
                         },
                         new
                         {
@@ -1937,7 +1939,7 @@ namespace WikidataGame.Backend.Migrations
                             ORDER BY ASC(?biteForce)
                             ",
                             Status = 2,
-                            TaskDescription = "Order these animals by bite force quotient (ascending)."
+                            TaskDescription = "Order these animals by bite force quotient (Ascending)"
                         },
                         new
                         {
@@ -3346,7 +3348,7 @@ namespace WikidataGame.Backend.Migrations
                             Id = new Guid("b95607f9-8cd6-48e8-bc99-c9c305e812be"),
                             CategoryId = new Guid("ddd333f7-ef45-4e13-a2ca-fb4494dce324"),
                             GroupId = new Guid("acc3d752-2880-4882-ba16-e3deb3ee9cee"),
-                            MiniGameType = 2,
+                            MiniGameType = 0,
                             SparqlQuery = @"
                                 SELECT DISTINCT ?question ?answer 
 
@@ -3494,7 +3496,7 @@ namespace WikidataGame.Backend.Migrations
                               order by DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "What is the name of this painting?"
+                            TaskDescription = "What is the name of the painting?"
                         },
                         new
                         {
@@ -3689,7 +3691,7 @@ namespace WikidataGame.Backend.Migrations
                         order by ?year
                         ",
                             Status = 2,
-                            TaskDescription = "Sort these softdrinks by inception."
+                            TaskDescription = "Sort these softdrinks by inception"
                         },
                         new
                         {
@@ -3837,7 +3839,7 @@ namespace WikidataGame.Backend.Migrations
                               SELECT ?actor ?actorLabel ?question ?movieLabel ?awardLabel
                               WHERE{
                                  INCLUDE %allWinners.
-                                 BIND(CONCAT('Who won the ', CONCAT(STR(?awardLabel), CONCAT(' for ', CONCAT(STR(?movieLabel), '?'))))  as ?question)
+                                 BIND(CONCAT('Who won the ', CONCAT(STR(?awardLabel), CONCAT(' for the movie ', CONCAT(STR(?movieLabel), '?'))))  as ?question)
                               }
                               ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
                               LIMIT 1
@@ -3862,7 +3864,7 @@ namespace WikidataGame.Backend.Migrations
                             ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "{0}"
+                            TaskDescription = "Who won the {3} for for the movie {4}?"
                         },
                         new
                         {
@@ -4008,7 +4010,7 @@ namespace WikidataGame.Backend.Migrations
                             ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Who is the trainer of {0}?"
+                            TaskDescription = "Who is the trainer of {0} ?"
                         },
                         new
                         {
@@ -4050,7 +4052,7 @@ namespace WikidataGame.Backend.Migrations
                             ORDER BY ?playerCount
                             ",
                             Status = 2,
-                            TaskDescription = "Who is the trainer of {0}?"
+                            TaskDescription = "Who is the trainer of {0} ?"
                         });
                 });
 

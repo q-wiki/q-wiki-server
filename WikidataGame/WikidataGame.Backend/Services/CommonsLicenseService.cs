@@ -17,7 +17,7 @@ namespace WikidataGame.Backend.Services
 
         public static async Task<LicenseInfo> RetrieveLicenseInfoByUrlAsync(string url)
         {
-            var regex = new Regex("/File:(?<filename>.*?)$");
+            var regex = new Regex("FilePath/(?<filename>.*?)$");
             var match = regex.Match(url);
             if (!match.Success)
                 throw new UnableToRetrieveLicenseException();
@@ -27,9 +27,9 @@ namespace WikidataGame.Backend.Services
             {
                 using (var webClient = new WebClient())
                 {
-                    var infoJson = await webClient.DownloadStringTaskAsync(string.Format(LicenseInfoEndpoint, HttpUtility.UrlEncode(filename)));
+                    var infoJson = await webClient.DownloadStringTaskAsync(string.Format(LicenseInfoEndpoint, filename));
                     var jObject = JObject.Parse(infoJson);
-                    var imageInfo = jObject.SelectToken("query.pages").Children().First().SelectToken("imageinfo[0].extmetadata").ToObject<LicenseInfo>();
+                    var imageInfo = jObject.SelectToken("query.pages..imageinfo[0].extmetadata").ToObject<LicenseInfo>();
                     return imageInfo;
                 }
             }

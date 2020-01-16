@@ -70,7 +70,12 @@ namespace WikidataGame.Backend.Helpers
                 CategoryChemistry,
                 CategoryGeography,
                 CategoryHistory,
-                CategorySpace);
+                CategorySpace,
+                CategoryNature,
+                CategoryCulture,
+                CategoryFood,
+                CategoryEntertainment,
+                CategorySport);
         }
 
         public static void SeedQuestions(ModelBuilder modelBuilder)

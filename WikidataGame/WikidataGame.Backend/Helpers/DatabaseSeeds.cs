@@ -480,7 +480,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("f64d3784-3584-4f19-be07-aa44fd9a4086"),
                     CategoryId = CategoryGeography.Id,
                     GroupId = new Guid("848e9590-10f6-4d16-b2cd-ca282adaee99"),
-                    MiniGameType = MiniGameType.BlurryImage,
+                    MiniGameType = MiniGameType.Image,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Where are we?",
                     SparqlQuery = @"
@@ -530,7 +530,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("6a5c5b99-f1ce-49ee-a220-429c1fb54d7c"),
                     CategoryId = CategoryGeography.Id,
                     GroupId = new Guid("848e9590-10f6-4d16-b2cd-ca282adaee99"),
-                    MiniGameType = MiniGameType.BlurryImage,
+                    MiniGameType = MiniGameType.Image,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which famous landmark is this?",
                     SparqlQuery = @"
@@ -1028,7 +1028,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("3ad7e147-5862-48f1-aa7a-62d5df7f1222"),
                     CategoryId = CategoryHistory.Id,
                     GroupId = new Guid("26333055-8b72-4b65-b622-1bfac80e0adc"),
-                    MiniGameType = MiniGameType.BlurryImage,
+                    MiniGameType = MiniGameType.Image,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which of presidents signature is this?",
                     SparqlQuery = @"
@@ -1941,7 +1941,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("5ab7c050-06c1-4307-b100-32237f5c0429"),
                     CategoryId = CategoryNature.Id,
                     GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                    MiniGameType = MiniGameType.BlurryImage,
+                    MiniGameType = MiniGameType.Image,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which animal is is this?",
                     SparqlQuery = @"
@@ -2038,7 +2038,7 @@ namespace WikidataGame.Backend.Helpers
                      Id = new Guid("b5f2a986-4f0d-43e2-9f73-9fc22e76c2ab"),
                      CategoryId = CategoryNature.Id,
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                     MiniGameType = MiniGameType.BlurryImage,
+                     MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
                      TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
@@ -2135,7 +2135,7 @@ namespace WikidataGame.Backend.Helpers
                      Id = new Guid("50120520-4441-48c1-b387-1c923a038194"),
                      CategoryId = CategoryNature.Id,
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                     MiniGameType = MiniGameType.BlurryImage,
+                     MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
                      TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
@@ -2232,7 +2232,7 @@ namespace WikidataGame.Backend.Helpers
                      Id = new Guid("5abd274b-0826-4a30-832b-9e072a2cd0a4"),
                      CategoryId = CategoryNature.Id,
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                     MiniGameType = MiniGameType.BlurryImage,
+                     MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
                      TaskDescription = "Which animal is this",
                      SparqlQuery = @"
@@ -2330,7 +2330,7 @@ namespace WikidataGame.Backend.Helpers
                      Id = new Guid("fd92d683-fa21-4210-93c7-6a99b8968919"),
                      CategoryId = CategoryNature.Id,
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                     MiniGameType = MiniGameType.BlurryImage,
+                     MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
                      TaskDescription = "Which animal is in the image?",
                      SparqlQuery = @"
@@ -2378,7 +2378,7 @@ namespace WikidataGame.Backend.Helpers
                      Id = new Guid("9ea7b09b-7991-4eb4-b2a1-571e926c5790"),
                      CategoryId = CategoryNature.Id,
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                     MiniGameType = MiniGameType.BlurryImage,
+                     MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
                      TaskDescription = "Which animal is in the image?",
                      SparqlQuery = @"
@@ -2426,7 +2426,7 @@ namespace WikidataGame.Backend.Helpers
                      Id = new Guid("4f701ada-11d3-45a7-8251-6745d39ffc9a"),
                      CategoryId = CategoryNature.Id,
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                     MiniGameType = MiniGameType.BlurryImage,
+                     MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
                      TaskDescription = "Which animal is in the image?",
                      SparqlQuery = @"
@@ -2475,7 +2475,7 @@ namespace WikidataGame.Backend.Helpers
                      Id = new Guid("3a244446-94f0-4d1f-825e-8bd40e6a5d06"),
                      CategoryId = CategoryNature.Id,
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                     MiniGameType = MiniGameType.BlurryImage,
+                     MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
                      TaskDescription = "Which animal is in the image?",
                      SparqlQuery = @"
@@ -2525,7 +2525,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("5272473e-6ef3-4d32-8d64-bb18fa977b29"),
                     CategoryId = CategoryNature.Id,
                     GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                    MiniGameType = MiniGameType.BlurryImage,
+                    MiniGameType = MiniGameType.Image,
                     Status = QuestionStatus.Approved,
                     TaskDescription = "Which animal is in the image?",
                     SparqlQuery = @"
@@ -2627,7 +2627,7 @@ namespace WikidataGame.Backend.Helpers
                      Id = new Guid("beb15e73-d985-4322-a1a5-e3dec8ac1d28"),
                      CategoryId = CategoryNature.Id,
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                     MiniGameType = MiniGameType.BlurryImage,
+                     MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
                      TaskDescription = "Which animal is in the image?",
                      SparqlQuery = @"
@@ -2710,7 +2710,7 @@ namespace WikidataGame.Backend.Helpers
                     Id = new Guid("bae2897b-61c9-448e-bedf-8fc069dd62b0"),
                      CategoryId = CategoryNature.Id,
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                     MiniGameType = MiniGameType.BlurryImage,
+                     MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
                      TaskDescription = "Which animal is in the image?",
                      SparqlQuery = @"
@@ -2793,7 +2793,7 @@ namespace WikidataGame.Backend.Helpers
                      Id = new Guid("8f47586c-5a63-401b-88fb-b63f628a3fe4"),
                      CategoryId = CategoryNature.Id,
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                     MiniGameType = MiniGameType.BlurryImage,
+                     MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
                      TaskDescription = "Which animal is in the image?",
                      SparqlQuery = @"
@@ -2872,7 +2872,7 @@ namespace WikidataGame.Backend.Helpers
                      Id = new Guid("1687d325-eda8-43ab-9821-711be8d1fea6"),
                      CategoryId = CategoryNature.Id,
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                     MiniGameType = MiniGameType.BlurryImage,
+                     MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
                      TaskDescription = "Which animal is in the image?",
                      SparqlQuery = @"
@@ -2951,7 +2951,7 @@ namespace WikidataGame.Backend.Helpers
                       Id = new Guid("374a02cb-037d-4720-9952-1e3cb96f22ae"),
                       CategoryId = CategoryNature.Id,
                       GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                      MiniGameType = MiniGameType.BlurryImage,
+                      MiniGameType = MiniGameType.Image,
                       Status = QuestionStatus.Approved,
                       TaskDescription = "Which animal is in the image?",
                       SparqlQuery = @"
@@ -3030,7 +3030,7 @@ namespace WikidataGame.Backend.Helpers
                       Id = new Guid("025286ac-d6d1-4e9f-954c-f659e83d7d6d"),
                       CategoryId = CategoryNature.Id,
                       GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                      MiniGameType = MiniGameType.BlurryImage,
+                      MiniGameType = MiniGameType.Image,
                       Status = QuestionStatus.Approved,
                       TaskDescription = "Which animal is in the image",
                       SparqlQuery = @"
@@ -3231,7 +3231,7 @@ namespace WikidataGame.Backend.Helpers
                       Id = new Guid("b32fe12c-4016-4eed-a6d6-0bbb505553a0"),
                       CategoryId = CategoryCulture.Id,
                       GroupId = new Guid("d834932d-1203-4039-9baf-68322b176bae"),
-                      MiniGameType = MiniGameType.BlurryImage,
+                      MiniGameType = MiniGameType.Image,
                       Status = QuestionStatus.Approved,
                       TaskDescription = "What is the name of the painting?",
                       SparqlQuery = @"
@@ -3478,7 +3478,7 @@ namespace WikidataGame.Backend.Helpers
                        Id = new Guid("15679f96-27bd-4e88-b367-4eb05e5f6d95"),
                        CategoryId = CategoryFood.Id,
                        GroupId = new Guid("fee91818-2fb5-4845-affa-2504d4191ee1"),
-                       MiniGameType = MiniGameType.BlurryImage,
+                       MiniGameType = MiniGameType.Image,
                        Status = QuestionStatus.Approved,
                        TaskDescription = "What dish is this?",
                        SparqlQuery = @"

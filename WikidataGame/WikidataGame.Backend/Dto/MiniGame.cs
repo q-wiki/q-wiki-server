@@ -15,6 +15,8 @@ namespace WikidataGame.Backend.Dto
 
         public IEnumerable<string> AnswerOptions { get; set; }
 
+        public string ImageUrl { get; set; }
+
         public string LicenseInfo { get; set; }
     }
 

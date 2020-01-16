@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using WikidataGame.Backend.Models;
 using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Repos;
+using System.Text.RegularExpressions;
 
 namespace WikidataGame.Backend.Services
 {
@@ -24,16 +25,34 @@ namespace WikidataGame.Backend.Services
             var data = QueryWikidata(question.SparqlQuery);
 
             var minigame = await _minigameRepo.CreateMiniGameAsync(gameId, playerId, tileId, question, MiniGameType);
-            minigame.TaskDescription = string.Format(question.TaskDescription, data[0].Item1); // placeholder and answer in first tuple!
+            minigame.TaskDescription = question.TaskDescription;
+            minigame.ImageUrl = data[0].Item1;
             minigame.CorrectAnswer = new List<string> { data[0].Item2 }; // placeholder and answer in first tuple!
             var templist = data.Select(item => item.Item2).ToList();
             minigame.AnswerOptions = templist.OrderBy(a => Guid.NewGuid()).ToList(); // shuffle answer options
 
-            minigame.LicenseInfo = await CommonsLicenseService.RetrieveLicenseInfoByFilenameAsync(minigame.TaskDescription);
+            var imageInfo = await CommonsLicenseService.RetrieveLicenseInfoByUrlAsync(data[0].Item1);
+            var regex = new Regex("href=\"(?<link>.*?)\".*?>(?<name>.*?)</");
+            var match = regex.Match(imageInfo.Artist.Value);
+            if (match.Success)
+            {
+                minigame.LicenseInfo = $"{LinkFromTextAndUrl(match.Groups["name"].Value, match.Groups["link"].Value)}, ";
+            }
+            else
+            {
+                minigame.LicenseInfo = $"{imageInfo.Artist} ,";
+            }
+            minigame.LicenseInfo += $"{LinkFromTextAndUrl(imageInfo.ObjectName.Value, minigame.ImageUrl)}, {LinkFromTextAndUrl(imageInfo.LicenseShortName.Value, imageInfo.LicenseUrl.Value)}";
+
 
             await _dataContext.SaveChangesAsync();
 
             return minigame;
+        }
+
+        private static string LinkFromTextAndUrl(string text, string url)
+        {
+            return $"<link=\"{url}\">{text}</link>";
         }
     }
 }

@@ -144,6 +144,7 @@ namespace WikidataGame.Backend
             ).CreateMapper());
             services.AddTransient<IUserValidator<User>, UserValidator>();
             services.AddSingleton<INotificationService>(new NotificationService(Configuration.GetConnectionString("NotificationHub")));
+            services.AddSingleton(new GitHubAuthService(Configuration.GetConnectionString("GitHubClientId"), Configuration.GetConnectionString("GitHubClientSecret")));
             services.AddScoped<UserManager<User>>();
             services.AddSingleton(new AuthService(Configuration.GetConnectionString("GoogleClientSecret")));
             services.AddScoped<IGameRepository, GameRepository>();

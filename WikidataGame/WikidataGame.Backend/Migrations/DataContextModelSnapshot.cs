@@ -4057,7 +4057,7 @@ namespace WikidataGame.Backend.Migrations
                             ORDER BY ?playerCount
                             ",
                             Status = 2,
-                            TaskDescription = "Sort sports by participating players."
+                            TaskDescription = "Sort these sports by participating players."
                         });
                 });
 

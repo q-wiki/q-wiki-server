@@ -1728,7 +1728,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which animal is {0}",
+                    TaskDescription = "Which animal is {0}?",
                     SparqlQuery = @"
                             SELECT DISTINCT ?question ?item (?name as ?answer)
 
@@ -1782,7 +1782,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which animal is {0}",
+                    TaskDescription = "Which animal is {0}?",
                     SparqlQuery = @"
                            SELECT DISTINCT ?question ?item (?name as ?answer)
                                 WITH{
@@ -1835,7 +1835,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which animal is {0}",
+                    TaskDescription = "Which animal is {0}?",
                     SparqlQuery = @"
                            SELECT DISTINCT ?question ?item (?name as ?answer)
 
@@ -1889,7 +1889,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which animal is {0}",
+                    TaskDescription = "Which animal is {0}?",
                     SparqlQuery = @"
                            SELECT DISTINCT ?question ?item (?name as ?answer)
 
@@ -1943,7 +1943,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                     MiniGameType = MiniGameType.Image,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which animal is is this?",
+                    TaskDescription = "Which animal is this?",
                     SparqlQuery = @"
                             # This query includes: artiodactyla, primates, marsupials
                             SELECT DISTINCT ?question (?name as ?answer)
@@ -2234,7 +2234,7 @@ namespace WikidataGame.Backend.Helpers
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                      MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is this",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
                                 # This query includes: primates + artiodactyla + rodentia
                                 SELECT DISTINCT ?question (?name as ?answer)
@@ -2332,9 +2332,9 @@ namespace WikidataGame.Backend.Helpers
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                      MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is in the image?",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
-                        SELECT DISTINCT ?question (?name as ?answer) ?image
+                        SELECT DISTINCT ?question (?name as ?answer)
 
                         #seperated animals in variables befor unionizing for performance/quicker response
                         WITH{
@@ -2380,7 +2380,7 @@ namespace WikidataGame.Backend.Helpers
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                      MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is in the image?",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
                         SELECT DISTINCT ?question (?name as ?answer)
 
@@ -2428,7 +2428,7 @@ namespace WikidataGame.Backend.Helpers
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                      MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is in the image?",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
                         SELECT DISTINCT ?question (?name as ?answer)
 
@@ -2477,7 +2477,7 @@ namespace WikidataGame.Backend.Helpers
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                      MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is in the image?",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
                         SELECT DISTINCT ?question (?name as ?answer)
 
@@ -2527,7 +2527,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                     MiniGameType = MiniGameType.Image,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which animal is in the image?",
+                    TaskDescription = "Which animal is this?",
                     SparqlQuery = @"
                         # which of these 
                         SELECT DISTINCT ?question (?name as ?answer)
@@ -2629,7 +2629,7 @@ namespace WikidataGame.Backend.Helpers
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                      MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is in the image?",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
                         # which of these 
                         SELECT DISTINCT ?question (?name as ?answer)
@@ -2712,7 +2712,7 @@ namespace WikidataGame.Backend.Helpers
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                      MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is in the image?",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
                        # which of these 
                         SELECT DISTINCT ?question (?name as ?answer)
@@ -2795,7 +2795,7 @@ namespace WikidataGame.Backend.Helpers
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                      MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is in the image?",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
                         SELECT DISTINCT ?question (?name as ?answer)
 
@@ -2874,7 +2874,7 @@ namespace WikidataGame.Backend.Helpers
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                      MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is in the image?",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
                             SELECT DISTINCT ?question (?name as ?answer)
 
@@ -2953,7 +2953,7 @@ namespace WikidataGame.Backend.Helpers
                       GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                       MiniGameType = MiniGameType.Image,
                       Status = QuestionStatus.Approved,
-                      TaskDescription = "Which animal is in the image?",
+                      TaskDescription = "Which animal is this?",
                       SparqlQuery = @"
                             SELECT DISTINCT ?question (?name as ?answer)
 
@@ -3032,7 +3032,7 @@ namespace WikidataGame.Backend.Helpers
                       GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                       MiniGameType = MiniGameType.Image,
                       Status = QuestionStatus.Approved,
-                      TaskDescription = "Which animal is in the image",
+                      TaskDescription = "Which animal is this?",
                       SparqlQuery = @"
                                 # This query includes: primates + artiodactyla + rodentia
                                 SELECT DISTINCT ?question (?name as ?answer)
@@ -3133,42 +3133,49 @@ namespace WikidataGame.Backend.Helpers
                       TaskDescription = "Who invented {0}?",
                       SparqlQuery = @"
                                 SELECT DISTINCT ?question ?answer 
-
                                 WITH{
-                                  SELECT DISTINCT ?item ?itemLabel ?inventor ?inventorLabel
+                                 SELECT DISTINCT ?inventorLabel (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?itemLabel); SEPARATOR=',')) AS ?itemLabel)
                                   WHERE 
                                     { 
                                       ?inventor wdt:P31 wd:Q5; wdt:P106 wd:Q205375.
                                       ?item wdt:P61 ?inventor.
                                       SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
-                                        ?item rdfs:label ?question.
-                                        ?inventor rdfs:label ?answer.
-                                                         }
+                                        ?item rdfs:label ?itemLabel.
+                                        ?inventor rdfs:label ?inventorLabel
+                                      }
+                                      filter(lang(?inventorLabel) = 'en').
                                     }
-                                  ORDER BY (MD5(CONCAT(STR(?inventor), STR(NOW())))) 
-                                  LIMIT 1
-                                 } as %selectedInventor
+                                  group by ?inventorLabel
+                                  ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
+                                 } as %allInventors
 
                                 WITH{
-                                    SELECT ?inventor ?inventorLabel
-                                    WHERE 
+                                 SELECT ?inventorLabel ?itemLabel
+                                  WHERE 
                                     { 
-                                      ?inventor (wdt:P31|wdt:P106) wd:Q205375.
-                                      ?item wdt:P61 ?inventor.
-                                      FILTER NOT EXISTS {INCLUDE %selectedInventor}
-                                    } 
-                                   ORDER BY (MD5(CONCAT(STR(?inventor), STR(NOW())))) 
-                                  LIMIT 3
+                                     INCLUDE %allInventors
+                                    }
+                                   ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
+                                   LIMIT 1
+                                } as %selectedInventor
+
+                                WITH{
+                                 SELECT Distinct ?inventorLabel
+                                  WHERE 
+                                    { 
+                                     INCLUDE %allInventors.
+                                     FILTER NOT EXISTS {INCLUDE %selectedInventor}
+                                    }
+                                   ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
+                                   LIMIT 3
                                 } as %decoyInventors
 
                                 WHERE{
                                   {INCLUDE %selectedInventor}
                                   UNION
                                   {INCLUDE %decoyInventors}
-                                  SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
-                                        ?item rdfs:label ?question.
-                                        ?inventor rdfs:label ?answer.
-                                                         }
+                                  BIND(?inventorLabel as ?answer)
+                                  Bind(?itemLabel as ?question)
                                 }
 
                                 Order by DESC(?question)
@@ -3434,44 +3441,44 @@ namespace WikidataGame.Backend.Helpers
                        Status = QuestionStatus.Approved,
                        TaskDescription = "Sort these softdrinks by inception.",
                        SparqlQuery = @"
-                        #Structure is important to get only one drink of a inception year and avoid duplicates
-                        SELECT DISTINCT ?question  ?answer ?year
-                        WITH{
-                                SELECT (Sample(GROUP_CONCAT(DISTINCT sample(?softDrink); SEPARATOR=', ')) AS ?softDrink) (Sample(GROUP_CONCAT( DISTINCT sample(?softDrinkLabel); SEPARATOR=', ')) AS ?softDrinkLabel) (year(?inception) as ?year) 
-                                WHERE {
-                                     ?softDrink (wd:wd31|wdt:P279)* wd:Q147538.
-                                     ?softDrink wdt:P571 ?inception.
-                                     Filter(?softDrink != wd:Q180289)
-                                     ?softDrink rdfs:label ?softDrinkLabel
-                                                               #makes sure to get only known drinks in germany by checking if item has a german label
-                                     filter langMatches(lang(?softDrinkLabel), 'de')
-                                     SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
-                                                                             ?softDrinkLabel rdfs:label ?answer.
-                                                                           }
-                                     BIND(Year(?inception) as ?year)
-                                }
-                                group by ?inception
-                                ORDER BY (MD5(CONCAT(STR(?year), STR(NOW()))))                
-                        } as %allSoftDrinks
+                            #Structure is important to get only one drink of a inception year and avoid duplicates
+                            SELECT DISTINCT ?question  ?answer ?year
+                            WITH{
+                                    SELECT (Sample(GROUP_CONCAT(DISTINCT sample(?softDrink); SEPARATOR=', ')) AS ?softDrink) (Sample(GROUP_CONCAT( DISTINCT sample(?softDrinkLabel); SEPARATOR=', ')) AS ?softDrinkLabel) (year(?inception) as ?year) 
+                                    WHERE {
+                                         ?softDrink (wd:wd31|wdt:P279)* wd:Q147538.
+                                         ?softDrink wdt:P571 ?inception.
+                                         Filter(?softDrink != wd:Q180289)
+                                         ?softDrink rdfs:label ?softDrinkLabel
+                                                                   #makes sure to get only known drinks in germany by checking if item has a german label
+                                         filter langMatches(lang(?softDrinkLabel), 'de')
+                                         SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                                                 ?softDrinkLabel rdfs:label ?answer.
+                                                                               }
+                                         BIND(Year(?inception) as ?year)
+                                    }
+                                    group by ?inception
+                                    ORDER BY (MD5(CONCAT(STR(?year), STR(NOW()))))                
+                            } as %allSoftDrinks
 
-                        WITH{
-                          SELECT ?softDrinkLabel ?year ?empty
-                          WHERE{
-                            INCLUDE %allSoftDrinks.
-                          }
-                          ORDER BY (MD5(CONCAT(STR(?year), STR(NOW()))))
-                          LIMIT 4
-                        } as %selectedSoftDrink
+                            WITH{
+                              SELECT ?softDrinkLabel ?year ?empty
+                              WHERE{
+                                INCLUDE %allSoftDrinks.
+                              }
+                              ORDER BY (MD5(CONCAT(STR(?year), STR(NOW()))))
+                              LIMIT 4
+                            } as %selectedSoftDrink
 
-                        WHERE{
-                          INCLUDE %selectedSoftDrink
-                          SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
-                                                  ?softDrinkLabel rdfs:label ?answer.
-                                                 }
-                          BIND('Order Softdrinks by inception' as ?question)       
-                        }
-                        order by ?year
-                        "
+                            WHERE{
+                              INCLUDE %selectedSoftDrink
+                              SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                      ?softDrinkLabel rdfs:label ?answer.
+                                                     }
+                              BIND('Order Softdrinks by inception' as ?question)       
+                            }
+                            order by ?year
+                            "
                    },
                    new Question
                    {
@@ -3532,7 +3539,7 @@ namespace WikidataGame.Backend.Helpers
                        GroupId = new Guid("f8717bdd-75df-4064-9394-af163034a1c0"),
                        MiniGameType = MiniGameType.Sort,
                        Status = QuestionStatus.Approved,
-                       TaskDescription = "Sort these actors by the number of movies they appeared in",
+                       TaskDescription = "Sort these actors by the number of movies they appeared in.",
                        SparqlQuery = @"
                             # Fetch how many successful (measured by box office revenue) movies an actor played in
 
@@ -3797,9 +3804,9 @@ namespace WikidataGame.Backend.Helpers
                        Id = new Guid("edeefc69-f882-46f6-96cd-ae9212fdb0df"),
                        CategoryId = CategorySport.Id,
                        GroupId = new Guid("0b1ff760-e02f-4ddc-8f32-5161931ebcbe"),
-                       MiniGameType = MiniGameType.MultipleChoice,
+                       MiniGameType = MiniGameType.Sort,
                        Status = QuestionStatus.Approved,
-                       TaskDescription = "Who is the trainer of {0}?",
+                       TaskDescription = "Sort these sports by participating players.",
                        SparqlQuery = @"
                             SELECT (Sample(GROUP_CONCAT( DISTINCT ?question; SEPARATOR=', ')) AS ?question) (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?answer); SEPARATOR=', ')) AS ?answer) 
                             ?playerCount
@@ -3809,8 +3816,8 @@ namespace WikidataGame.Backend.Helpers
 	                                   ?sport wdt:P31 wd:Q31629.
                                        ?sport wdt:P1873 ?playerCount.
                                        SERVICE wikibase:label {
-                                                                 bd:serviceParam wikibase:language 'en'.
-                                                                 ?sport rdfs:label ?answer.
+                                              bd:serviceParam wikibase:language 'en'.
+                                              ?sport rdfs:label ?answer.
                                        }
                                  }
                                  ORDER BY MD5(CONCAT(STR(?playerCount), STR(NOW())))
@@ -3828,7 +3835,7 @@ namespace WikidataGame.Backend.Helpers
                             WHERE {
                                    INCLUDE %fourSports.
                                    INCLUDE %sports.
-                                           BIND('participating players' as ?question)
+                                   BIND('participating players' as ?question)
                                     }
                             GROUP BY ?playerCount
                             ORDER BY ?playerCount

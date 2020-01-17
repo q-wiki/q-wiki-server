@@ -1943,7 +1943,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                     MiniGameType = MiniGameType.Image,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which animal is is this?",
+                    TaskDescription = "Which animal is this?",
                     SparqlQuery = @"
                             # This query includes: artiodactyla, primates, marsupials
                             SELECT DISTINCT ?question (?name as ?answer)
@@ -2332,9 +2332,9 @@ namespace WikidataGame.Backend.Helpers
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                      MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is in the image?",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
-                        SELECT DISTINCT ?question (?name as ?answer) ?image
+                        SELECT DISTINCT ?question (?name as ?answer)
 
                         #seperated animals in variables befor unionizing for performance/quicker response
                         WITH{
@@ -2380,7 +2380,7 @@ namespace WikidataGame.Backend.Helpers
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                      MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is in the image?",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
                         SELECT DISTINCT ?question (?name as ?answer)
 
@@ -2428,7 +2428,7 @@ namespace WikidataGame.Backend.Helpers
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                      MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is in the image?",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
                         SELECT DISTINCT ?question (?name as ?answer)
 
@@ -2477,7 +2477,7 @@ namespace WikidataGame.Backend.Helpers
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                      MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is in the image?",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
                         SELECT DISTINCT ?question (?name as ?answer)
 
@@ -2527,7 +2527,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                     MiniGameType = MiniGameType.Image,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which animal is in the image?",
+                    TaskDescription = "Which animal is this?",
                     SparqlQuery = @"
                         # which of these 
                         SELECT DISTINCT ?question (?name as ?answer)
@@ -2629,7 +2629,7 @@ namespace WikidataGame.Backend.Helpers
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                      MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is in the image?",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
                         # which of these 
                         SELECT DISTINCT ?question (?name as ?answer)
@@ -2712,7 +2712,7 @@ namespace WikidataGame.Backend.Helpers
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                      MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is in the image?",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
                        # which of these 
                         SELECT DISTINCT ?question (?name as ?answer)
@@ -2795,7 +2795,7 @@ namespace WikidataGame.Backend.Helpers
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                      MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is in the image?",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
                         SELECT DISTINCT ?question (?name as ?answer)
 
@@ -2874,7 +2874,7 @@ namespace WikidataGame.Backend.Helpers
                      GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                      MiniGameType = MiniGameType.Image,
                      Status = QuestionStatus.Approved,
-                     TaskDescription = "Which animal is in the image?",
+                     TaskDescription = "Which animal is this?",
                      SparqlQuery = @"
                             SELECT DISTINCT ?question (?name as ?answer)
 
@@ -2953,7 +2953,7 @@ namespace WikidataGame.Backend.Helpers
                       GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                       MiniGameType = MiniGameType.Image,
                       Status = QuestionStatus.Approved,
-                      TaskDescription = "Which animal is in the image?",
+                      TaskDescription = "Which animal is this?",
                       SparqlQuery = @"
                             SELECT DISTINCT ?question (?name as ?answer)
 
@@ -3032,7 +3032,7 @@ namespace WikidataGame.Backend.Helpers
                       GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                       MiniGameType = MiniGameType.Image,
                       Status = QuestionStatus.Approved,
-                      TaskDescription = "Which animal is in the image?",
+                      TaskDescription = "Which animal is this?",
                       SparqlQuery = @"
                                 # This query includes: primates + artiodactyla + rodentia
                                 SELECT DISTINCT ?question (?name as ?answer)

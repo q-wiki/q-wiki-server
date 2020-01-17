@@ -3,10 +3,59 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WikidataGame.Backend.Migrations
 {
-    public partial class FixWhoInventedQueryAndSportParticipantsQuery : Migration
+    public partial class AddedQuestionmarkAndFullStopToTaskDescription : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("025286ac-d6d1-4e9f-954c-f659e83d7d6d"),
+                column: "TaskDescription",
+                value: "Which animal is this?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("1687d325-eda8-43ab-9821-711be8d1fea6"),
+                column: "TaskDescription",
+                value: "Which animal is this?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("1f2679f4-db27-47db-af4c-d2cf25708254"),
+                column: "TaskDescription",
+                value: "Which animal is {0}?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("374a02cb-037d-4720-9952-1e3cb96f22ae"),
+                column: "TaskDescription",
+                value: "Which animal is this?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("3803ddc5-f8ea-4bd6-93a2-855407f8178f"),
+                column: "TaskDescription",
+                value: "Sort these actors by the number of movies they appeared in.");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("3a244446-94f0-4d1f-825e-8bd40e6a5d06"),
+                column: "TaskDescription",
+                value: "Which animal is this?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("428ac495-541e-48a9-82a2-f94a503a4f26"),
+                column: "TaskDescription",
+                value: "Which animal is {0}?");
+
             migrationBuilder.UpdateData(
                 table: "Questions",
                 keyColumn: "Id",
@@ -51,6 +100,55 @@ namespace WikidataGame.Backend.Migrations
                             }
                             order by ?year
                             ");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("4f701ada-11d3-45a7-8251-6745d39ffc9a"),
+                column: "TaskDescription",
+                value: "Which animal is this?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("5272473e-6ef3-4d32-8d64-bb18fa977b29"),
+                column: "TaskDescription",
+                value: "Which animal is this?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("5ab7c050-06c1-4307-b100-32237f5c0429"),
+                column: "TaskDescription",
+                value: "Which animal is this?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("5abd274b-0826-4a30-832b-9e072a2cd0a4"),
+                column: "TaskDescription",
+                value: "Which animal is this?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("8f47586c-5a63-401b-88fb-b63f628a3fe4"),
+                column: "TaskDescription",
+                value: "Which animal is this?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("9ea7b09b-7991-4eb4-b2a1-571e926c5790"),
+                column: "TaskDescription",
+                value: "Which animal is this?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("b3778c74-3284-4518-a8f0-deea5a2b8363"),
+                column: "TaskDescription",
+                value: "Which animal is {0}?");
 
             migrationBuilder.UpdateData(
                 table: "Questions",
@@ -110,6 +208,27 @@ namespace WikidataGame.Backend.Migrations
             migrationBuilder.UpdateData(
                 table: "Questions",
                 keyColumn: "Id",
+                keyValue: new Guid("bae2897b-61c9-448e-bedf-8fc069dd62b0"),
+                column: "TaskDescription",
+                value: "Which animal is this?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("beb15e73-d985-4322-a1a5-e3dec8ac1d28"),
+                column: "TaskDescription",
+                value: "Which animal is this?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("d15f9f1c-9433-4964-a5e3-4e69ed0b45a9"),
+                column: "TaskDescription",
+                value: "Which animal is {0}?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
                 keyValue: new Guid("edeefc69-f882-46f6-96cd-ae9212fdb0df"),
                 columns: new[] { "MiniGameType", "SparqlQuery", "TaskDescription" },
                 values: new object[] { 0, @"
@@ -144,11 +263,105 @@ namespace WikidataGame.Backend.Migrations
                                     }
                             GROUP BY ?playerCount
                             ORDER BY ?playerCount
-                            ", "Sort sports by participating players?" });
+                            ", "Sort these sports by participating players." });
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("fd92d683-fa21-4210-93c7-6a99b8968919"),
+                columns: new[] { "SparqlQuery", "TaskDescription" },
+                values: new object[] { @"
+                        SELECT DISTINCT ?question (?name as ?answer)
+
+                        #seperated animals in variables befor unionizing for performance/quicker response
+                        WITH{
+                            SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
+                            WHERE{
+                              ?item wdt:P171* wd:Q5113;
+                                    wdt:P1843 ?name;
+                                    wdt:P141 wd:Q211005;
+                                    wdt:P18 ?image.
+                              filter(lang(?name) = 'en').
+                            }
+                          GROUP BY ?item
+                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                          LIMIT 4
+                        } as %allBirds
+
+                        WITH {
+                          SELECT DISTINCT ?image ?name WHERE {
+                            {Include %allBirds}
+                          }  
+                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                          LIMIT 1
+                        } as %selectedBird
+
+                        WITH {
+                          SELECT DISTINCT ?name WHERE {
+                            {Include %allBirds}
+                            FILTER NOT EXISTS{Include %selectedBird}
+                          } 
+                          LIMIT 3
+                        } as %decoyBirds
+
+                        WHERE {
+                           {INCLUDE %selectedBird} UNION {INCLUDE %decoyBirds}       
+                           BIND(?image as ?question)
+                         } ORDER BY DESC(?question)
+                        ", "Which animal is this?" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("025286ac-d6d1-4e9f-954c-f659e83d7d6d"),
+                column: "TaskDescription",
+                value: "Which animal is in the image");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("1687d325-eda8-43ab-9821-711be8d1fea6"),
+                column: "TaskDescription",
+                value: "Which animal is in the image?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("1f2679f4-db27-47db-af4c-d2cf25708254"),
+                column: "TaskDescription",
+                value: "Which animal is {0}");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("374a02cb-037d-4720-9952-1e3cb96f22ae"),
+                column: "TaskDescription",
+                value: "Which animal is in the image?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("3803ddc5-f8ea-4bd6-93a2-855407f8178f"),
+                column: "TaskDescription",
+                value: "Sort these actors by the number of movies they appeared in");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("3a244446-94f0-4d1f-825e-8bd40e6a5d06"),
+                column: "TaskDescription",
+                value: "Which animal is in the image?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("428ac495-541e-48a9-82a2-f94a503a4f26"),
+                column: "TaskDescription",
+                value: "Which animal is {0}");
+
             migrationBuilder.UpdateData(
                 table: "Questions",
                 keyColumn: "Id",
@@ -193,6 +406,55 @@ namespace WikidataGame.Backend.Migrations
                         }
                         order by ?year
                         ");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("4f701ada-11d3-45a7-8251-6745d39ffc9a"),
+                column: "TaskDescription",
+                value: "Which animal is in the image?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("5272473e-6ef3-4d32-8d64-bb18fa977b29"),
+                column: "TaskDescription",
+                value: "Which animal is in the image?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("5ab7c050-06c1-4307-b100-32237f5c0429"),
+                column: "TaskDescription",
+                value: "Which animal is is this?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("5abd274b-0826-4a30-832b-9e072a2cd0a4"),
+                column: "TaskDescription",
+                value: "Which animal is this");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("8f47586c-5a63-401b-88fb-b63f628a3fe4"),
+                column: "TaskDescription",
+                value: "Which animal is in the image?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("9ea7b09b-7991-4eb4-b2a1-571e926c5790"),
+                column: "TaskDescription",
+                value: "Which animal is in the image?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("b3778c74-3284-4518-a8f0-deea5a2b8363"),
+                column: "TaskDescription",
+                value: "Which animal is {0}");
 
             migrationBuilder.UpdateData(
                 table: "Questions",
@@ -245,6 +507,27 @@ namespace WikidataGame.Backend.Migrations
             migrationBuilder.UpdateData(
                 table: "Questions",
                 keyColumn: "Id",
+                keyValue: new Guid("bae2897b-61c9-448e-bedf-8fc069dd62b0"),
+                column: "TaskDescription",
+                value: "Which animal is in the image?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("beb15e73-d985-4322-a1a5-e3dec8ac1d28"),
+                column: "TaskDescription",
+                value: "Which animal is in the image?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("d15f9f1c-9433-4964-a5e3-4e69ed0b45a9"),
+                column: "TaskDescription",
+                value: "Which animal is {0}");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
                 keyValue: new Guid("edeefc69-f882-46f6-96cd-ae9212fdb0df"),
                 columns: new[] { "MiniGameType", "SparqlQuery", "TaskDescription" },
                 values: new object[] { 2, @"
@@ -280,6 +563,51 @@ namespace WikidataGame.Backend.Migrations
                             GROUP BY ?playerCount
                             ORDER BY ?playerCount
                             ", "Who is the trainer of {0}?" });
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("fd92d683-fa21-4210-93c7-6a99b8968919"),
+                columns: new[] { "SparqlQuery", "TaskDescription" },
+                values: new object[] { @"
+                        SELECT DISTINCT ?question (?name as ?answer) ?image
+
+                        #seperated animals in variables befor unionizing for performance/quicker response
+                        WITH{
+                            SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
+                            WHERE{
+                              ?item wdt:P171* wd:Q5113;
+                                    wdt:P1843 ?name;
+                                    wdt:P141 wd:Q211005;
+                                    wdt:P18 ?image.
+                              filter(lang(?name) = 'en').
+                            }
+                          GROUP BY ?item
+                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                          LIMIT 4
+                        } as %allBirds
+
+                        WITH {
+                          SELECT DISTINCT ?image ?name WHERE {
+                            {Include %allBirds}
+                          }  
+                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                          LIMIT 1
+                        } as %selectedBird
+
+                        WITH {
+                          SELECT DISTINCT ?name WHERE {
+                            {Include %allBirds}
+                            FILTER NOT EXISTS{Include %selectedBird}
+                          } 
+                          LIMIT 3
+                        } as %decoyBirds
+
+                        WHERE {
+                           {INCLUDE %selectedBird} UNION {INCLUDE %decoyBirds}       
+                           BIND(?image as ?question)
+                         } ORDER BY DESC(?question)
+                        ", "Which animal is in the image?" });
         }
     }
 }

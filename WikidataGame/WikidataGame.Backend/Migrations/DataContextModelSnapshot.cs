@@ -2249,7 +2249,7 @@ namespace WikidataGame.Backend.Migrations
                              } ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Which animal is is this?"
+                            TaskDescription = "Which animal is this?"
                         },
                         new
                         {
@@ -2550,7 +2550,7 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        SELECT DISTINCT ?question (?name as ?answer) ?image
+                        SELECT DISTINCT ?question (?name as ?answer)
 
                         #seperated animals in variables befor unionizing for performance/quicker response
                         WITH{
@@ -2589,7 +2589,7 @@ namespace WikidataGame.Backend.Migrations
                          } ORDER BY DESC(?question)
                         ",
                             Status = 2,
-                            TaskDescription = "Which animal is in the image?"
+                            TaskDescription = "Which animal is this?"
                         },
                         new
                         {
@@ -2637,7 +2637,7 @@ namespace WikidataGame.Backend.Migrations
                            BIND(?image as ?question)
                          } ORDER BY DESC(?question)",
                             Status = 2,
-                            TaskDescription = "Which animal is in the image?"
+                            TaskDescription = "Which animal is this?"
                         },
                         new
                         {
@@ -2686,7 +2686,7 @@ namespace WikidataGame.Backend.Migrations
                          } ORDER BY DESC(?question)
                         ",
                             Status = 2,
-                            TaskDescription = "Which animal is in the image?"
+                            TaskDescription = "Which animal is this?"
                         },
                         new
                         {
@@ -2736,7 +2736,7 @@ namespace WikidataGame.Backend.Migrations
                         ORDER BY DESC(?question)
                         ",
                             Status = 2,
-                            TaskDescription = "Which animal is in the image?"
+                            TaskDescription = "Which animal is this?"
                         },
                         new
                         {
@@ -2838,7 +2838,7 @@ namespace WikidataGame.Backend.Migrations
                         ORDER BY DESC(?question)
                         ",
                             Status = 2,
-                            TaskDescription = "Which animal is in the image?"
+                            TaskDescription = "Which animal is this?"
                         },
                         new
                         {
@@ -2921,7 +2921,7 @@ namespace WikidataGame.Backend.Migrations
                         ORDER BY DESC(?question)
                         ",
                             Status = 2,
-                            TaskDescription = "Which animal is in the image?"
+                            TaskDescription = "Which animal is this?"
                         },
                         new
                         {
@@ -3004,7 +3004,7 @@ namespace WikidataGame.Backend.Migrations
                         ORDER BY DESC(?question)
                         ",
                             Status = 2,
-                            TaskDescription = "Which animal is in the image?"
+                            TaskDescription = "Which animal is this?"
                         },
                         new
                         {
@@ -3083,7 +3083,7 @@ namespace WikidataGame.Backend.Migrations
                          } ORDER BY DESC(?question)
                         ",
                             Status = 2,
-                            TaskDescription = "Which animal is in the image?"
+                            TaskDescription = "Which animal is this?"
                         },
                         new
                         {
@@ -3162,7 +3162,7 @@ namespace WikidataGame.Backend.Migrations
                              } ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Which animal is in the image?"
+                            TaskDescription = "Which animal is this?"
                         },
                         new
                         {
@@ -3241,7 +3241,7 @@ namespace WikidataGame.Backend.Migrations
                              } ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Which animal is in the image?"
+                            TaskDescription = "Which animal is this?"
                         },
                         new
                         {
@@ -3339,7 +3339,7 @@ namespace WikidataGame.Backend.Migrations
                                  } ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Which animal is in the image?"
+                            TaskDescription = "Which animal is this?"
                         },
                         new
                         {

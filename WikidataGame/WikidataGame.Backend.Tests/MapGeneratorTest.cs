@@ -68,7 +68,7 @@ namespace WikidataGame.Backend.Tests
         [Fact]
         public void GenerateMap_RegularSizeMap_ReturnsMapWithoutIslands ()
         {
-            var map = GetRegularMapCandidate();
+            var map = MapGeneratorService.GenerateMap( GameConstants.DefaultMapWidth, GameConstants.DefaultMapHeight, GameConstants.DefaultAccessibleTilesCount);
             Assert.False(TileHelper.HasIslands(map, GameConstants.DefaultMapWidth, GameConstants.DefaultMapHeight));
         }
 

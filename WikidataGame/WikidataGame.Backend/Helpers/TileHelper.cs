@@ -80,7 +80,6 @@ namespace WikidataGame.Backend.Helpers
         {
             var colors = new Dictionary<(int, int), int?>(); // maps a tuple of (x, y) to chosen colors
             var color = -1;
-            var synonymousColors = new Dictionary<int, int>();
 
             for (var y = 0; y < height; y++)
             {
@@ -91,7 +90,7 @@ namespace WikidataGame.Backend.Helpers
                     {
                         var neighborCoords = GetNeighbors(tiles, x, y, width, height)
                             .Keys
-                            .Where(((int _x, int _y) coord) => coord._x <= x && coord._y <= y)
+                            // .Where(((int _x, int _y) coord) => coord._x <= x && coord._y <= y)
                             .ToList();
 
                         // try to find a neighbor that has a color and use that
@@ -107,28 +106,8 @@ namespace WikidataGame.Backend.Helpers
                         {
                             colors[(x, y)] = ++color;
                         }
-
-                        // if neighboring fields use a different color,
-                        // the colors are equivalent
-                        neighborCoords
-                            .Select(coord => colors.GetValueOrDefault(coord, color))
-                            .Where(neighboringColor => neighboringColor != color)
-                            .ToList()
-                            .ForEach(neighboringColor => synonymousColors[neighboringColor.Value] = color);
                     }
                 }
-            }
-
-            // remove all ambiguity by giving synonmous colors the same color
-            while (synonymousColors.Count() > 0)
-            {
-                (var fromColor, var toColor) = synonymousColors.First();
-                colors.Keys.ToList().ForEach(coord => {
-                    if (colors[coord] == fromColor) {
-                        colors[coord] = toColor;
-                    }
-                });
-                synonymousColors.Remove(fromColor);
             }
 
             return colors.Values.Distinct().Count() > 1;

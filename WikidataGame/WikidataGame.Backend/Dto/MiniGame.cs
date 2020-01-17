@@ -14,12 +14,16 @@ namespace WikidataGame.Backend.Dto
         public string TaskDescription { get; set; }
 
         public IEnumerable<string> AnswerOptions { get; set; }
+
+        public string ImageUrl { get; set; }
+
+        public string LicenseInfo { get; set; }
     }
 
     public enum MiniGameType
     {
         Sort,
-        BlurryImage,
+        Image,
         MultipleChoice
     }
 

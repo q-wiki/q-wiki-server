@@ -33,7 +33,7 @@ namespace WikidataGame.Backend.Services
 
             var imageInfo = await CommonsLicenseService.RetrieveLicenseInfoByUrlAsync(data[0].Item1);
             var regex = new Regex("href=\"(?<link>.*?)\".*?>(?<name>.*?)</");
-            var match = regex.Match(imageInfo.Artist.Value);
+            var match = regex.Match(imageInfo.Artist?.Value);
             if (match.Success)
             {
                 minigame.LicenseInfo = $"{LinkFromTextAndUrl(match.Groups["name"].Value, match.Groups["link"].Value)}, ";
@@ -42,7 +42,7 @@ namespace WikidataGame.Backend.Services
             {
                 minigame.LicenseInfo = $"{imageInfo.Artist} ,";
             }
-            minigame.LicenseInfo += $"{LinkFromTextAndUrl(imageInfo.ObjectName.Value, minigame.ImageUrl)}, {LinkFromTextAndUrl(imageInfo.LicenseShortName.Value, imageInfo.LicenseUrl.Value)}";
+            minigame.LicenseInfo += $"{LinkFromTextAndUrl(imageInfo.ObjectName?.Value, minigame.ImageUrl)}, {LinkFromTextAndUrl(imageInfo.LicenseShortName?.Value, imageInfo.LicenseUrl?.Value)}";
 
 
             await _dataContext.SaveChangesAsync();

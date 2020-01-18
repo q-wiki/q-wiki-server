@@ -117,29 +117,17 @@ namespace WikidataGame.Backend.Helpers
         public static Tile FindTileForShortestPath(IEnumerable<Tile> playerTiles, IEnumerable<Tile> opponentTiles, Game game)
         {
             var combinations = playerTiles.SelectMany(g => opponentTiles.Select(c => new { Start = g, End = c }));
-            Path<TileNode> shortestPath = null;
+            Path<Tile> shortestPath = null;
             foreach(var tileCombination in combinations)
             {
-                var startTileNode = TileNodeFromKeyValuePair(tileCombination.Start, game.MapWidth);
-                var endTileNode = TileNodeFromKeyValuePair(tileCombination.End, game.MapWidth);
-                var result = AStar.FindPath(startTileNode, endTileNode, game.Tiles.OrderBy(t => t.MapIndex).ToList(), game.MapWidth, game.MapHeight);
+                var result = AStar.FindPath(tileCombination.Start, tileCombination.End, game.Tiles.OrderBy(t => t.MapIndex).ToList(), game.MapWidth, game.MapHeight);
                 if(shortestPath == null || result.TotalCost < shortestPath.TotalCost)
                 {
                     shortestPath = result;
                 }
             }
             var pathElement = shortestPath.ElementAtOrDefault(shortestPath.Count() - 2);
-            return pathElement.Tile;
-        }
-
-        private static TileNode TileNodeFromKeyValuePair(Tile tile, int mapWidth)
-        {
-            return new TileNode
-            {
-                Tile = tile,
-                X = tile.MapIndex % mapWidth,
-                Y = tile.MapIndex / mapWidth
-            };
+            return pathElement;
         }
     }
 }

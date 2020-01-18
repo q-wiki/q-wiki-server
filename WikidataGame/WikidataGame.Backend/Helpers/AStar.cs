@@ -12,31 +12,36 @@ namespace WikidataGame.Backend.Helpers
     /// </summary>
     public static class AStar
     {
-        public static Path<TileNode> FindPath(
-            TileNode start,
-            TileNode destination,
+        public static Path<Tile> FindPath(
+            Tile start,
+            Tile destination,
             IEnumerable<Tile> map,
             int mapWidth,
             int mapHeight)
         {
-            var closed = new HashSet<TileNode>();
-            var queue = new PriorityQueue<double, Path<TileNode>>();
-            queue.Enqueue(0, new Path<TileNode>(start));
+            var closed = new HashSet<Tile>();
+            var queue = new PriorityQueue<double, Path<Tile>>();
+            queue.Enqueue(0, new Path<Tile>(start));
             while (!queue.IsEmpty)
             {
                 var path = queue.Dequeue();
                 if (closed.Contains(path.LastStep))
                     continue;
-                if (path.LastStep.Tile.Id == destination.Tile.Id)
+                if (path.LastStep.Id == destination.Id)
                     return path;
                 closed.Add(path.LastStep);
-                foreach (TileNode n in path.LastStep.Neighbours(map, mapWidth, mapHeight).ToList())
+                foreach (Tile n in GetNeighbours(path.LastStep, map, mapWidth, mapHeight))
                 {
                     var newPath = path.AddStep(n, 1);
                     queue.Enqueue(newPath.TotalCost, newPath);
                 }
             }
             return null;
+        }
+
+        private static IEnumerable<Tile> GetNeighbours(Tile tile, IEnumerable<Tile> map, int mapWidth, int mapHeight)
+        {
+            return TileHelper.GetNeighbors(map, tile.MapIndex % mapWidth, tile.MapIndex / mapWidth, mapWidth, mapHeight).Where(n => n.Value.IsAccessible).Select(n => n.Value);
         }
     }
     
@@ -95,22 +100,4 @@ namespace WikidataGame.Backend.Helpers
             get { return !list.Any(); }
         }
     }
-
-    public class TileNode
-    {
-        public Tile Tile { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
-
-        public IEnumerable<TileNode> Neighbours(IEnumerable<Tile> map, int mapWidth, int mapHeight)
-        {
-            return TileHelper.GetNeighbors(map, X, Y, mapWidth, mapHeight).Where(n => n.Value.IsAccessible).Select(n => new TileNode
-            {
-                Tile = n.Value,
-                X = n.Key.Item1,
-                Y = n.Key.Item2
-            });
-        }
-    }
-
 }

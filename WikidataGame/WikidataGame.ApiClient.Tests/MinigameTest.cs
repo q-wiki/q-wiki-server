@@ -130,14 +130,6 @@ namespace WikidataGame.ApiClient.Tests
                 (result, id) = await CreateAndAnswerMinigameRandomly(apiClient, game.Id, tile);
                 ModelAssertion.AssertMinigameResult(result);
                 var updatedTile2 = result.Tiles.SelectMany(t => t).SingleOrDefault(t => t != null && t.Id == tile.Id);
-                if (result.IsWin.Value)
-                {
-                    Assert.True(updatedTile2.OwnerId == game.Me.Id);
-                }
-                else
-                {
-                    Assert.True(string.IsNullOrEmpty(updatedTile2.OwnerId));
-                }
                 flattenedTiles = result.Tiles.SelectMany(t => t).ToList();
             }
 

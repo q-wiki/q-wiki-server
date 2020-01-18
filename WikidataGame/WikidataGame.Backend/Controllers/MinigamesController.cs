@@ -156,13 +156,14 @@ namespace WikidataGame.Backend.Controllers
             }
 
             await FinalizeMove(gameRepo, notificationService, user, gameId);
+            await dataContext.SaveChangesAsync();
             var game = await gameRepo.GetAsync(gameId);
             while(game.NextMovePlayerId == DatabaseSeeds.BotGuid) //Bot turn
             {
                 BotTurn(game, ccs);
                 await FinalizeMove(gameRepo, notificationService, user, gameId);
+                await dataContext.SaveChangesAsync();
             }
-            await dataContext.SaveChangesAsync();
 
             return Ok(mapper.Map<MiniGameResult>(minigame));
         }
@@ -182,7 +183,12 @@ namespace WikidataGame.Backend.Controllers
             else
             {
                 //level up existing tile
-                tile = botTiles.Where(c => c.ChosenCategoryId != null).OrderBy(_ => Guid.NewGuid()).First();
+                tile = botTiles.OrderBy(_ => Guid.NewGuid()).First();
+                if (tile.ChosenCategoryId == null) //start tile
+                {
+                    var availableCategories = TileHelper.GetCategoriesForTile(ccs, tile.Id);
+                    tile.ChosenCategoryId = availableCategories.OrderBy(_ => Guid.NewGuid()).First().Id;
+                }
             }
             var certainty = random.NextDouble() - (tile.Difficulty / 20d);
             if (certainty > 0.35d) //win
@@ -193,7 +199,7 @@ namespace WikidataGame.Backend.Controllers
                     tile.ChosenCategoryId = availableCategories.OrderBy(_ => Guid.NewGuid()).First().Id;
                     tile.OwnerId = DatabaseSeeds.BotGuid;
                 }
-                else if(tile.OwnerId != DatabaseSeeds.BotGuid)
+                else if (tile.OwnerId != DatabaseSeeds.BotGuid)
                 {
                     tile.OwnerId = DatabaseSeeds.BotGuid;
                 }

@@ -60,7 +60,7 @@ namespace WikidataGame.Backend.Controllers
         {
             var user = await userManager.GetUserAsync(User);
             var friendUser = await userManager.FindByIdAsync(userId.ToString());
-            if (friendUser == null) //user does not exist
+            if (friendUser == null || friendUser.Id == DatabaseSeeds.BotGuid) //user does not exist
             {
                 return NotFound("User not found");
             }

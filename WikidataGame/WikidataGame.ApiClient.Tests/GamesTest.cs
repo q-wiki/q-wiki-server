@@ -28,6 +28,19 @@ namespace WikidataGame.ApiClient.Tests
         }
 
         [Fact]
+        public async void CreateGame_WithAiBot_ReturnsCreatedGame()
+        {
+            var authInfo = await RetrieveBearerAsync();
+            var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo.Bearer));
+            var gameInfo = await apiClient.CreateNewGameAsync(true);
+            ModelAssertion.AssertGameInfo(gameInfo);
+            Assert.Equal("ffffffff-ffff-ffff-ffff-ffffffffffff", gameInfo.Opponent.Id);
+
+            //cleanup
+            await apiClient.DeleteGameAsync(gameInfo.GameId);
+        }
+
+        [Fact]
         public async void RetrieveGame_WithGameId_ReturnsGame()
         {
             var authInfo = await RetrieveBearerAsync();

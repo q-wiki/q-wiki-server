@@ -400,9 +400,12 @@ namespace WikidataGame
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            public static GameInfo CreateNewGame(this IWikidataGameAPI operations)
+            /// <param name='withAiOpponent'>
+            /// Set to true, to match up with an AI opponent
+            /// </param>
+            public static GameInfo CreateNewGame(this IWikidataGameAPI operations, bool? withAiOpponent = false)
             {
-                return operations.CreateNewGameAsync().GetAwaiter().GetResult();
+                return operations.CreateNewGameAsync(withAiOpponent).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -411,12 +414,15 @@ namespace WikidataGame
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
+            /// <param name='withAiOpponent'>
+            /// Set to true, to match up with an AI opponent
+            /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<GameInfo> CreateNewGameAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<GameInfo> CreateNewGameAsync(this IWikidataGameAPI operations, bool? withAiOpponent = false, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.CreateNewGameWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.CreateNewGameWithHttpMessagesAsync(withAiOpponent, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -839,6 +845,43 @@ namespace WikidataGame
                 {
                     return _result.Body;
                 }
+            }
+
+            /// <summary>
+            /// Automatic OAuth flow
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='code'>
+            /// GitHub code for authorization
+            /// </param>
+            /// <param name='sourceUrl'>
+            /// Source url for frontend
+            /// </param>
+            public static void AuthenticateWithGitHub(this IWikidataGameAPI operations, string code = default(string), string sourceUrl = default(string))
+            {
+                operations.AuthenticateWithGitHubAsync(code, sourceUrl).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Automatic OAuth flow
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='code'>
+            /// GitHub code for authorization
+            /// </param>
+            /// <param name='sourceUrl'>
+            /// Source url for frontend
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task AuthenticateWithGitHubAsync(this IWikidataGameAPI operations, string code = default(string), string sourceUrl = default(string), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                (await operations.AuthenticateWithGitHubWithHttpMessagesAsync(code, sourceUrl, null, cancellationToken).ConfigureAwait(false)).Dispose();
             }
 
     }

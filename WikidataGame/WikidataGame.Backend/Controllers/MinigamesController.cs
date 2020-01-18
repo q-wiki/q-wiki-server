@@ -120,6 +120,7 @@ namespace WikidataGame.Backend.Controllers
             [FromServices] UserManager<Models.User> userManager,
             [FromServices] IMapper mapper,
             [FromServices] INotificationService notificationService,
+            [FromServices] CategoryCacheService ccs,
             [FromServices] DataContext dataContext)
 #pragma warning restore CS1573
         {
@@ -154,14 +155,75 @@ namespace WikidataGame.Backend.Controllers
                 }
             }
 
+            await FinalizeMove(gameRepo, notificationService, user, gameId);
+            await dataContext.SaveChangesAsync();
+            var game = await gameRepo.GetAsync(gameId);
+            while(game.NextMovePlayerId == DatabaseSeeds.BotGuid) //Bot turn
+            {
+                BotTurn(game, ccs);
+                await FinalizeMove(gameRepo, notificationService, user, gameId);
+                await dataContext.SaveChangesAsync();
+            }
+
+            return Ok(mapper.Map<MiniGameResult>(minigame));
+        }
+
+        private void BotTurn(Models.Game game, CategoryCacheService ccs)
+        {
+            var random = new Random();
+            var map = game.Tiles.OrderBy(t => t.MapIndex);
+            var botTiles = map.Where(t => t.OwnerId == DatabaseSeeds.BotGuid).ToList();
+            Models.Tile tile;
+            if (random.NextDouble() > 0.2d)
+            {
+                //Find tile with shortest route to opponent
+                var opponentTiles = map.Where(t => t.OwnerId != DatabaseSeeds.BotGuid && t.OwnerId != null).ToList();
+                tile = TileHelper.FindTileForShortestPath(botTiles, opponentTiles, game);
+            }
+            else
+            {
+                //level up existing tile
+                tile = botTiles.OrderBy(_ => Guid.NewGuid()).First();
+                if (tile.ChosenCategoryId == null) //start tile
+                {
+                    var availableCategories = TileHelper.GetCategoriesForTile(ccs, tile.Id);
+                    tile.ChosenCategoryId = availableCategories.OrderBy(_ => Guid.NewGuid()).First().Id;
+                }
+            }
+            var certainty = random.NextDouble() - (tile.Difficulty / 20d);
+            if (certainty > 0.35d) //win
+            {
+                if (tile.OwnerId == default)
+                {
+                    var availableCategories = TileHelper.GetCategoriesForTile(ccs, tile.Id);
+                    tile.ChosenCategoryId = availableCategories.OrderBy(_ => Guid.NewGuid()).First().Id;
+                    tile.OwnerId = DatabaseSeeds.BotGuid;
+                }
+                else if (tile.OwnerId != DatabaseSeeds.BotGuid)
+                {
+                    tile.OwnerId = DatabaseSeeds.BotGuid;
+                }
+                else
+                {
+                    tile.Difficulty = Math.Min(tile.Difficulty + 1, 2);
+                }
+            }
+        }
+
+        private async Task FinalizeMove(
+            IGameRepository gameRepo,
+            INotificationService notificationService,
+            Models.User user,
+            Guid gameId)
+        {
             var game = await gameRepo.GetAsync(gameId);
             game.StepsLeftWithinMove--;
-            if(await gameRepo.AllTilesConqueredAsync(user, gameId))
+            if (await gameRepo.AllTilesConqueredAsync(user, gameId))
             {
                 await gameRepo.SetGameWonAsync(game, notificationService);
             }
 
-            if(game.StepsLeftWithinMove < 1)
+            if (game.StepsLeftWithinMove < 1)
             {
                 game.MoveCount++;
                 if (game.MoveCount / game.GameUsers.Count >= Models.Game.MaxRounds)
@@ -178,9 +240,6 @@ namespace WikidataGame.Backend.Controllers
                     await notificationService.SendNotificationAsync(PushType.YourTurn, nextPlayer.User, user, game.Id);
                 }
             }
-            await dataContext.SaveChangesAsync();
-
-            return Ok(mapper.Map<MiniGameResult>(minigame));
         }
     }
 }

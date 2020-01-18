@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -111,6 +112,22 @@ namespace WikidataGame.Backend.Helpers
             }
 
             return colors.Values.Distinct().Count() > 1;
+        }
+
+        public static Tile FindTileForShortestPath(IEnumerable<Tile> playerTiles, IEnumerable<Tile> opponentTiles, Game game)
+        {
+            var combinations = playerTiles.SelectMany(g => opponentTiles.Select(c => new { Start = g, End = c }));
+            Path<Tile> shortestPath = null;
+            foreach(var tileCombination in combinations)
+            {
+                var result = AStar.FindPath(tileCombination.Start, tileCombination.End, game.Tiles.OrderBy(t => t.MapIndex).ToList(), game.MapWidth, game.MapHeight);
+                if(shortestPath == null || result.TotalCost < shortestPath.TotalCost)
+                {
+                    shortestPath = result;
+                }
+            }
+            var pathElement = shortestPath.ElementAtOrDefault(shortestPath.Count() - 2);
+            return pathElement;
         }
     }
 }

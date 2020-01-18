@@ -15,7 +15,7 @@ namespace WikidataGame.Backend.Helpers
         {
             return Enumerable.Range(0, sourceMember.MapHeight)
                 .Select(yCoord =>
-                    sourceMember.Tiles.Skip(yCoord * sourceMember.MapWidth)
+                    sourceMember.Tiles.OrderBy(t => t.MapIndex).Skip(yCoord * sourceMember.MapWidth)
                         .Take(sourceMember.MapWidth)
                         // inaccessible tiles are represented as `null`
                         .Select(t => t.IsAccessible ? context.Mapper.Map<Dto.Tile>(t) : null)

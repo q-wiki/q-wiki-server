@@ -28,6 +28,7 @@ namespace WikidataGame.Backend.Controllers
         public async Task<ActionResult<PlatformStats>> GetPlatformStats(
             [FromServices] IRepository<Models.Category, Guid> categoryRepo,
             [FromServices] IGameRepository gameRepo,
+            [FromServices] IMinigameRepository minigameRepo,
             [FromServices] IQuestionRepository questionRepo)
         {
             return Ok(new PlatformStats
@@ -35,7 +36,7 @@ namespace WikidataGame.Backend.Controllers
                 NumberOfCategories = await categoryRepo.CountAsync(),
                 NumberOfGamesPlayed = await gameRepo.CountAsync(),
                 NumberOfQuestions = await questionRepo.CountAsync(q => q.Status == Models.QuestionStatus.Approved),
-                NumberOfContributions = 0 //TODO: Add contributions ability and handle count here
+                NumberOfMinigames = await minigameRepo.CountAsync()
             });
         }
 

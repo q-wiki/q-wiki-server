@@ -117,7 +117,7 @@ namespace WikidataGame.ApiClient.Tests
 
             Assert.True(stats.NumberOfGamesPlayed.HasValue);
 
-            Assert.True(stats.NumberOfContributions.HasValue);
+            Assert.True(stats.NumberOfMinigames.HasValue);
         }
 
         public static void AssertDetailedMinigame(DetailedMiniGame dmg)

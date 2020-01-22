@@ -45,35 +45,37 @@ namespace WikidataGame.Backend.Services
             }
         }
 
-        public static async Task<string> RetrieveLicenseInfoStringByUrlAsync(string url)
+        public static async Task<string> RetrieveLicenseInfoStringByUrlAsync(string url, bool asHtml = false)
         {
-            string licenseOoutput;
+            string licenseOutput;
             var imageInfo = await RetrieveLicenseInfoByUrlAsync(url);
             var regex = new Regex("href=\"(?<link>.*?)\".*?>(?<name>.*?)</");
             var match = regex.Match(imageInfo.Artist?.Value);
             if (match.Success)
             {
-                licenseOoutput = $"{LinkFromTextAndUrl(match.Groups["name"].Value, match.Groups["link"].Value)}, ";
+                licenseOutput = $"{LinkFromTextAndUrl(match.Groups["name"].Value, match.Groups["link"].Value, asHtml)}, ";
             }
             else
             {
-                licenseOoutput = $"{imageInfo.Artist} ,";
+                licenseOutput = $"{imageInfo.Artist} ,";
             }
-            licenseOoutput += $"{LinkFromTextAndUrl(imageInfo.ObjectName?.Value, url)}, ";
+            licenseOutput += $"{LinkFromTextAndUrl(imageInfo.ObjectName?.Value, url, asHtml)}, ";
             if (imageInfo.LicenseUrl != null)
             {
-                licenseOoutput += $"{LinkFromTextAndUrl(imageInfo.LicenseShortName?.Value, imageInfo.LicenseUrl?.Value)}";
+                licenseOutput += $"{LinkFromTextAndUrl(imageInfo.LicenseShortName?.Value, imageInfo.LicenseUrl?.Value, asHtml)}";
             }
             else
             {
-                licenseOoutput += imageInfo.LicenseShortName?.Value;
+                licenseOutput += imageInfo.LicenseShortName?.Value;
             }
-            return licenseOoutput;
+            return licenseOutput;
         }
-
-
-        private static string LinkFromTextAndUrl(string text, string url)
+        
+        private static string LinkFromTextAndUrl(string text, string url, bool asHtml)
         {
+            if (asHtml)
+                return $"<a href=\"{url}\" target=\"_blank\">{text}</a>";
+
             return $"<link=\"{url}\">{text}</link>";
         }
     }

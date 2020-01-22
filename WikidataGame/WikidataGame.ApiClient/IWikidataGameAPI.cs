@@ -388,6 +388,16 @@ namespace WikidataGame
         /// </param>
         Task<HttpOperationResponse<Report>> AddPlatformReportWithHttpMessagesAsync(Report report = default(Report), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
+        /// <param name='imageUrl'>
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<string>> PlatformRetrieveLicenseWithHttpMessagesAsync(string imageUrl = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
         /// <summary>
         /// Automatic OAuth flow
         /// </summary>
@@ -403,7 +413,7 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse> AuthenticateWithGitHubWithHttpMessagesAsync(string code = default(string), string sourceUrl = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse> AuthenticatePlatformWithGitHubWithHttpMessagesAsync(string code = default(string), string sourceUrl = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
     }
 }

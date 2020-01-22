@@ -181,6 +181,21 @@ namespace WikidataGame.Backend.Controllers
             return Created(string.Empty, reportModel);
         }
 
+        [HttpGet("License")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        public async Task<ActionResult> PlatformRetrieveLicense(
+            string imageUrl)
+        {
+            try
+            {
+                return Ok(await CommonsLicenseService.RetrieveLicenseInfoStringByUrlAsync(imageUrl, true));
+            }
+            catch(UnableToRetrieveLicenseException)
+            {
+                return BadRequest("Unable to retrieve license for url");
+            }
+        }
+
         /// <summary>
         /// Automatic OAuth flow
         /// </summary>
@@ -188,7 +203,7 @@ namespace WikidataGame.Backend.Controllers
         /// <param name="sourceUrl">Source url for frontend</param>
         /// <returns></returns>
         [HttpGet("GithubOAuth")]
-        public async Task<ActionResult> AuthenticateWithGitHub(
+        public async Task<ActionResult> AuthenticatePlatformWithGitHub(
             string code,
             string sourceUrl,
 #pragma warning disable CS1573 // no xml comments for service injection

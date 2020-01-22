@@ -22,12 +22,12 @@ namespace WikidataGame.Models
         /// <summary>
         /// Initializes a new instance of the PlatformStats class.
         /// </summary>
-        public PlatformStats(int? numberOfQuestions = default(int?), int? numberOfCategories = default(int?), int? numberOfGamesPlayed = default(int?), int? numberOfContributions = default(int?))
+        public PlatformStats(int? numberOfQuestions = default(int?), int? numberOfCategories = default(int?), int? numberOfGamesPlayed = default(int?), int? numberOfMinigames = default(int?))
         {
             NumberOfQuestions = numberOfQuestions;
             NumberOfCategories = numberOfCategories;
             NumberOfGamesPlayed = numberOfGamesPlayed;
-            NumberOfContributions = numberOfContributions;
+            NumberOfMinigames = numberOfMinigames;
             CustomInit();
         }
 
@@ -53,8 +53,8 @@ namespace WikidataGame.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "numberOfContributions")]
-        public int? NumberOfContributions { get; set; }
+        [JsonProperty(PropertyName = "numberOfMinigames")]
+        public int? NumberOfMinigames { get; set; }
 
     }
 }

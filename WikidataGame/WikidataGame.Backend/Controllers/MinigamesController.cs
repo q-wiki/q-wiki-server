@@ -222,8 +222,7 @@ namespace WikidataGame.Backend.Controllers
             {
                 await gameRepo.SetGameWonAsync(game, notificationService);
             }
-
-            if (game.StepsLeftWithinMove < 1)
+            else if (game.StepsLeftWithinMove < 1)
             {
                 game.MoveCount++;
                 if (game.MoveCount / game.GameUsers.Count >= Models.Game.MaxRounds)

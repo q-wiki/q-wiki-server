@@ -181,6 +181,11 @@ namespace WikidataGame.Backend.Controllers
             return Created(string.Empty, reportModel);
         }
 
+        /// <summary>
+        /// Retrieves an html license text for the specified commons image url
+        /// </summary>
+        /// <param name="imageUrl">commons FilePath url</param>
+        /// <returns>html license text</returns>
         [HttpGet("License")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         public async Task<ActionResult> PlatformRetrieveLicense(

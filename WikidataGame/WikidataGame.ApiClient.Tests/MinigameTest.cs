@@ -97,8 +97,8 @@ namespace WikidataGame.ApiClient.Tests
             else
             {
                 Assert.True(updatedTile3.OwnerId == game.Opponent.Id);
+                Assert.True(minigameAnswer3.NextMovePlayerId == game.Opponent.Id);
             }
-            Assert.True(minigameAnswer3.NextMovePlayerId == game.Opponent.Id);
 
             //cleanup
             await apiClient.DeleteGameAsync(gameInfo.GameId);

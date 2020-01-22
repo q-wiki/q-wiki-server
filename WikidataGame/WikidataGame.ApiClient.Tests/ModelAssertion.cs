@@ -99,7 +99,9 @@ namespace WikidataGame.ApiClient.Tests
             Assert.NotEmpty(mgr.CorrectAnswer);
             Assert.All(mgr.CorrectAnswer, a => Assert.False(string.IsNullOrEmpty(a)));
             Assert.True(mgr.IsWin.HasValue);
-            AssertGuid(mgr.NextMovePlayerId);
+            if(!mgr.IsWin.Value)
+                AssertGuid(mgr.NextMovePlayerId); //null on win
+
             Assert.All(mgr.Tiles, tilelist =>
             {
                 Assert.NotEmpty(tilelist);

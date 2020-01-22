@@ -30,6 +30,12 @@ namespace WikidataGame.Backend.Services
                     var infoJson = await webClient.DownloadStringTaskAsync(string.Format(LicenseInfoEndpoint, filename));
                     var jObject = JObject.Parse(infoJson);
                     var imageInfo = jObject.SelectToken("query.pages..imageinfo[0].extmetadata").ToObject<LicenseInfo>();
+                    var htmlregex = new Regex("<(\\s*[(/?)\\w+]*)");
+                    if (htmlregex.IsMatch(imageInfo.ObjectName?.Value))
+                    {
+                        imageInfo.ObjectName = new ValueSource { Value = HttpUtility.UrlDecode(filename), Source = "Q-Wiki" };
+                    }
+
                     return imageInfo;
                 }
             }
@@ -39,6 +45,37 @@ namespace WikidataGame.Backend.Services
             }
         }
 
+        public static async Task<string> RetrieveLicenseInfoStringByUrlAsync(string url)
+        {
+            string licenseOoutput;
+            var imageInfo = await RetrieveLicenseInfoByUrlAsync(url);
+            var regex = new Regex("href=\"(?<link>.*?)\".*?>(?<name>.*?)</");
+            var match = regex.Match(imageInfo.Artist?.Value);
+            if (match.Success)
+            {
+                licenseOoutput = $"{LinkFromTextAndUrl(match.Groups["name"].Value, match.Groups["link"].Value)}, ";
+            }
+            else
+            {
+                licenseOoutput = $"{imageInfo.Artist} ,";
+            }
+            licenseOoutput += $"{LinkFromTextAndUrl(imageInfo.ObjectName?.Value, url)}, ";
+            if (imageInfo.LicenseUrl != null)
+            {
+                licenseOoutput += $"{LinkFromTextAndUrl(imageInfo.LicenseShortName?.Value, imageInfo.LicenseUrl?.Value)}";
+            }
+            else
+            {
+                licenseOoutput += imageInfo.LicenseShortName?.Value;
+            }
+            return licenseOoutput;
+        }
+
+
+        private static string LinkFromTextAndUrl(string text, string url)
+        {
+            return $"<link=\"{url}\">{text}</link>";
+        }
     }
 
     public class LicenseInfo

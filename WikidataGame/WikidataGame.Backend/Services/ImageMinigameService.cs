@@ -31,28 +31,11 @@ namespace WikidataGame.Backend.Services
             var templist = data.Select(item => item.Item2).ToList();
             minigame.AnswerOptions = templist.OrderBy(a => Guid.NewGuid()).ToList(); // shuffle answer options
 
-            var imageInfo = await CommonsLicenseService.RetrieveLicenseInfoByUrlAsync(data[0].Item1);
-            var regex = new Regex("href=\"(?<link>.*?)\".*?>(?<name>.*?)</");
-            var match = regex.Match(imageInfo.Artist.Value);
-            if (match.Success)
-            {
-                minigame.LicenseInfo = $"{LinkFromTextAndUrl(match.Groups["name"].Value, match.Groups["link"].Value)}, ";
-            }
-            else
-            {
-                minigame.LicenseInfo = $"{imageInfo.Artist} ,";
-            }
-            minigame.LicenseInfo += $"{LinkFromTextAndUrl(imageInfo.ObjectName.Value, minigame.ImageUrl)}, {LinkFromTextAndUrl(imageInfo.LicenseShortName.Value, imageInfo.LicenseUrl.Value)}";
-
-
+            minigame.LicenseInfo = await CommonsLicenseService.RetrieveLicenseInfoStringByUrlAsync(data[0].Item1);
             await _dataContext.SaveChangesAsync();
 
             return minigame;
         }
 
-        private static string LinkFromTextAndUrl(string text, string url)
-        {
-            return $"<link=\"{url}\">{text}</link>";
-        }
     }
 }

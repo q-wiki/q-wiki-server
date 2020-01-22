@@ -63,6 +63,7 @@ namespace WikidataGame.Backend.Helpers
             //Seed Database
             DatabaseSeeds.SeedCategories(modelBuilder);
             DatabaseSeeds.SeedQuestions(modelBuilder);
+            DatabaseSeeds.SeedUsers(modelBuilder);
         }
 
     }

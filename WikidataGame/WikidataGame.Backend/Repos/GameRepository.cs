@@ -122,6 +122,7 @@ namespace WikidataGame.Backend.Repos
 
         public async Task SetGameWonAsync(Game game, INotificationService notificationService)
         {
+            game.NextMovePlayerId = null;
             var winningPlayerIds = await WinningPlayerIdsAsync(game.Id);
             foreach (var winnerId in winningPlayerIds)
             {

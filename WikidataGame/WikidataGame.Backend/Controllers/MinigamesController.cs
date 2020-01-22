@@ -190,8 +190,8 @@ namespace WikidataGame.Backend.Controllers
                     tile.ChosenCategoryId = availableCategories.OrderBy(_ => Guid.NewGuid()).First().Id;
                 }
             }
-            var certainty = random.NextDouble() - (tile.Difficulty / 20d);
-            if (certainty > 0.35d) //win
+            var certainty = random.NextDouble() * 0.9d - (tile.Difficulty / 10d);
+            if (certainty > 0.4d) //win
             {
                 if (tile.OwnerId == default)
                 {

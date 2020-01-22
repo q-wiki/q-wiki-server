@@ -36,6 +36,11 @@ namespace WikidataGame.Backend.Controllers
             [FromServices] INotificationService notificationService)
 #pragma warning restore CS1573
         {
+            if (string.IsNullOrEmpty(username))
+            {
+                return BadRequest();
+            }
+
             if (!username.StartsWith(AnonPrefix))
             {
                 username = $"{AnonPrefix}-{username}";

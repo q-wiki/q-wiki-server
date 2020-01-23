@@ -182,22 +182,28 @@ namespace WikidataGame.Backend.Controllers
         }
 
         /// <summary>
-        /// Retrieves an html license text for the specified commons image url
+        /// Retrieves information for the specified commons image url
         /// </summary>
         /// <param name="imageUrl">commons FilePath url</param>
-        /// <returns>html license text</returns>
-        [HttpGet("License")]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        /// <returns>image info (license text, thumbnail url)</returns>
+        [HttpGet("ImageInfo")]
+        [ProducesResponseType(typeof(CommonsImageInfo), StatusCodes.Status200OK)]
         public async Task<ActionResult> PlatformRetrieveLicense(
             string imageUrl)
         {
             try
             {
-                return Ok(await CommonsLicenseService.RetrieveLicenseInfoStringByUrlAsync(imageUrl, true));
+                (var thumbUrl, var licenseInfo) = await CommonsImageService.RetrieveImageInfoStringByUrlAsync(imageUrl, true);
+                var infoDto = new CommonsImageInfo
+                {
+                    ThumbUrl = thumbUrl,
+                    LicenseInfo = licenseInfo
+                };
+                return Ok(infoDto);
             }
             catch(UnableToRetrieveLicenseException)
             {
-                return BadRequest("Unable to retrieve license for url");
+                return BadRequest("Unable to retrieve image info");
             }
         }
 

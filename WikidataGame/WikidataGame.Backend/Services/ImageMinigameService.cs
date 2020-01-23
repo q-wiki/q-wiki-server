@@ -26,12 +26,13 @@ namespace WikidataGame.Backend.Services
 
             var minigame = await _minigameRepo.CreateMiniGameAsync(gameId, playerId, tileId, question, MiniGameType);
             minigame.TaskDescription = question.TaskDescription;
-            minigame.ImageUrl = data[0].Item1;
             minigame.CorrectAnswer = new List<string> { data[0].Item2 }; // placeholder and answer in first tuple!
             var templist = data.Select(item => item.Item2).ToList();
             minigame.AnswerOptions = templist.OrderBy(a => Guid.NewGuid()).ToList(); // shuffle answer options
 
-            minigame.LicenseInfo = await CommonsLicenseService.RetrieveLicenseInfoStringByUrlAsync(data[0].Item1);
+            (var thumbUrl, var licenseString) = await CommonsImageService.RetrieveImageInfoStringByUrlAsync(data[0].Item1);
+            minigame.LicenseInfo = licenseString;
+            minigame.ImageUrl = thumbUrl;
             await _dataContext.SaveChangesAsync();
 
             return minigame;

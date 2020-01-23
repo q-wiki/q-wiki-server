@@ -3645,7 +3645,11 @@ namespace WikidataGame
             return _result;
         }
 
+        /// <summary>
+        /// Retrieves information for the specified commons image url
+        /// </summary>
         /// <param name='imageUrl'>
+        /// commons FilePath url
         /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
@@ -3662,7 +3666,7 @@ namespace WikidataGame
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<string>> PlatformRetrieveLicenseWithHttpMessagesAsync(string imageUrl = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<CommonsImageInfo>> PlatformRetrieveLicenseWithHttpMessagesAsync(string imageUrl = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -3677,7 +3681,7 @@ namespace WikidataGame
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/Platform/License").ToString();
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/Platform/ImageInfo").ToString();
             List<string> _queryParameters = new List<string>();
             if (imageUrl != null)
             {
@@ -3752,7 +3756,7 @@ namespace WikidataGame
                 throw ex;
             }
             // Create Result
-            var _result = new HttpOperationResponse<string>();
+            var _result = new HttpOperationResponse<CommonsImageInfo>();
             _result.Request = _httpRequest;
             _result.Response = _httpResponse;
             // Deserialize Response
@@ -3761,7 +3765,7 @@ namespace WikidataGame
                 _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                 try
                 {
-                    _result.Body = SafeJsonConvert.DeserializeObject<string>(_responseContent, DeserializationSettings);
+                    _result.Body = SafeJsonConvert.DeserializeObject<CommonsImageInfo>(_responseContent, DeserializationSettings);
                 }
                 catch (JsonException ex)
                 {

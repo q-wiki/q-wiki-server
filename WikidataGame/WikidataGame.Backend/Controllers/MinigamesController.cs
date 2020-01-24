@@ -161,7 +161,7 @@ namespace WikidataGame.Backend.Controllers
             while(game.NextMovePlayerId == DatabaseSeeds.BotGuid) //Bot turn
             {
                 BotTurn(game, ccs);
-                await FinalizeMove(gameRepo, notificationService, user, gameId);
+                await FinalizeMove(gameRepo, notificationService, await userManager.FindByIdAsync(DatabaseSeeds.BotGuid.ToString()), gameId);
                 await dataContext.SaveChangesAsync();
             }
 
@@ -190,8 +190,8 @@ namespace WikidataGame.Backend.Controllers
                     tile.ChosenCategoryId = availableCategories.OrderBy(_ => Guid.NewGuid()).First().Id;
                 }
             }
-            var certainty = random.NextDouble() - (tile.Difficulty / 20d);
-            if (certainty > 0.35d) //win
+            var certainty = random.NextDouble() * 0.9d - (tile.Difficulty / 10d);
+            if (certainty > 0.4d) //win
             {
                 if (tile.OwnerId == default)
                 {
@@ -222,8 +222,7 @@ namespace WikidataGame.Backend.Controllers
             {
                 await gameRepo.SetGameWonAsync(game, notificationService);
             }
-
-            if (game.StepsLeftWithinMove < 1)
+            else if (game.StepsLeftWithinMove < 1)
             {
                 game.MoveCount++;
                 if (game.MoveCount / game.GameUsers.Count >= Models.Game.MaxRounds)

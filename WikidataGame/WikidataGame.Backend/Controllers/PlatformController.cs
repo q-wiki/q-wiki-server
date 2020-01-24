@@ -182,13 +182,39 @@ namespace WikidataGame.Backend.Controllers
         }
 
         /// <summary>
+        /// Retrieves information for the specified commons image url
+        /// </summary>
+        /// <param name="imageUrl">commons FilePath url</param>
+        /// <returns>image info (license text, thumbnail url)</returns>
+        [HttpGet("ImageInfo")]
+        [ProducesResponseType(typeof(CommonsImageInfo), StatusCodes.Status200OK)]
+        public async Task<ActionResult> PlatformRetrieveLicense(
+            string imageUrl)
+        {
+            try
+            {
+                (var thumbUrl, var licenseInfo) = await CommonsImageService.RetrieveImageInfoStringByUrlAsync(imageUrl, true);
+                var infoDto = new CommonsImageInfo
+                {
+                    ThumbUrl = thumbUrl,
+                    LicenseInfo = licenseInfo
+                };
+                return Ok(infoDto);
+            }
+            catch(UnableToRetrieveLicenseException)
+            {
+                return BadRequest("Unable to retrieve image info");
+            }
+        }
+
+        /// <summary>
         /// Automatic OAuth flow
         /// </summary>
         /// <param name="code">GitHub code for authorization</param>
         /// <param name="sourceUrl">Source url for frontend</param>
         /// <returns></returns>
         [HttpGet("GithubOAuth")]
-        public async Task<ActionResult> AuthenticateWithGitHub(
+        public async Task<ActionResult> AuthenticatePlatformWithGitHub(
             string code,
             string sourceUrl,
 #pragma warning disable CS1573 // no xml comments for service injection

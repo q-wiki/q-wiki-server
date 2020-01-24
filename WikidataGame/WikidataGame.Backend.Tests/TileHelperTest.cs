@@ -367,7 +367,7 @@ namespace WikidataGame.Backend.Tests
             var user2Id = Guid.NewGuid();
             var map = MapGeneratorService.GenerateMap(GameConstants.DefaultMapWidth, GameConstants.DefaultMapHeight, GameConstants.DefaultAccessibleTilesCount);
             map.ToList().ForEach(t => t.Id = Guid.NewGuid());
-            MapGeneratorService.SetStartPositions(map, new List<Guid>{ user1Id, user2Id });
+            MapGeneratorService.SetStartPositions(map, new List<Guid>{ user1Id, user2Id }, GameConstants.DefaultMapWidth, GameConstants.DefaultMapHeight);
             var game = new Game
             {
                 MapWidth = GameConstants.DefaultMapWidth,

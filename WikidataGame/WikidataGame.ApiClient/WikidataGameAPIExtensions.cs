@@ -848,6 +848,40 @@ namespace WikidataGame
             }
 
             /// <summary>
+            /// Retrieves information for the specified commons image url
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='imageUrl'>
+            /// commons FilePath url
+            /// </param>
+            public static CommonsImageInfo PlatformRetrieveLicense(this IWikidataGameAPI operations, string imageUrl = default(string))
+            {
+                return operations.PlatformRetrieveLicenseAsync(imageUrl).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves information for the specified commons image url
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='imageUrl'>
+            /// commons FilePath url
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<CommonsImageInfo> PlatformRetrieveLicenseAsync(this IWikidataGameAPI operations, string imageUrl = default(string), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.PlatformRetrieveLicenseWithHttpMessagesAsync(imageUrl, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
             /// Automatic OAuth flow
             /// </summary>
             /// <param name='operations'>
@@ -859,9 +893,9 @@ namespace WikidataGame
             /// <param name='sourceUrl'>
             /// Source url for frontend
             /// </param>
-            public static void AuthenticateWithGitHub(this IWikidataGameAPI operations, string code = default(string), string sourceUrl = default(string))
+            public static void AuthenticatePlatformWithGitHub(this IWikidataGameAPI operations, string code = default(string), string sourceUrl = default(string))
             {
-                operations.AuthenticateWithGitHubAsync(code, sourceUrl).GetAwaiter().GetResult();
+                operations.AuthenticatePlatformWithGitHubAsync(code, sourceUrl).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -879,9 +913,9 @@ namespace WikidataGame
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task AuthenticateWithGitHubAsync(this IWikidataGameAPI operations, string code = default(string), string sourceUrl = default(string), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task AuthenticatePlatformWithGitHubAsync(this IWikidataGameAPI operations, string code = default(string), string sourceUrl = default(string), CancellationToken cancellationToken = default(CancellationToken))
             {
-                (await operations.AuthenticateWithGitHubWithHttpMessagesAsync(code, sourceUrl, null, cancellationToken).ConfigureAwait(false)).Dispose();
+                (await operations.AuthenticatePlatformWithGitHubWithHttpMessagesAsync(code, sourceUrl, null, cancellationToken).ConfigureAwait(false)).Dispose();
             }
 
     }

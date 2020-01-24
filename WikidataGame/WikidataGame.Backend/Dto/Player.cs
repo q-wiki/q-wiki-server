@@ -7,19 +7,10 @@ namespace WikidataGame.Backend.Dto
 {
     public class Player
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; }
 
-        public static Player FromModel(Models.User player)
-        {
-            if (player == null)
-                return null;
+        public string ProfileImage { get; set; }
 
-            return new Player
-            {
-                Id = player.Id,
-                Name = $"Player {player.Id}"
-            };
-        }
     }
 }

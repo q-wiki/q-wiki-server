@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using WikidataGame.Backend.Models;
 using WikidataGame.Backend.Helpers;
+using System.Text;
 
 namespace WikidataGame.Backend.Services
 {
@@ -83,10 +84,10 @@ namespace WikidataGame.Backend.Services
             var highestPoint = noiseField.Max();
             var difficultyGap = (highestPoint - threshold) / 2;
 
-            return noiseField.Select(n => new Tile {
+            return noiseField.Select((n, index) => new Tile {
+                MapIndex = index,
                 IsAccessible = n > threshold,
-                Difficulty = Convert.ToInt32(Math.Round((n - threshold) / difficultyGap)),
-                Id = Guid.NewGuid().ToString()
+                Difficulty = Convert.ToInt32(Math.Round((n - threshold) / difficultyGap))
             }).ToList();
         }
 
@@ -109,23 +110,23 @@ namespace WikidataGame.Backend.Services
             return candidate;
         }
 
-        public static IEnumerable<Tile> SetStartPositions (IEnumerable<Tile> tiles, IEnumerable<string> userIds)
+        public static IEnumerable<Tile> SetStartPositions (IEnumerable<Tile> tiles, IEnumerable<Guid> userIds, int mapWidth, int mapHeight)
         {
-            var candidates = tiles.Where(t => t.IsAccessible && t.Difficulty == 0);
-            var startTiles = new Dictionary<string, string>();
+            var candidates = tiles.Where(t => t.IsAccessible); // && t.Difficulty == 0  <-- there is not always a possibility to get a 3 tile distance from level 0 tiles only
+            var startTiles = new Dictionary<Guid, Tile>();
             var rnd = new Random();
-
-            while (startTiles.Values.Distinct().Count() < userIds.Count())
+            do
             {
-                foreach (var userId in userIds) {
-                    startTiles[userId] = candidates.ElementAt(rnd.Next(candidates.Count())).Id;
+                foreach (var userId in userIds)
+                {
+                    startTiles[userId] = candidates.ElementAt(rnd.Next(candidates.Count()));
                 }
-            }
+            } while (startTiles.Values.Distinct().Count() < userIds.Count() ||
+                AStar.FindPath(startTiles.First().Value, startTiles.Last().Value, tiles.OrderBy(t => t.MapIndex), mapWidth, mapHeight).TotalCost <= 4);
 
             foreach (var tile in startTiles)
             {
-                var startTile = tiles.SingleOrDefault(t => t.Id == tile.Value);
-                startTile.OwnerId = tile.Key;
+                tile.Value.OwnerId = tile.Key;
             }
 
             return tiles;
@@ -133,14 +134,22 @@ namespace WikidataGame.Backend.Services
 
         public static void Debug (int mapWidth, IEnumerable<Tile> tiles)
         {
+            Console.WriteLine(MapToString(mapWidth, tiles));
+        }
+
+        public static string MapToString(int mapWidth, IEnumerable<Tile> tiles)
+        {
+            var sb = new StringBuilder();
             for (int i = 0; i < tiles.Count(); i++)
             {
-                Console.Write(tiles.ElementAt(i));
-                if (i % mapWidth == 0) System.Console.WriteLine();
+                if (i > 0 && i % mapWidth == 0) sb.AppendLine();
+                sb.Append(tiles.ElementAt(i).IsAccessible ? "x" : " ");
             }
-            Console.WriteLine();
-            Console.WriteLine($"Accessible tiles: {tiles.Count(x => x.IsAccessible)}");
-            Console.WriteLine();
+            sb.AppendLine();
+            sb.AppendLine($"Accessible tiles: {tiles.Count(x => x.IsAccessible)}");
+            sb.AppendLine();
+
+            return sb.ToString();
         }
     }
 }

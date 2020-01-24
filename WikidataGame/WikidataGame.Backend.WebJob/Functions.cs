@@ -27,15 +27,15 @@ namespace WikidataGame.Backend.WebJob
         public async Task ExpiryCleanup([TimerTrigger("0 */5 * * * *", RunOnStartup = true, UseMonitor = true)]TimerInfo timerInfo)
         {
             Console.WriteLine("Executing web job ....");
-            var expiredGames = _gameRepo.Find(x => x.GameUsers.Count(gu => gu.IsWinner) <= 0 &&
-                x.MoveStartedAt.HasValue && x.MoveStartedAt.Value.Add(Game.MaxMoveDuration) < DateTime.UtcNow).ToList();
+            var expiredGames = (await _gameRepo.FindAsync(x => x.GameUsers.Count(gu => gu.IsWinner) <= 0 &&
+                x.MoveStartedAt.HasValue && x.MoveStartedAt.Value.Add(Game.MaxMoveDuration) < DateTime.UtcNow)).ToList();
             foreach(var game in expiredGames)
             {
                 var expiringPlayer = game.GameUsers.SingleOrDefault(gu => gu.UserId == game.NextMovePlayerId);
                 var winningPlayer = game.GameUsers.SingleOrDefault(gu => gu.UserId != game.NextMovePlayerId);
                 winningPlayer.IsWinner = true;
-                await _notificationService.SendNotification(winningPlayer.User, "Congrats", "You won this game due to your opponent being inactive!");
-                await _notificationService.SendNotification(expiringPlayer.User, "Too bad.", "You lost the game due to inactivity!");
+                await _notificationService.SendNotificationAsync(PushType.YouWonTimeout, winningPlayer.User, expiringPlayer.User, game.Id);
+                await _notificationService.SendNotificationAsync(PushType.YouLostTimeout, expiringPlayer.User, winningPlayer.User, game.Id);
             }
             await _dataContext.SaveChangesAsync();
         }

@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikidataGame.Backend.Tests"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikidataGame.ApiClient.Tests", "WikidataGame.ApiClient.Tests\WikidataGame.ApiClient.Tests.csproj", "{83E47AB3-E883-47FB-A158-0ED5AD1D0E6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WikidataGame.Backend.WebJob", "WikidataGame.Backend.WebJob\WikidataGame.Backend.WebJob.csproj", "{1563C3D2-AB0D-42F5-BBCA-5CC054C95102}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikidataGame.Backend.WebJob", "WikidataGame.Backend.WebJob\WikidataGame.Backend.WebJob.csproj", "{1563C3D2-AB0D-42F5-BBCA-5CC054C95102}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

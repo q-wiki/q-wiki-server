@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,17 +11,6 @@ namespace WikidataGame.Backend.Helpers
 {
     public static class TileHelper
     {
-        public static IEnumerable<IEnumerable<Dto.Tile>> TileEnumerableModel2Dto(Game game, CategoryCacheService categoryCacheService)
-        {
-            return Enumerable.Range(0, game.MapHeight)
-                .Select(yCoord =>
-                    game.Tiles.Skip(yCoord * game.MapWidth)
-                        .Take(game.MapWidth)
-                        // inaccessible tiles are represented as `null`
-                        .Select(t => t.IsAccessible ? Dto.Tile.FromModel(t, categoryCacheService) : null)
-                );
-        }
-
         /// <summary>
         /// Returns 3 categories for a tile. The categories that are returned are
         /// stable and depend on the tile id.
@@ -28,19 +18,18 @@ namespace WikidataGame.Backend.Helpers
         /// <param name="categoryService"></param>
         /// <param name="tileId"></param>
         /// <returns></returns>
-        public static IEnumerable<Category> GetCategoriesForTile(CategoryCacheService categoryService, string tileId)
+        public static IEnumerable<Category> GetCategoriesForTile(CategoryCacheService categoryService, Guid tileId)
         {
             // we get all categories, draw 3 distinct random ints in
             // [i, categories.Count()[ and return the categories for
             // these draws
             var rnd = new Random(tileId.GetHashCode());
-            var categories = categoryService.Categories;
 
             var draws = new HashSet<Category>();
             while (draws.Count() < 3)
             {
-                var pick = rnd.Next(categories.Count());
-                draws.Add(categories.ElementAt(pick));
+                var pick = rnd.Next(categoryService.Categories.Count());
+                draws.Add(categoryService.Categories.ElementAt(pick));
             }
 
             return draws;
@@ -90,9 +79,8 @@ namespace WikidataGame.Backend.Helpers
 
         public static bool HasIslands (IEnumerable<Tile> tiles, int width, int height)
         {
-            var colors = new Dictionary<(int, int), int>(); // maps a tuple of (x, y) to chosen colors
+            var colors = new Dictionary<(int, int), int?>(); // maps a tuple of (x, y) to chosen colors
             var color = -1;
-            var synonymousColors = new Dictionary<int, int>();
 
             for (var y = 0; y < height; y++)
             {
@@ -103,46 +91,43 @@ namespace WikidataGame.Backend.Helpers
                     {
                         var neighborCoords = GetNeighbors(tiles, x, y, width, height)
                             .Keys
-                            .Where(((int x, int y) coord) => coord.x <= x && coord.y <= y)
+                            // .Where(((int _x, int _y) coord) => coord._x <= x && coord._y <= y)
                             .ToList();
 
                         // try to find a neighbor that has a color and use that
-                        try
+                        var neighborColor = neighborCoords
+                            .Select(neighbor => colors.GetValueOrDefault(neighbor, null))
+                            .FirstOrDefault(c => c != null);
+
+                        if(neighborColor != null)
                         {
-                            var neighborColor = neighborCoords
-                                .Select(neighbor => colors.GetValueOrDefault(neighbor, -2))
-                                .First(c => c != -2);
-                            colors[(x,y)] = neighborColor;
+                            colors[(x, y)] = neighborColor;
                         }
-                        catch (Exception ex) when (ex is ArgumentNullException || ex is InvalidOperationException)
+                        else
                         {
                             colors[(x, y)] = ++color;
                         }
-
-                        // if neighboring fields use a different color,
-                        // the colors are equivalent
-                        neighborCoords
-                            .Where(coord => colors.ContainsKey(coord) && colors[coord] != colors[(x, y)])
-                            .Select(coord => colors[coord])
-                            .ToList()
-                            .ForEach(neighborsColor => synonymousColors[neighborsColor] = color);
                     }
                 }
             }
 
-            // remove all ambiguity by giving synonmous colors the same color
-            while (synonymousColors.Count() > 0)
-            {
-                (var fromColor, var toColor) = synonymousColors.First();
-                colors.Keys.ToList().ForEach(coord => {
-                    if (colors[coord] == fromColor) {
-                        colors[coord] = toColor;
-                    }
-                });
-                synonymousColors.Remove(fromColor);
-            }
-
             return colors.Values.Distinct().Count() > 1;
+        }
+
+        public static Tile FindTileForShortestPath(IEnumerable<Tile> playerTiles, IEnumerable<Tile> opponentTiles, Game game)
+        {
+            var combinations = playerTiles.SelectMany(g => opponentTiles.Select(c => new { Start = g, End = c }));
+            Path<Tile> shortestPath = null;
+            foreach(var tileCombination in combinations)
+            {
+                var result = AStar.FindPath(tileCombination.Start, tileCombination.End, game.Tiles.OrderBy(t => t.MapIndex).ToList(), game.MapWidth, game.MapHeight);
+                if(shortestPath == null || result.TotalCost < shortestPath.TotalCost)
+                {
+                    shortestPath = result;
+                }
+            }
+            var pathElement = shortestPath.ElementAtOrDefault(shortestPath.Count() - 2);
+            return pathElement;
         }
     }
 }

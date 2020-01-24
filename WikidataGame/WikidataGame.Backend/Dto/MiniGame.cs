@@ -7,7 +7,7 @@ namespace WikidataGame.Backend.Dto
 {
     public class MiniGame
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         public MiniGameType Type { get; set; }
 
@@ -15,22 +15,22 @@ namespace WikidataGame.Backend.Dto
 
         public IEnumerable<string> AnswerOptions { get; set; }
 
-        public static MiniGame FromModel(Models.MiniGame minigame)
-        {
-            return new MiniGame
-            {
-                Id = minigame.Id,
-                TaskDescription = minigame.TaskDescription,
-                AnswerOptions = minigame.AnswerOptions,
-                Type = (MiniGameType)Enum.Parse(typeof(MiniGameType), minigame.Type.ToString())
-            };
-        }
+        public string ImageUrl { get; set; }
+
+        public string LicenseInfo { get; set; }
     }
 
     public enum MiniGameType
     {
         Sort,
-        BlurryImage,
+        Image,
         MultipleChoice
+    }
+
+    public class DetailedMiniGame : MiniGame
+    {
+        public Question Question { get; set; }
+
+        public IEnumerable<string> CorrectAnswer { get; set; }
     }
 }

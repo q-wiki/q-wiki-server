@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +22,7 @@ using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Models;
 using WikidataGame.Backend.Repos;
 using WikidataGame.Backend.Services;
+using WikidataGame.Backend.Validators;
 
 namespace WikidataGame.Backend
 {
@@ -36,11 +39,16 @@ namespace WikidataGame.Backend
             Configuration = builder.Build();
         }
 
-        public IConfiguration Configuration { get; }
+        public static IConfiguration Configuration { get; private set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAny", builder => builder.AllowAnyOrigin());
+            });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddJsonOptions(
                 options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
@@ -73,14 +81,9 @@ namespace WikidataGame.Backend
                 //services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("TestDb").UseLazyLoadingProxies());
                 services.AddDbContext<DataContext>(x => x.UseSqlite("Filename=qwiki.db").UseLazyLoadingProxies());
             }
-
-            // configure strongly typed settings objects
-            var appSettingsSection = Configuration.GetSection("AppSettings");
-            services.Configure<AppSettings>(appSettingsSection);
-
+            
             // configure jwt authentication
-            var appSettings = appSettingsSection.Get<AppSettings>();
-            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+            var key = Encoding.ASCII.GetBytes(Configuration.GetValue<string>("AuthSecret"));
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -90,16 +93,15 @@ namespace WikidataGame.Backend
             {
                 x.Events = new JwtBearerEvents
                 {
-                    OnTokenValidated = context =>
+                    OnTokenValidated = async context =>
                     {
-                        var userRepo = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
-                        var user = userRepo.SingleOrDefault(u => u.DeviceId == context.Principal.Identity.Name);
+                        var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<User>>();
+                        var user = await userManager.GetUserAsync(context.Principal);
                         if (user == null)
                         {
                             // return unauthorized if user no longer exists
                             context.Fail("Unauthorized");
                         }
-                        return Task.CompletedTask;
                     }
                 };
                 x.RequireHttpsMetadata = false;
@@ -109,24 +111,57 @@ namespace WikidataGame.Backend
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateAudience = false,
+                    ValidateLifetime = true
                 };
             });
 
+            //configure identity
+            services.AddDefaultIdentity<User>()
+                .AddEntityFrameworkStores<DataContext>()
+                .AddUserManager<UserManager<User>>();
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Password settings.
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 8;
+                options.Password.RequiredUniqueChars = 1;
+
+                // Lockout settings.
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
+
+                // User settings.
+                options.User.RequireUniqueEmail = false;
+            });
+            services.AddSingleton((provider) => new MapperConfiguration(cfg =>
+                cfg.AddProfile(new AutomapperProfile(provider))
+            ).CreateMapper());
+            services.AddTransient<IUserValidator<User>, UserValidator>();
             services.AddSingleton<INotificationService>(new NotificationService(Configuration.GetConnectionString("NotificationHub")));
-            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddSingleton(new GitHubAuthService(Configuration.GetConnectionString("GitHubClientId"), Configuration.GetConnectionString("GitHubClientSecret")));
+            services.AddScoped<UserManager<User>>();
+            services.AddSingleton(new AuthService(Configuration.GetConnectionString("GoogleClientSecret")));
             services.AddScoped<IGameRepository, GameRepository>();
             services.AddScoped<IMinigameRepository, MinigameRepository>();
             services.AddScoped<IQuestionRepository, QuestionRepository>();
-            services.AddSingleton<IRepository<Category, string>, Repository<Category, string>>();
+            services.AddScoped<IRepository<Category, Guid>, Repository<Category, Guid>>();
+            services.AddScoped<IRepository<Friend, Guid>, Repository<Friend, Guid>>();
+            services.AddScoped<IRepository<GameRequest, Guid>, Repository<GameRequest, Guid>>();
+            services.AddScoped<IRepository<Report, Guid>, Repository<Report, Guid>>();
             services.AddScoped<IMinigameService, MultipleChoiceMinigameService>();
             services.AddScoped<IMinigameService, SortingMinigameService>();
             services.AddSingleton<CategoryCacheService, CategoryCacheService>();
-            //services.AddScoped<IMinigameService, BlurryImageMinigameService>();
+            services.AddScoped<IMinigameService, ImageMinigameService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public async void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -136,7 +171,8 @@ namespace WikidataGame.Backend
             {
                 app.UseHsts();
             }
-
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
             app.UseAuthentication();
             app.UseMvc();
             app.UseSwagger();
@@ -147,7 +183,11 @@ namespace WikidataGame.Backend
 
             app.Run(async (context) => await Task.Run(() => context.Response.Redirect("/swagger")));
 
-            app.ApplicationServices.GetService<DataContext>().Database.EnsureCreated();
+            var dataContext = app.ApplicationServices.GetService<DataContext>();
+            dataContext.Database.Migrate();
+
+
+            await app.ApplicationServices.GetService<CategoryCacheService>().InitializeAsync();
         }
     }
 }

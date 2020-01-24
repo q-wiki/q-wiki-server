@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,15 +8,19 @@ using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Repos
 {
-    public class QuestionRepository : Repository<Question, string>, IQuestionRepository
+    public class QuestionRepository : Repository<Question, Guid>, IQuestionRepository
     {
         public QuestionRepository(DataContext context) : base(context){}
 
-        public Question GetRandomQuestionForCategory(string categoryId)
+        public Question GetRandomQuestionForCategory(Guid categoryId)
         {
-            return (Context as DataContext)
-                .Questions.Where(q => q.CategoryId == categoryId)
-                .OrderBy(q => Guid.NewGuid()).FirstOrDefault();
+            return Context.Set<Question>()
+                .Where(q => q.Status == QuestionStatus.Approved && q.CategoryId == categoryId)
+                .GroupBy(q => q.GroupId)
+                .OrderBy(q => Guid.NewGuid())
+                .First()
+                .OrderBy(q => Guid.NewGuid())
+                .First();
         }
     }
 }

@@ -41,10 +41,13 @@ namespace WikidataGame
 
 
         /// <summary>
-        /// Authenticates a player
+        /// Authenticates a player using username/password
         /// </summary>
-        /// <param name='xDeviceID'>
-        /// device identifier
+        /// <param name='xUsername'>
+        /// Username (min. 3 chars)
+        /// </param>
+        /// <param name='xPassword'>
+        /// Password (min. 8 chars)
         /// </param>
         /// <param name='xPushToken'>
         /// push token generated through firebase/apns
@@ -55,19 +58,19 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<AuthInfo>> AuthenticateWithHttpMessagesAsync(string xDeviceID = default(string), string xPushToken = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<AuthInfo>> AuthenticateWithHttpMessagesAsync(string xUsername = default(string), string xPassword = default(string), string xPushToken = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Creates a new game and matches the player with an opponent
+        /// Authenticates a player using Google Play Services
         /// </summary>
-        /// <param name='mapWidth'>
-        /// Width of generated map
+        /// <param name='xUsername'>
+        /// Username (min. 3 chars)
         /// </param>
-        /// <param name='mapHeight'>
-        /// Height of generated map
+        /// <param name='xAuthCode'>
+        /// backend auth code
         /// </param>
-        /// <param name='accessibleTilesCount'>
-        /// How many accessible tiles the generated map should contain.
+        /// <param name='xPushToken'>
+        /// push token generated through firebase/apns
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -75,7 +78,139 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<GameInfo>> CreateNewGameWithHttpMessagesAsync(int? mapWidth = 10, int? mapHeight = 10, int? accessibleTilesCount = 70, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<AuthInfo>> AuthenticateGooglePlayWithHttpMessagesAsync(string xUsername = default(string), string xAuthCode = default(string), string xPushToken = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Retrieves the friendlist for the signed in user
+        /// </summary>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<IList<Player>>> GetFriendsWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Adds a user as a friend
+        /// </summary>
+        /// <param name='friendId'>
+        /// The user id of the player that should be added
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<Player>> PostFriendWithHttpMessagesAsync(string friendId = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Removes a friend from the friend list
+        /// </summary>
+        /// <param name='friendId'>
+        /// User id of the friend to be removed
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<Player>> DeleteFriendWithHttpMessagesAsync(string friendId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Retrieves users (limit 10) with a username similar to the query
+        /// string
+        /// </summary>
+        /// <param name='query'>
+        /// Username or part of a username (min. 3 characters)
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<IList<Player>>> GetFindFriendsWithHttpMessagesAsync(string query = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Retrieves all game requests for the authenticated player
+        /// </summary>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<GameRequestList>> GetGameRequestsWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Sends a game request to the specified user
+        /// </summary>
+        /// <param name='userId'>
+        /// user id
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<GameRequest>> RequestMatchWithHttpMessagesAsync(string userId = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Deletes a game request for the sender or recipient
+        /// </summary>
+        /// <param name='gameRequestId'>
+        /// game request identifier
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse> DeleteGameRequestWithHttpMessagesAsync(string gameRequestId = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Creates a new game by accepting a game request
+        /// </summary>
+        /// <param name='gameRequestId'>
+        /// game request identifier
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<GameInfo>> CreateNewGameByRequestWithHttpMessagesAsync(string gameRequestId = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Retrieves all currently running games for the authenticated player
+        /// </summary>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<IList<GameInfo>>> GetGamesWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Creates a new game and matches the player with an opponent
+        /// </summary>
+        /// <param name='withAiOpponent'>
+        /// Set to true, to match up with an AI opponent
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<GameInfo>> CreateNewGameWithHttpMessagesAsync(bool? withAiOpponent = false, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Retrieves information on the specified game
@@ -158,6 +293,131 @@ namespace WikidataGame
         /// The cancellation token.
         /// </param>
         Task<HttpOperationResponse<MiniGameResult>> AnswerMinigameWithHttpMessagesAsync(string gameId, string minigameId, IList<string> answers = default(IList<string>), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Retrieves statistics containing the number of categories, games
+        /// played and questions added
+        /// </summary>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<PlatformStats>> GetPlatformStatsWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Retrieves detailed information on a bygone minigame by id
+        /// </summary>
+        /// <param name='minigameId'>
+        /// minigame identifier
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<DetailedMiniGame>> GetPlatformMinigameByIdWithHttpMessagesAsync(string minigameId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Retrieves a list of all available questions
+        /// </summary>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<IList<Question>>> GetPlatformQuestionsWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Adds the specified question to the question catalogue (with status
+        /// pending)
+        /// </summary>
+        /// <param name='question'>
+        /// question to add
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<Question>> AddPlatformQuestionWithHttpMessagesAsync(Question question = default(Question), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Adds a rating for the specified question
+        /// </summary>
+        /// <param name='questionId'>
+        /// question identifier
+        /// </param>
+        /// <param name='rating'>
+        /// rating (1-5)
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<Question>> AddPlatformQuestionRatingWithHttpMessagesAsync(string questionId, int rating, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Retrieves a list of all available categories
+        /// </summary>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<IList<Category>>> GetPlatformCategoriesWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Creates a new report for mistakes/errors within a minigame
+        /// </summary>
+        /// <param name='report'>
+        /// Report to be created
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<Report>> AddPlatformReportWithHttpMessagesAsync(Report report = default(Report), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Retrieves information for the specified commons image url
+        /// </summary>
+        /// <param name='imageUrl'>
+        /// commons FilePath url
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<CommonsImageInfo>> PlatformRetrieveLicenseWithHttpMessagesAsync(string imageUrl = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Automatic OAuth flow
+        /// </summary>
+        /// <param name='code'>
+        /// GitHub code for authorization
+        /// </param>
+        /// <param name='sourceUrl'>
+        /// Source url for frontend
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse> AuthenticatePlatformWithGitHubWithHttpMessagesAsync(string code = default(string), string sourceUrl = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
     }
 }

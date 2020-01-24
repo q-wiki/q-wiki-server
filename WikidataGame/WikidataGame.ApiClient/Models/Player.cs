@@ -22,10 +22,11 @@ namespace WikidataGame.Models
         /// <summary>
         /// Initializes a new instance of the Player class.
         /// </summary>
-        public Player(string id = default(string), string name = default(string))
+        public Player(string id = default(string), string name = default(string), string profileImage = default(string))
         {
             Id = id;
             Name = name;
+            ProfileImage = profileImage;
             CustomInit();
         }
 
@@ -43,6 +44,11 @@ namespace WikidataGame.Models
         /// </summary>
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "profileImage")]
+        public string ProfileImage { get; set; }
 
     }
 }

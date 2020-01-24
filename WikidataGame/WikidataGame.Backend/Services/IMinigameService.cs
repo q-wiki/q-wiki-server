@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WikidataGame.Backend.Dto;
+using WikidataGame.Backend.Models;
 
 namespace WikidataGame.Backend.Services
 {
     public interface IMinigameService
     {
-        Models.MiniGameType MiniGameType { get; }
-        MiniGame GenerateMiniGame(string gameId, string playerId, Models.Question categoryId, string tileId);
+        MiniGameType MiniGameType { get; }
+        Task<MiniGame> GenerateMiniGameAsync(Guid gameId, Guid playerId, Question question, Guid tileId);
     }
 }

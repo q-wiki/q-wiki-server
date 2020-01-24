@@ -9,5 +9,6 @@ namespace WikidataGame.Backend.Dto
     {
         public string Bearer { get; set; }
         public DateTime Expires { get; set; }
+        public Player User { get; set; }
     }
 }

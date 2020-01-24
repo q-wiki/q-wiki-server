@@ -15,7 +15,7 @@ namespace WikidataGame.Backend.Tests
     {
         public IEnumerator<object[]> GetEnumerator()
         {
-            return Db.Instance.QuestionRepo.GetAll().Select(q => new object[] { q }).GetEnumerator();
+            return Db.Instance.QuestionRepo.GetAllAsync().Result.Select(q => new object[] { q }).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

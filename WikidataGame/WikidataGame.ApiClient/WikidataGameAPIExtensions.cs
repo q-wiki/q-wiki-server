@@ -18,30 +18,36 @@ namespace WikidataGame
     public static partial class WikidataGameAPIExtensions
     {
             /// <summary>
-            /// Authenticates a player
+            /// Authenticates a player using username/password
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='xDeviceID'>
-            /// device identifier
+            /// <param name='xUsername'>
+            /// Username (min. 3 chars)
+            /// </param>
+            /// <param name='xPassword'>
+            /// Password (min. 8 chars)
             /// </param>
             /// <param name='xPushToken'>
             /// push token generated through firebase/apns
             /// </param>
-            public static AuthInfo Authenticate(this IWikidataGameAPI operations, string xDeviceID = default(string), string xPushToken = default(string))
+            public static AuthInfo Authenticate(this IWikidataGameAPI operations, string xUsername = default(string), string xPassword = default(string), string xPushToken = default(string))
             {
-                return operations.AuthenticateAsync(xDeviceID, xPushToken).GetAwaiter().GetResult();
+                return operations.AuthenticateAsync(xUsername, xPassword, xPushToken).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Authenticates a player
+            /// Authenticates a player using username/password
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='xDeviceID'>
-            /// device identifier
+            /// <param name='xUsername'>
+            /// Username (min. 3 chars)
+            /// </param>
+            /// <param name='xPassword'>
+            /// Password (min. 8 chars)
             /// </param>
             /// <param name='xPushToken'>
             /// push token generated through firebase/apns
@@ -49,9 +55,340 @@ namespace WikidataGame
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<AuthInfo> AuthenticateAsync(this IWikidataGameAPI operations, string xDeviceID = default(string), string xPushToken = default(string), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<AuthInfo> AuthenticateAsync(this IWikidataGameAPI operations, string xUsername = default(string), string xPassword = default(string), string xPushToken = default(string), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.AuthenticateWithHttpMessagesAsync(xDeviceID, xPushToken, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.AuthenticateWithHttpMessagesAsync(xUsername, xPassword, xPushToken, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Authenticates a player using Google Play Services
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='xUsername'>
+            /// Username (min. 3 chars)
+            /// </param>
+            /// <param name='xAuthCode'>
+            /// backend auth code
+            /// </param>
+            /// <param name='xPushToken'>
+            /// push token generated through firebase/apns
+            /// </param>
+            public static AuthInfo AuthenticateGooglePlay(this IWikidataGameAPI operations, string xUsername = default(string), string xAuthCode = default(string), string xPushToken = default(string))
+            {
+                return operations.AuthenticateGooglePlayAsync(xUsername, xAuthCode, xPushToken).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Authenticates a player using Google Play Services
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='xUsername'>
+            /// Username (min. 3 chars)
+            /// </param>
+            /// <param name='xAuthCode'>
+            /// backend auth code
+            /// </param>
+            /// <param name='xPushToken'>
+            /// push token generated through firebase/apns
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<AuthInfo> AuthenticateGooglePlayAsync(this IWikidataGameAPI operations, string xUsername = default(string), string xAuthCode = default(string), string xPushToken = default(string), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.AuthenticateGooglePlayWithHttpMessagesAsync(xUsername, xAuthCode, xPushToken, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Retrieves the friendlist for the signed in user
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            public static IList<Player> GetFriends(this IWikidataGameAPI operations)
+            {
+                return operations.GetFriendsAsync().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves the friendlist for the signed in user
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<IList<Player>> GetFriendsAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetFriendsWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Adds a user as a friend
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='friendId'>
+            /// The user id of the player that should be added
+            /// </param>
+            public static Player PostFriend(this IWikidataGameAPI operations, string friendId = default(string))
+            {
+                return operations.PostFriendAsync(friendId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Adds a user as a friend
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='friendId'>
+            /// The user id of the player that should be added
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<Player> PostFriendAsync(this IWikidataGameAPI operations, string friendId = default(string), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.PostFriendWithHttpMessagesAsync(friendId, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Removes a friend from the friend list
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='friendId'>
+            /// User id of the friend to be removed
+            /// </param>
+            public static Player DeleteFriend(this IWikidataGameAPI operations, string friendId)
+            {
+                return operations.DeleteFriendAsync(friendId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Removes a friend from the friend list
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='friendId'>
+            /// User id of the friend to be removed
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<Player> DeleteFriendAsync(this IWikidataGameAPI operations, string friendId, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.DeleteFriendWithHttpMessagesAsync(friendId, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Retrieves users (limit 10) with a username similar to the query string
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='query'>
+            /// Username or part of a username (min. 3 characters)
+            /// </param>
+            public static IList<Player> GetFindFriends(this IWikidataGameAPI operations, string query = default(string))
+            {
+                return operations.GetFindFriendsAsync(query).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves users (limit 10) with a username similar to the query string
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='query'>
+            /// Username or part of a username (min. 3 characters)
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<IList<Player>> GetFindFriendsAsync(this IWikidataGameAPI operations, string query = default(string), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetFindFriendsWithHttpMessagesAsync(query, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Retrieves all game requests for the authenticated player
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            public static GameRequestList GetGameRequests(this IWikidataGameAPI operations)
+            {
+                return operations.GetGameRequestsAsync().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves all game requests for the authenticated player
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<GameRequestList> GetGameRequestsAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetGameRequestsWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Sends a game request to the specified user
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='userId'>
+            /// user id
+            /// </param>
+            public static GameRequest RequestMatch(this IWikidataGameAPI operations, string userId = default(string))
+            {
+                return operations.RequestMatchAsync(userId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Sends a game request to the specified user
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='userId'>
+            /// user id
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<GameRequest> RequestMatchAsync(this IWikidataGameAPI operations, string userId = default(string), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.RequestMatchWithHttpMessagesAsync(userId, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Deletes a game request for the sender or recipient
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='gameRequestId'>
+            /// game request identifier
+            /// </param>
+            public static void DeleteGameRequest(this IWikidataGameAPI operations, string gameRequestId = default(string))
+            {
+                operations.DeleteGameRequestAsync(gameRequestId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Deletes a game request for the sender or recipient
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='gameRequestId'>
+            /// game request identifier
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task DeleteGameRequestAsync(this IWikidataGameAPI operations, string gameRequestId = default(string), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                (await operations.DeleteGameRequestWithHttpMessagesAsync(gameRequestId, null, cancellationToken).ConfigureAwait(false)).Dispose();
+            }
+
+            /// <summary>
+            /// Creates a new game by accepting a game request
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='gameRequestId'>
+            /// game request identifier
+            /// </param>
+            public static GameInfo CreateNewGameByRequest(this IWikidataGameAPI operations, string gameRequestId = default(string))
+            {
+                return operations.CreateNewGameByRequestAsync(gameRequestId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Creates a new game by accepting a game request
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='gameRequestId'>
+            /// game request identifier
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<GameInfo> CreateNewGameByRequestAsync(this IWikidataGameAPI operations, string gameRequestId = default(string), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.CreateNewGameByRequestWithHttpMessagesAsync(gameRequestId, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Retrieves all currently running games for the authenticated player
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            public static IList<GameInfo> GetGames(this IWikidataGameAPI operations)
+            {
+                return operations.GetGamesAsync().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves all currently running games for the authenticated player
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<IList<GameInfo>> GetGamesAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetGamesWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -63,18 +400,12 @@ namespace WikidataGame
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='mapWidth'>
-            /// Width of generated map
+            /// <param name='withAiOpponent'>
+            /// Set to true, to match up with an AI opponent
             /// </param>
-            /// <param name='mapHeight'>
-            /// Height of generated map
-            /// </param>
-            /// <param name='accessibleTilesCount'>
-            /// How many accessible tiles the generated map should contain.
-            /// </param>
-            public static GameInfo CreateNewGame(this IWikidataGameAPI operations, int? mapWidth = 10, int? mapHeight = 10, int? accessibleTilesCount = 70)
+            public static GameInfo CreateNewGame(this IWikidataGameAPI operations, bool? withAiOpponent = false)
             {
-                return operations.CreateNewGameAsync(mapWidth, mapHeight, accessibleTilesCount).GetAwaiter().GetResult();
+                return operations.CreateNewGameAsync(withAiOpponent).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -83,21 +414,15 @@ namespace WikidataGame
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='mapWidth'>
-            /// Width of generated map
-            /// </param>
-            /// <param name='mapHeight'>
-            /// Height of generated map
-            /// </param>
-            /// <param name='accessibleTilesCount'>
-            /// How many accessible tiles the generated map should contain.
+            /// <param name='withAiOpponent'>
+            /// Set to true, to match up with an AI opponent
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<GameInfo> CreateNewGameAsync(this IWikidataGameAPI operations, int? mapWidth = 10, int? mapHeight = 10, int? accessibleTilesCount = 70, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<GameInfo> CreateNewGameAsync(this IWikidataGameAPI operations, bool? withAiOpponent = false, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.CreateNewGameWithHttpMessagesAsync(mapWidth, mapHeight, accessibleTilesCount, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.CreateNewGameWithHttpMessagesAsync(withAiOpponent, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -292,6 +617,305 @@ namespace WikidataGame
                 {
                     return _result.Body;
                 }
+            }
+
+            /// <summary>
+            /// Retrieves statistics containing the number of categories, games played and
+            /// questions added
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            public static PlatformStats GetPlatformStats(this IWikidataGameAPI operations)
+            {
+                return operations.GetPlatformStatsAsync().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves statistics containing the number of categories, games played and
+            /// questions added
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<PlatformStats> GetPlatformStatsAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetPlatformStatsWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Retrieves detailed information on a bygone minigame by id
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='minigameId'>
+            /// minigame identifier
+            /// </param>
+            public static DetailedMiniGame GetPlatformMinigameById(this IWikidataGameAPI operations, string minigameId)
+            {
+                return operations.GetPlatformMinigameByIdAsync(minigameId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves detailed information on a bygone minigame by id
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='minigameId'>
+            /// minigame identifier
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<DetailedMiniGame> GetPlatformMinigameByIdAsync(this IWikidataGameAPI operations, string minigameId, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetPlatformMinigameByIdWithHttpMessagesAsync(minigameId, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Retrieves a list of all available questions
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            public static IList<Question> GetPlatformQuestions(this IWikidataGameAPI operations)
+            {
+                return operations.GetPlatformQuestionsAsync().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves a list of all available questions
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<IList<Question>> GetPlatformQuestionsAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetPlatformQuestionsWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Adds the specified question to the question catalogue (with status pending)
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='question'>
+            /// question to add
+            /// </param>
+            public static Question AddPlatformQuestion(this IWikidataGameAPI operations, Question question = default(Question))
+            {
+                return operations.AddPlatformQuestionAsync(question).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Adds the specified question to the question catalogue (with status pending)
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='question'>
+            /// question to add
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<Question> AddPlatformQuestionAsync(this IWikidataGameAPI operations, Question question = default(Question), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.AddPlatformQuestionWithHttpMessagesAsync(question, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Adds a rating for the specified question
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='questionId'>
+            /// question identifier
+            /// </param>
+            /// <param name='rating'>
+            /// rating (1-5)
+            /// </param>
+            public static Question AddPlatformQuestionRating(this IWikidataGameAPI operations, string questionId, int rating)
+            {
+                return operations.AddPlatformQuestionRatingAsync(questionId, rating).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Adds a rating for the specified question
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='questionId'>
+            /// question identifier
+            /// </param>
+            /// <param name='rating'>
+            /// rating (1-5)
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<Question> AddPlatformQuestionRatingAsync(this IWikidataGameAPI operations, string questionId, int rating, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.AddPlatformQuestionRatingWithHttpMessagesAsync(questionId, rating, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Retrieves a list of all available categories
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            public static IList<Category> GetPlatformCategories(this IWikidataGameAPI operations)
+            {
+                return operations.GetPlatformCategoriesAsync().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves a list of all available categories
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<IList<Category>> GetPlatformCategoriesAsync(this IWikidataGameAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetPlatformCategoriesWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Creates a new report for mistakes/errors within a minigame
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='report'>
+            /// Report to be created
+            /// </param>
+            public static Report AddPlatformReport(this IWikidataGameAPI operations, Report report = default(Report))
+            {
+                return operations.AddPlatformReportAsync(report).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Creates a new report for mistakes/errors within a minigame
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='report'>
+            /// Report to be created
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<Report> AddPlatformReportAsync(this IWikidataGameAPI operations, Report report = default(Report), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.AddPlatformReportWithHttpMessagesAsync(report, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Retrieves information for the specified commons image url
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='imageUrl'>
+            /// commons FilePath url
+            /// </param>
+            public static CommonsImageInfo PlatformRetrieveLicense(this IWikidataGameAPI operations, string imageUrl = default(string))
+            {
+                return operations.PlatformRetrieveLicenseAsync(imageUrl).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves information for the specified commons image url
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='imageUrl'>
+            /// commons FilePath url
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<CommonsImageInfo> PlatformRetrieveLicenseAsync(this IWikidataGameAPI operations, string imageUrl = default(string), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.PlatformRetrieveLicenseWithHttpMessagesAsync(imageUrl, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Automatic OAuth flow
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='code'>
+            /// GitHub code for authorization
+            /// </param>
+            /// <param name='sourceUrl'>
+            /// Source url for frontend
+            /// </param>
+            public static void AuthenticatePlatformWithGitHub(this IWikidataGameAPI operations, string code = default(string), string sourceUrl = default(string))
+            {
+                operations.AuthenticatePlatformWithGitHubAsync(code, sourceUrl).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Automatic OAuth flow
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='code'>
+            /// GitHub code for authorization
+            /// </param>
+            /// <param name='sourceUrl'>
+            /// Source url for frontend
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task AuthenticatePlatformWithGitHubAsync(this IWikidataGameAPI operations, string code = default(string), string sourceUrl = default(string), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                (await operations.AuthenticatePlatformWithGitHubWithHttpMessagesAsync(code, sourceUrl, null, cancellationToken).ConfigureAwait(false)).Dispose();
             }
 
     }

@@ -161,7 +161,7 @@ namespace WikidataGame.Backend.Controllers
             while(game.NextMovePlayerId == DatabaseSeeds.BotGuid) //Bot turn
             {
                 BotTurn(game, ccs);
-                await FinalizeMove(gameRepo, notificationService, user, gameId);
+                await FinalizeMove(gameRepo, notificationService, await userManager.FindByIdAsync(DatabaseSeeds.BotGuid.ToString()), gameId);
                 await dataContext.SaveChangesAsync();
             }
 

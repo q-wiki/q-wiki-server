@@ -14,7 +14,7 @@ namespace WikidataGame.Backend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
@@ -426,7 +426,7 @@ namespace WikidataGame.Backend.Migrations
                               LIMIT 1
                             } AS %oneState
                             WITH {
-                              SELECT ?state ?empty WHERE {
+                              SELECT DISTINCT ?state ?empty WHERE {
                                 INCLUDE %states.
                                 FILTER NOT EXISTS { INCLUDE %selectedContinent. }
                               } ORDER BY MD5(CONCAT(STR(?state), STR(NOW()))) # order by random
@@ -1946,13 +1946,483 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                             MiniGameType = 2,
                             SparqlQuery = @"
-                            SELECT DISTINCT ?question ?item (?name as ?answer)
+                            # which of these species is {endangered || heavily endangered} ?
+                            SELECT DISTINCT ?question (?name as ?answer)
+
+                            #seperated animals in variables befor unionizing for performance/quicker response
 
                             WITH{
                                 SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', ')) as ?name)
                                 WHERE{
-                                  ?item wdt:P171* wd:Q5113.
+                                  #artiadactyl
+                                  {?item wdt:P171* wd:Q25329.}
+                                  UNION
+                                  #rodents
+                                  {?item wdt:P171* wd:Q10850.}
+                                  UNION
+                                  {?item wdt:p171* wd:Q25306}
                                   ?item wdt:P1843 ?name.
+                                  filter(lang(?name) = 'en').
+                                   FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                     ?item wdt:P171* wd:Q23038290
+                                   }
+                                }
+                              GROUP BY ?item
+                              ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                              LIMIT 800
+                            } as %allAnimals
+
+                            WITH {
+                              SELECT DISTINCT (GROUP_CONCAT(DISTINCT SAMPLE(?sLabel); SEPARATOR=', ') as ?status)  ?name
+                              WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?s.
+                                ?s wdt:P279 wd:Q515487.
+                                SERVICE wikibase:label { 
+                                 bd:serviceParam wikibase:language 'en'.
+                                  ?s  rdfs:label ?sLabel.
+                                } 
+                                ?s wdt:P279 wd:Q515487.
+                              } 
+                              GROUP BY ?name
+                            } as %endangered
+
+                            WITH {
+                              SELECT DISTINCT ?empty ?name WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?status.
+                                BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                        include %endangered.
+                                        BIND(lcase(?name) as ?caseName)
+                                      }
+                                    }
+                                } 
+                                VALUES ?status {wd:Q211005}.
+                              } 
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 3
+                            } as %noproblem
+
+                            WITH{
+                              SELECT *
+                              WHERE{
+                                include %endangered 
+                              }
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 1
+                            } as %selectedSpecies
+
+                            WHERE {
+                              {INCLUDE %selectedSpecies} 
+                               UNION 
+                              {INCLUDE %noproblem}
+                              SERVICE wikibase:label { 
+                                bd:serviceParam wikibase:language 'en'.
+                                ?item  rdfs:label ?itemLabel.
+                                ?status rdfs:label ?question.
+                              } 
+                             } ORDER BY DESC(?question)
+                            ",
+                            Status = 2,
+                            TaskDescription = "Which species is {0}?"
+                        },
+                        new
+                        {
+                            Id = new Guid("b3778c74-3284-4518-a8f0-deea5a2b8363"),
+                            CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
+                            MiniGameType = 2,
+                            SparqlQuery = @"
+                            # which of these species is {endangered || heavily endangered} ?
+                            SELECT DISTINCT ?question (?name as ?answer)
+
+                            #seperated animals in variables befor unionizing for performance/quicker response
+
+                            WITH{
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', ')) as ?name)
+                                WHERE{
+                                  #artiadactyl
+                                  {?item wdt:P171* wd:Q25329.}
+                                  UNION
+                                  #primates
+                                  {?item wdt:P171* wd:Q7380.}
+                                  UNION
+                                  #marsupials
+                                  {?item wdt:p171* wd:Q25336}
+                                  ?item wdt:P1843 ?name.
+                                  filter(lang(?name) = 'en').
+                                   FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                     ?item wdt:P171* wd:Q23038290
+                                   }
+                                }
+                              GROUP BY ?item
+                              ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                              #LIMIT 800
+                            } as %allAnimals
+
+                            WITH {
+                              SELECT DISTINCT (GROUP_CONCAT(DISTINCT SAMPLE(?sLabel); SEPARATOR=', ') as ?status)  ?name
+                              WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?s.
+                                ?s wdt:P279 wd:Q515487.
+                                SERVICE wikibase:label { 
+                                 bd:serviceParam wikibase:language 'en'.
+                                  ?s  rdfs:label ?sLabel.
+                                } 
+                                ?s wdt:P279 wd:Q515487.
+                              } 
+                              GROUP BY ?name
+                            } as %endangered
+
+                            WITH {
+                              SELECT DISTINCT ?empty ?name WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?status.
+                                BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                        include %endangered.
+                                        BIND(lcase(?name) as ?caseName)
+                                      }
+                                    }
+                                } 
+                                VALUES ?status {wd:Q211005}.
+                              } 
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 3
+                            } as %noproblem
+
+                            WITH{
+                              SELECT *
+                              WHERE{
+                                include %endangered 
+                              }
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 1
+                            } as %selectedSpecies
+
+                            WHERE {
+                              {INCLUDE %selectedSpecies} 
+                               UNION 
+                              {INCLUDE %noproblem}
+                              SERVICE wikibase:label { 
+                                bd:serviceParam wikibase:language 'en'.
+                                ?item  rdfs:label ?itemLabel.
+                                ?status rdfs:label ?question.
+                              } 
+                             } ORDER BY DESC(?question)
+                            ",
+                            Status = 2,
+                            TaskDescription = "Which species is {0}?"
+                        },
+                        new
+                        {
+                            Id = new Guid("428ac495-541e-48a9-82a2-f94a503a4f26"),
+                            CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
+                            MiniGameType = 2,
+                            SparqlQuery = @"
+                            # which of these species is {endangered || heavily endangered} ?
+                            SELECT DISTINCT ?question (?name as ?answer)
+
+                            #seperated animals in variables befor unionizing for performance/quicker response
+
+                            WITH{
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', ')) as ?name)
+                                WHERE{
+                                  #rodents
+                                  {?item wdt:P171* wd:Q10850.}
+                                  UNION
+                                  #carnivores
+                                  {?item wdt:P171* wd:Q25306.}
+                                  UNION
+                                  #marsupials
+                                  {?item wdt:p171* wd:Q25336}
+                                  ?item wdt:P1843 ?name.
+                                  filter(lang(?name) = 'en').
+                                   FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                     ?item wdt:P171* wd:Q23038290
+                                   }
+                                }
+                              GROUP BY ?item
+                              ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                              #LIMIT 800
+                            } as %allAnimals
+
+                            WITH {
+                              SELECT DISTINCT (GROUP_CONCAT(DISTINCT SAMPLE(?sLabel); SEPARATOR=', ') as ?status)  ?name
+                              WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?s.
+                                ?s wdt:P279 wd:Q515487.
+                                SERVICE wikibase:label { 
+                                 bd:serviceParam wikibase:language 'en'.
+                                  ?s  rdfs:label ?sLabel.
+                                } 
+                                ?s wdt:P279 wd:Q515487.
+                              } 
+                              GROUP BY ?name
+                            } as %endangered
+
+                            WITH {
+                              SELECT DISTINCT ?empty ?name WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?status.
+                                BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                        include %endangered.
+                                        BIND(lcase(?name) as ?caseName)
+                                      }
+                                    }
+                                } 
+                                VALUES ?status {wd:Q211005}.
+                              } 
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 3
+                            } as %noproblem
+
+                            WITH{
+                              SELECT *
+                              WHERE{
+                                include %endangered 
+                              }
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 1
+                            } as %selectedSpecies
+
+                            WHERE {
+                              {INCLUDE %selectedSpecies} 
+                               UNION 
+                              {INCLUDE %noproblem}
+                              SERVICE wikibase:label { 
+                                bd:serviceParam wikibase:language 'en'.
+                                ?item  rdfs:label ?itemLabel.
+                                ?status rdfs:label ?question.
+                              } 
+                             } ORDER BY DESC(?question)
+                            ",
+                            Status = 2,
+                            TaskDescription = "Which species is {0}?"
+                        },
+                        new
+                        {
+                            Id = new Guid("d15f9f1c-9433-4964-a5e3-4e69ed0b45a9"),
+                            CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
+                            MiniGameType = 2,
+                            SparqlQuery = @"
+                           # which of these species is {endangered || heavily endangered} ?
+                            SELECT DISTINCT ?question (?name as ?answer)
+
+                            #seperated animals in variables befor unionizing for performance/quicker response
+
+                            WITH{
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', ')) as ?name)
+                                WHERE{
+                                  #artiodactyla
+                                  {?item wdt:P171* wd:Q25329.}
+                                  UNION
+                                  #carnivores
+                                  {?item wdt:P171* wd:Q25306.}
+                                  UNION
+                                  #primates
+                                  {?item wdt:p171* wd:Q7380}
+                                  ?item wdt:P1843 ?name.
+                                  filter(lang(?name) = 'en').
+                                   FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                     ?item wdt:P171* wd:Q23038290
+                                   }
+                                }
+                              GROUP BY ?item
+                              ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                              #LIMIT 800
+                            } as %allAnimals
+
+                            WITH {
+                              SELECT DISTINCT (GROUP_CONCAT(DISTINCT SAMPLE(?sLabel); SEPARATOR=', ') as ?status)  ?name
+                              WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?s.
+                                ?s wdt:P279 wd:Q515487.
+                                SERVICE wikibase:label { 
+                                 bd:serviceParam wikibase:language 'en'.
+                                  ?s  rdfs:label ?sLabel.
+                                } 
+                                ?s wdt:P279 wd:Q515487.
+                              } 
+                              GROUP BY ?name
+                            } as %endangered
+
+                            WITH {
+                              SELECT DISTINCT ?empty ?name WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?status.
+                                BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                        include %endangered.
+                                        BIND(lcase(?name) as ?caseName)
+                                      }
+                                    }
+                                } 
+                                VALUES ?status {wd:Q211005}.
+                              } 
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 3
+                            } as %noproblem
+
+                            WITH{
+                              SELECT *
+                              WHERE{
+                                include %endangered 
+                              }
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 1
+                            } as %selectedSpecies
+
+                            WHERE {
+                              {INCLUDE %selectedSpecies} 
+                               UNION 
+                              {INCLUDE %noproblem}
+                              SERVICE wikibase:label { 
+                                bd:serviceParam wikibase:language 'en'.
+                                ?item  rdfs:label ?itemLabel.
+                                ?status rdfs:label ?question.
+                              } 
+                             } ORDER BY DESC(?question)
+                            ",
+                            Status = 2,
+                            TaskDescription = "Which species is {0}?"
+                        },
+                        new
+                        {
+                            Id = new Guid("5abd274b-0826-4a30-832b-9e072a2cd0a4"),
+                            CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
+                            MiniGameType = 2,
+                            SparqlQuery = @"
+                            # which of these species is {endangered || heavily endangered} ?
+                            SELECT DISTINCT ?question (?name as ?answer)
+
+                            #seperated animals in variables befor unionizing for performance/quicker response
+
+                            WITH{
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', ')) as ?name)
+                                WHERE{
+                                  #artiodactyla
+                                  {?item wdt:P171* wd:Q25329.}
+                                  UNION
+                                  #carnivores
+                                  {?item wdt:P171* wd:Q25306.}
+                                  UNION
+                                  #primates
+                                  {?item wdt:p171* wd:Q7380}
+                                  ?item wdt:P1843 ?name.
+                                  filter(lang(?name) = 'en').
+                                   FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                     ?item wdt:P171* wd:Q23038290
+                                   }
+                                }
+                              GROUP BY ?item
+                              ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                              #LIMIT 800
+                            } as %allAnimals
+
+                            WITH {
+                              SELECT DISTINCT (GROUP_CONCAT(DISTINCT SAMPLE(?sLabel); SEPARATOR=', ') as ?status)  ?name
+                              WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?s.
+                                ?s wdt:P279 wd:Q515487.
+                                SERVICE wikibase:label { 
+                                 bd:serviceParam wikibase:language 'en'.
+                                  ?s  rdfs:label ?sLabel.
+                                } 
+                                ?s wdt:P279 wd:Q515487.
+                              } 
+                              GROUP BY ?name
+                            } as %endangered
+
+                            WITH {
+                              SELECT DISTINCT ?empty ?name WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?status.
+                                BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                        include %endangered.
+                                        BIND(lcase(?name) as ?caseName)
+                                      }
+                                    }
+                                } 
+                                VALUES ?status {wd:Q211005}.
+                              } 
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 3
+                            } as %noproblem
+
+                            WITH{
+                              SELECT *
+                              WHERE{
+                                include %endangered 
+                              }
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 1
+                            } as %selectedSpecies
+
+                            WHERE {
+                              {INCLUDE %selectedSpecies} 
+                               UNION 
+                              {INCLUDE %noproblem}
+                              SERVICE wikibase:label { 
+                                bd:serviceParam wikibase:language 'en'.
+                                ?item  rdfs:label ?itemLabel.
+                                ?status rdfs:label ?question.
+                              } 
+                             } ORDER BY DESC(?question)
+                            ",
+                            Status = 2,
+                            TaskDescription = "Which species is {0}?"
+                        },
+                        new
+                        {
+                            Id = new Guid("5ab7c050-06c1-4307-b100-32237f5c0429"),
+                            CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
+                            GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
+                            MiniGameType = 2,
+                            SparqlQuery = @"
+                           SELECT DISTINCT ?question (?name as ?answer)
+
+                            WITH{
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', ')) as ?name)
+                                WHERE{
+                                  {?item wdt:P171* wd:Q21736.}
+                                  UNION
+                                  {?item wdt:P171* wd:Q853058.}
+                                  UNION
+                                  {?item wdt:P171* wd:Q31431}
+      
+                                  ?item wdt:P1843 ?name.
+                                  ?item wdt:P141 ?status.
                                   filter(lang(?name) = 'en').
                                    FILTER NOT EXISTS{
                                      ?item wdt:P141 wd:Q237350.
@@ -1963,103 +2433,146 @@ namespace WikidataGame.Backend.Migrations
                             } as %allBirds
 
                             WITH {
-                              SELECT DISTINCT ?item ?status ?name WHERE {
+                              SELECT DISTINCT (GROUP_CONCAT(DISTINCT SAMPLE(?sLabel); SEPARATOR=', ') as ?status) ?name WHERE {
                                 {Include %allBirds}
-                                ?item wdt:P141 ?status.
-                                ?status wdt:P279 wd:Q515487.
-                              } ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) LIMIT 1
+                                ?item wdt:P141 ?s.
+                                ?s wdt:P279 wd:Q515487.
+                                SERVICE wikibase:label { 
+                                bd:serviceParam wikibase:language 'en'.
+                                  ?s  rdfs:label ?sLabel.
+                                } 
+                                ?s wdt:P279 wd:Q515487.
+                              } 
+                              group by ?name
                             } as %endangered
+
                             WITH {
                               SELECT DISTINCT ?empty ?name WHERE {
                                 {Include %allBirds}
                                 ?item wdt:P141 ?status.
-                                SERVICE wikibase:label { 
-                                bd:serviceParam wikibase:language 'en'.} 
+                                #filter common names across multiple species that might be endangered
+                                BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                      include %endangered.
+                                      BIND(lcase(?name) as ?caseName)}
+                                    }
+                                }
                                 VALUES ?status {wd:Q211005}.
                               } 
-                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) LIMIT 3
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
+                              LIMIT 3
                             } as %noproblem
 
+                            WITH{
+                              select * 
+                              where{
+                                 include %endangered
+                              }
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
+                              LIMIT 1
+                            } as %selectedSpecies
+
                             WHERE {
-                              {INCLUDE %endangered} UNION {INCLUDE %noproblem}
-          
-                              SERVICE wikibase:label { 
-                                bd:serviceParam wikibase:language 'en'.
-                                ?item  rdfs:label ?itemLabel.
-                                ?status rdfs:label ?question.
-                              } 
+                              {INCLUDE %selectedSpecies} UNION {INCLUDE %noproblem}
+                              BIND(?status as ?question)
                              } ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Which animal is {0}?"
+                            TaskDescription = "Which species is {0}?"
                         },
                         new
                         {
-                            Id = new Guid("b3778c74-3284-4518-a8f0-deea5a2b8363"),
+                            Id = new Guid("b5f2a986-4f0d-43e2-9f73-9fc22e76c2ab"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
                             GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                             MiniGameType = 2,
                             SparqlQuery = @"
-                           SELECT DISTINCT ?question ?item (?name as ?answer)
-                                WITH{
-                                    SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', ')) as ?name)
-                                    WHERE{
-                                      ?item wdt:P171* wd:Q10908.
-                                      ?item wdt:P1843 ?name.
-                                      filter(lang(?name) = 'en').
-                                       FILTER NOT EXISTS{
-                                         ?item wdt:P141 wd:Q237350.
-                                         ?item wdt:P171* wd:Q23038290
-                                       }
+                            SELECT DISTINCT ?question (?name as ?answer)
+
+                            WITH{
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(STR(?name)); SEPARATOR=', ')) as ?name)
+                                WHERE{
+                                  ?item wdt:P171* wd:Q10908.
+                                  ?item wdt:P1843 ?name.
+                                  filter(lang(?name) = 'en').
+                                   FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                     ?item wdt:P171* wd:Q23038290
+                                   }
+                                }
+                              GROUP BY ?item
+                              LIMIT 800
+                            } as %allAmphibia
+
+                            WITH {
+                              SELECT DISTINCT (GROUP_CONCAT(DISTINCT SAMPLE(?sLabel); SEPARATOR=', ') as ?status) ?name WHERE {
+                                {Include %allAmphibia}
+                                ?item wdt:P141 ?s.
+                                ?s wdt:P279 wd:Q515487.
+                                SERVICE wikibase:label { 
+                                bd:serviceParam wikibase:language 'en'.
+                                ?s  rdfs:label ?sLabel.
+                                } 
+                                ?status wdt:P279 wd:Q515487.
+                              }
+                              group by ?name
+                            } as %endangered
+
+                            WITH {
+                              SELECT DISTINCT ?name WHERE {
+                                {Include %allAmphibia}
+                                BIND(lcase(?name) as ?caseName)
+                                #filter common names across multiple species that might be endangered
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                      include %endangered.
+                                      BIND(lcase(?name) as ?caseName)}
                                     }
-                                  GROUP BY ?item
-                                } as %allAmphibia
+                                }
+                                ?item wdt:P141 ?status.
+                                VALUES ?status {wd:Q211005}.
+                              } 
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
+                              LIMIT 3
+                            } as %noProblem
 
-                                WITH {
-                                  SELECT DISTINCT ?item ?status ?name WHERE {
-                                    {Include %allAmphibia}
-                                    ?item wdt:P141 ?status.
-                                    ?status wdt:P279 wd:Q515487.
-                                  } ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) LIMIT 1
-                                } as %endangered
-                                WITH {
-                                  SELECT DISTINCT ?empty ?name WHERE {
-                                    {Include %allAmphibia}
-                                    ?item wdt:P141 ?status.
-                                    SERVICE wikibase:label { 
-                                    bd:serviceParam wikibase:language 'en'.} 
-                                    VALUES ?status {wd:Q211005}.
-                                  } 
-                                  ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) LIMIT 3
-                                } as %noproblem
+                            WITH{
+                              SELECT *
+                              WHERE{
+                                include %endangered.
+                              }
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
+                              LIMIT 1
+                            } as %selectedSpecies
 
-                                WHERE {
-                                  {INCLUDE %endangered} UNION {INCLUDE %noproblem}
-          
-                                  SERVICE wikibase:label { 
-                                    bd:serviceParam wikibase:language 'en'.
-                                    ?item  rdfs:label ?itemLabel.
-                                    ?status rdfs:label ?question.
-                                  } 
-                                 } ORDER BY DESC(?question)
+                            WHERE {
+                              {INCLUDE %selectedSpecies} UNION {INCLUDE %noProblem}
+                              BIND(?status as ?question)
+                             } ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Which animal is {0}?"
+                            TaskDescription = "Which species is {0}?"
                         },
                         new
                         {
-                            Id = new Guid("428ac495-541e-48a9-82a2-f94a503a4f26"),
+                            Id = new Guid("50120520-4441-48c1-b387-1c923a038194"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
                             GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                             MiniGameType = 2,
                             SparqlQuery = @"
-                           SELECT DISTINCT ?question ?item (?name as ?answer)
+                              SELECT DISTINCT ?question (?name as ?answer)
 
                                 WITH{
                                     SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', ')) as ?name)
                                     WHERE{
                                       ?item wdt:P171* wd:Q122422.
                                       ?item wdt:P1843 ?name.
+                                      ?item wdt:P141 ?status.
                                       filter(lang(?name) = 'en').
                                        FILTER NOT EXISTS{
                                          ?item wdt:P141 wd:Q237350.
@@ -2067,28 +2580,54 @@ namespace WikidataGame.Backend.Migrations
                                        }
                                     }
                                   GROUP BY ?item
+                                  LIMIT 200
                                 } as %allReptiles
 
                                 WITH {
-                                  SELECT DISTINCT ?item ?status ?name WHERE {
+                                  SELECT DISTINCT (GROUP_CONCAT(DISTINCT SAMPLE(?sLabel); SEPARATOR=', ') as ?status) ?name WHERE {
                                     {Include %allReptiles}
-                                    ?item wdt:P141 ?status.
-                                    ?status wdt:P279 wd:Q515487.
-                                  } ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) LIMIT 1
+                                    ?item wdt:P141 ?s.
+                                    ?s wdt:P279 wd:Q515487.
+                                    SERVICE wikibase:label { 
+                                    bd:serviceParam wikibase:language 'en'.
+                                      ?s  rdfs:label ?sLabel.
+                                    } 
+                                    ?s wdt:P279 wd:Q515487.
+                                  } 
+                                   group by ?name
                                 } as %endangered
+
                                 WITH {
                                   SELECT DISTINCT ?empty ?name WHERE {
                                     {Include %allReptiles}
                                     ?item wdt:P141 ?status.
-                                    SERVICE wikibase:label { 
-                                    bd:serviceParam wikibase:language 'en'.} 
-                                    VALUES ?status {wd:Q211005}.
-                                  } 
-                                  ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) LIMIT 3
-                                } as %noproblem
+                                    BIND(lcase(?name) as ?caseName)
+                                    FILTER NOT EXISTS{
+                                        {
+                                          select ?caseName
+                                          where{
+                                            include %endangered.
+                                            BIND(lcase(?name) as ?caseName)
+                                          }
+                                        }
+                                      } 
+                                      VALUES ?status {wd:Q211005}.
+                                    }
+                                  ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                                  LIMIT 3
+                                } as %noProblem
+
+                                WITH{
+                                  SELECT *
+                                  WHERE{
+                                    include %endangered 
+                                  }
+                                  ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                                  LIMIT 1
+                                } as %selectedSpecies
 
                                 WHERE {
-                                  {INCLUDE %endangered} UNION {INCLUDE %noproblem}
+                                  {INCLUDE %selectedSpecies} UNION {INCLUDE %noProblem}
           
                                   SERVICE wikibase:label { 
                                     bd:serviceParam wikibase:language 'en'.
@@ -2098,450 +2637,87 @@ namespace WikidataGame.Backend.Migrations
                                  } ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Which animal is {0}?"
+                            TaskDescription = "Which species is {0}?"
                         },
                         new
                         {
-                            Id = new Guid("d15f9f1c-9433-4964-a5e3-4e69ed0b45a9"),
+                            Id = new Guid("025286ac-d6d1-4e9f-954c-f659e83d7d6d"),
                             CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
                             GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                             MiniGameType = 2,
                             SparqlQuery = @"
-                           SELECT DISTINCT ?question ?item (?name as ?answer)
+                                SELECT DISTINCT ?question (?name as ?answer)
 
                                 WITH{
                                     SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', ')) as ?name)
                                     WHERE{
-                                      ?item wdt:P171* wd:Q127282.
+                                      {?item wdt:P171* wd:Q150760.}
+                                      UNION
+                                      {?item wdt:P171* wd:Q840552}
                                       ?item wdt:P1843 ?name.
                                       filter(lang(?name) = 'en').
-                                       FILTER NOT EXISTS{
+                                      ?item wdt:P141 ?status.
+                                      FILTER NOT EXISTS{
                                          ?item wdt:P141 wd:Q237350.
                                          ?item wdt:P171* wd:Q23038290
-                                       }
+                                      }
                                     }
                                   GROUP BY ?item
+                                  ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                                  LIMIT 800
                                 } as %allFishes
 
                                 WITH {
-                                  SELECT DISTINCT ?item ?status ?name WHERE {
+                                  SELECT DISTINCT (GROUP_CONCAT(DISTINCT SAMPLE(?sLabel); SEPARATOR=', ') as ?status) ?name WHERE {
                                     {Include %allFishes}
-                                    ?item wdt:P141 ?status.
-                                    ?status wdt:P279 wd:Q515487.
-                                  } ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) LIMIT 1
+                                    ?item wdt:P141 ?s.
+                                    ?s wdt:P279 wd:Q515487.
+                                    SERVICE wikibase:label { 
+                                    bd:serviceParam wikibase:language 'en'.
+                                      ?s  rdfs:label ?sLabel.
+                                    } 
+                                    ?s wdt:P279 wd:Q515487.
+                                  } 
+                                  group by ?name
                                 } as %endangered
+
                                 WITH {
                                   SELECT DISTINCT ?empty ?name WHERE {
                                     {Include %allFishes}
-                                    ?item wdt:P141 ?status.
-                                    SERVICE wikibase:label { 
-                                    bd:serviceParam wikibase:language 'en'.} 
-                                    VALUES ?status {wd:Q211005}.
+                                    BIND(lcase(?name) as ?caseName)
+                                    FILTER NOT EXISTS{
+                                        {
+                                          select ?caseName
+                                          where{
+                                            include %endangered.
+                                            BIND(lcase(?name) as ?caseName)
+                                          }
+                                        }
+                                      } 
                                   } 
                                   ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) LIMIT 3
                                 } as %noproblem
 
+                                WITH{
+                                  SELECT *
+                                  WHERE{
+                                    include %endangered 
+                                  }
+                                  ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                                  LIMIT 1
+                                } as %selectedSpecies
+
                                 WHERE {
-                                  {INCLUDE %endangered} UNION {INCLUDE %noproblem}
+                                  {INCLUDE %selectedSpecies} UNION {INCLUDE %noproblem}
           
                                   SERVICE wikibase:label { 
                                     bd:serviceParam wikibase:language 'en'.
-                                    ?item  rdfs:label ?itemLabel.
                                     ?status rdfs:label ?question.
                                   } 
                                  } ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Which animal is {0}?"
-                        },
-                        new
-                        {
-                            Id = new Guid("5ab7c050-06c1-4307-b100-32237f5c0429"),
-                            CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
-                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                            MiniGameType = 1,
-                            SparqlQuery = @"
-                            # This query includes: artiodactyla, primates, marsupials
-                            SELECT DISTINCT ?question (?name as ?answer)
-                            #seperated animals in variables befor unionizing for performance/quicker response
-                            WITH{
-                                SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                                WHERE{
-                                  ?item wdt:P171* wd:Q25336;
-                                        wdt:P1843 ?name;
-                                        wdt:P141 wd:Q211005;
-                                        wdt:P18 ?image.
-                                   FILTER NOT EXISTS{
-                                     ?item wdt:P141 wd:Q237350.
-                                     ?item wdt:P171* wd:Q23038290
-                                   }
-                                  filter(lang(?name) = 'en').
-                                }
-                              GROUP BY ?item
-                            } as %allMarsupials
-
-                            WITH{
-                                SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                                WHERE{
-                                  ?item wdt:P171* wd:Q7380;
-                                        wdt:P1843 ?name;
-                                        wdt:P141 wd:Q211005;
-                                        wdt:P18 ?image.
-                                   FILTER NOT EXISTS{
-                                     ?item wdt:P141 wd:Q237350.
-                                     ?item wdt:P171* wd:Q23038290
-                                   }
-                                  filter(lang(?name) = 'en').
-                                }
-                              GROUP BY ?item
-                            } as %allPrimates
-
-                            WITH{
-                                SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                                WHERE{
-                                  ?item wdt:P171* wd:Q25329;
-                                        wdt:P1843 ?name;
-                                        wdt:P141 wd:Q211005;
-                                        wdt:P18 ?image.
-                                   FILTER NOT EXISTS{
-                                     ?item wdt:P141 wd:Q237350.
-                                     ?item wdt:P171* wd:Q23038290
-                                   }
-                                  filter(lang(?name) = 'en').
-                                }
-                              GROUP BY ?item
-                            } as %allArtiodactyla
-
-                            WITH{
-                             SELECT *
-                              WHERE{
-                                {include %allMarsupials}
-                                UNION
-                                {include %allPrimates}
-                                UNION 
-                                {include %allArtiodactyla}
-                              }
-                              ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                            } as %allAnimals
-
-
-                            WITH {
-                              SELECT DISTINCT ?image ?name WHERE {
-                                {Include %allAnimals}
-                              }  
-                                ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                              LIMIT 1
-                            } as %selectedAnimal
-
-                            WITH {
-                              SELECT DISTINCT ?name WHERE {
-                                {Include %allAnimals}
-                                FILTER NOT EXISTS{Include %selectedAnimal}
-                              } 
-                              LIMIT 3
-                            } as %decoyAnimals
-
-                            WHERE {
-                               {INCLUDE %selectedAnimal} 
-                               UNION 
-                               {INCLUDE %decoyAnimals}       
-                               BIND(?image as ?question)
-                             } ORDER BY DESC(?question)
-                            ",
-                            Status = 2,
-                            TaskDescription = "Which animal is this?"
-                        },
-                        new
-                        {
-                            Id = new Guid("b5f2a986-4f0d-43e2-9f73-9fc22e76c2ab"),
-                            CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
-                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                            MiniGameType = 1,
-                            SparqlQuery = @"
-                            # This query includes: rodentia, carnivora, marsupial
-                            SELECT DISTINCT ?question (?name as ?answer)
-
-                            #seperated animals in variables befor unionizing for performance/quicker response
-                            WITH{
-                                SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                                WHERE{
-                                  ?item wdt:P171* wd:Q10850;
-                                        wdt:P1843 ?name;
-                                        wdt:P141 wd:Q211005;
-                                        wdt:P18 ?image.
-                                   FILTER NOT EXISTS{
-                                     ?item wdt:P141 wd:Q237350.
-                                     ?item wdt:P171* wd:Q23038290
-                                   }
-                                  filter(lang(?name) = 'en').
-                                }
-                              GROUP BY ?item
-                            } as %allRodentia
-
-                            WITH{
-                                SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                                WHERE{
-                                  ?item wdt:P171* wd:Q25306;
-                                        wdt:P1843 ?name;
-                                        wdt:P141 wd:Q211005;
-                                        wdt:P18 ?image.
-                                   FILTER NOT EXISTS{
-                                     ?item wdt:P141 wd:Q237350.
-                                     ?item wdt:P171* wd:Q23038290
-                                   }
-                                  filter(lang(?name) = 'en').
-                                }
-                              GROUP BY ?item
-                            } as %allCarnivora
-
-                            WITH{
-                                SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                                WHERE{
-                                  ?item wdt:P171* wd:Q25336;
-                                        wdt:P1843 ?name;
-                                        wdt:P141 wd:Q211005;
-                                        wdt:P18 ?image.
-                                   FILTER NOT EXISTS{
-                                     ?item wdt:P141 wd:Q237350.
-                                     ?item wdt:P171* wd:Q23038290
-                                   }
-                                  filter(lang(?name) = 'en').
-                                }
-                              GROUP BY ?item
-                            } as %allMarsupial
-
-                            WITH{
-                             SELECT *
-                              WHERE{
-                                 {include %allRodentia}
-                                 UNION
-                                {include %allCarnivora}
-                                UNION
-                                {include %allMarsupial}
-                              }
-                              ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                            } as %allAnimals
-
-
-                            WITH {
-                              SELECT DISTINCT ?image ?name WHERE {
-                                {Include %allAnimals}
-                              }  
-                              LIMIT 1
-                            } as %selectedAnimal
-
-                            WITH {
-                              SELECT DISTINCT ?name WHERE {
-                                {Include %allAnimals}
-                                FILTER NOT EXISTS{Include %selectedAnimal}
-                              } 
-                              LIMIT 3
-                            } as %decoyAnimals
-
-                            WHERE {
-                               {INCLUDE %selectedAnimal} 
-                               UNION 
-                               {INCLUDE %decoyAnimals}       
-                               BIND(?image as ?question)
-                             } ORDER BY DESC(?question)
-                            ",
-                            Status = 2,
-                            TaskDescription = "Which animal is this?"
-                        },
-                        new
-                        {
-                            Id = new Guid("50120520-4441-48c1-b387-1c923a038194"),
-                            CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
-                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                            MiniGameType = 1,
-                            SparqlQuery = @"
-                              # This query includes: carnivore, artiodactyla, primates
-                              SELECT DISTINCT ?question (?name as ?answer)
-                                #seperated animals in variables befor unionizing for performance/quicker response
-                                WITH{
-                                    SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                                    WHERE{
-                                      ?item wdt:P171* wd:Q10850;
-                                            wdt:P1843 ?name;
-                                            wdt:P141 wd:Q211005;
-                                            wdt:P18 ?image.
-                                       FILTER NOT EXISTS{
-                                         ?item wdt:P141 wd:Q237350.
-                                         ?item wdt:P171* wd:Q23038290
-                                       }
-                                      filter(lang(?name) = 'en').
-                                    }
-                                  GROUP BY ?item
-                                } as %allRodentia
-
-                                WITH{
-                                    SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                                    WHERE{
-                                      ?item wdt:P171* wd:Q7380;
-                                            wdt:P1843 ?name;
-                                            wdt:P141 wd:Q211005;
-                                            wdt:P18 ?image.
-                                       FILTER NOT EXISTS{
-                                         ?item wdt:P141 wd:Q237350.
-                                         ?item wdt:P171* wd:Q23038290
-                                       }
-                                      filter(lang(?name) = 'en').
-                                    }
-                                  GROUP BY ?item
-                                } as %allPrimates
-
-                                WITH{
-                                    SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                                    WHERE{
-                                      ?item wdt:P171* wd:Q25329;
-                                            wdt:P1843 ?name;
-                                            wdt:P141 wd:Q211005;
-                                            wdt:P18 ?image.
-                                       FILTER NOT EXISTS{
-                                         ?item wdt:P141 wd:Q237350.
-                                         ?item wdt:P171* wd:Q23038290
-                                       }
-                                      filter(lang(?name) = 'en').
-                                    }
-                                  GROUP BY ?item
-                                } as %allArtiodactyla
-
-                                WITH{
-                                 SELECT *
-                                  WHERE{
-                                    {include %allRodentia}
-                                    UNION
-                                    {include %allPrimates}
-                                    UNION 
-                                    {include %allArtiodactyla}
-                                  }
-                                  ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                                  Limit 4
-                                } as %allAnimals
-
-                                WITH {
-                                  SELECT DISTINCT ?image ?name WHERE {
-                                    {Include %allAnimals}
-                                  }  
-                                    ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                                  LIMIT 1
-                                } as %selectedAnimal
-
-                                WITH {
-                                  SELECT DISTINCT ?name WHERE {
-                                    {Include %allAnimals}
-                                    FILTER NOT EXISTS{Include %selectedAnimal}
-                                  } 
-                                  LIMIT 3
-                                } as %decoyAnimals
-
-                                WHERE {
-                                   {INCLUDE %selectedAnimal} 
-                                   UNION 
-                                   {INCLUDE %decoyAnimals}       
-                                   BIND(?image as ?question)
-                                 } ORDER BY DESC(?question)
-                            ",
-                            Status = 2,
-                            TaskDescription = "Which animal is this?"
-                        },
-                        new
-                        {
-                            Id = new Guid("5abd274b-0826-4a30-832b-9e072a2cd0a4"),
-                            CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
-                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                            MiniGameType = 1,
-                            SparqlQuery = @"
-                                # This query includes: primates + artiodactyla + rodentia
-                                SELECT DISTINCT ?question (?name as ?answer)
-
-                                #seperated animals in variables befor unionizing for performance/quicker response
-                                WITH{
-                                    SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                                    WHERE{
-                                      ?item wdt:P171* wd:Q7380;
-                                            wdt:P1843 ?name;
-                                            wdt:P141 wd:Q211005;
-                                            wdt:P18 ?image.
-                                       FILTER NOT EXISTS{
-                                         ?item wdt:P141 wd:Q237350.
-                                         ?item wdt:P171* wd:Q23038290
-                                       }
-                                      filter(lang(?name) = 'en').
-                                    }
-                                  GROUP BY ?item
-                                } as %allPrimates
-
-
-                                WITH{
-                                    SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                                    WHERE{
-                                      ?item wdt:P171* wd:Q25329;
-                                            wdt:P1843 ?name;
-                                            wdt:P141 wd:Q211005;
-                                            wdt:P18 ?image.
-                                       FILTER NOT EXISTS{
-                                         ?item wdt:P141 wd:Q237350.
-                                         ?item wdt:P171* wd:Q23038290
-                                       }
-                                      filter(lang(?name) = 'en').
-                                    }
-                                  GROUP BY ?item
-                                } as %allArtiodactyla
-
-                                WITH{
-                                    SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                                    WHERE{
-                                      ?item wdt:P171* wd:Q10850;
-                                            wdt:P1843 ?name;
-                                            wdt:P141 wd:Q211005;
-                                            wdt:P18 ?image.
-                                       FILTER NOT EXISTS{
-                                         ?item wdt:P141 wd:Q237350.
-                                         ?item wdt:P171* wd:Q23038290
-                                       }
-                                      filter(lang(?name) = 'en').
-                                    }
-                                  GROUP BY ?item
-                                } as %allRodents
-
-                                WITH{
-                                 SELECT *
-                                  WHERE{
-                                     {include %allPrimates}
-                                     UNION
-                                    {include %allRodents}
-                                    UNION
-                                    {include %allArtiodactyla}
-                                  }
-                                  ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                                } as %allAnimals
-
-
-                                WITH {
-                                  SELECT DISTINCT ?image ?name WHERE {
-                                    {Include %allAnimals}
-                                  }  
-                                  LIMIT 1
-                                } as %selectedAnimal
-
-                                WITH {
-                                  SELECT DISTINCT ?name WHERE {
-                                    {Include %allAnimals}
-                                    FILTER NOT EXISTS{Include %selectedAnimal}
-                                  } 
-                                  LIMIT 3
-                                } as %decoyAnimals
-
-                                WHERE {
-                                   {INCLUDE %selectedAnimal} 
-                                   UNION 
-                                   {INCLUDE %decoyAnimals}       
-                                   BIND(?image as ?question)
-                                 } ORDER BY DESC(?question)
-                            ",
-                            Status = 2,
-                            TaskDescription = "Which animal is this?"
+                            TaskDescription = "Which species is {0}?"
                         },
                         new
                         {
@@ -2550,43 +2726,69 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        SELECT DISTINCT ?question (?name as ?answer)
+                                # which of these species is {endangered || heavily endangered} ?
+                                SELECT DISTINCT ?question (?name as ?answer)
 
-                        #seperated animals in variables befor unionizing for performance/quicker response
-                        WITH{
-                            SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                            WHERE{
-                              ?item wdt:P171* wd:Q5113;
-                                    wdt:P1843 ?name;
-                                    wdt:P141 wd:Q211005;
-                                    wdt:P18 ?image.
-                              filter(lang(?name) = 'en').
-                            }
-                          GROUP BY ?item
-                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                          LIMIT 4
-                        } as %allBirds
+                                #seperated animals in variables befor unionizing for performance/quicker response
+                                WITH{
+                                    SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
+                                    WHERE{
+                                       {?item wdt:P171* wd:Q21736.}
+                                      UNION
+                                      {?item wdt:P171* wd:Q853058.}
+                                      UNION
+                                      {?item wdt:P171* wd:Q31431}
 
-                        WITH {
-                          SELECT DISTINCT ?image ?name WHERE {
-                            {Include %allBirds}
-                          }  
-                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                          LIMIT 1
-                        } as %selectedBird
+                                      ?item wdt:P18 ?image;
+                                            wdt:P1843 ?name;
+                                      filter(lang(?name) = 'en').
+                                      FILTER NOT EXISTS{
+                                         ?item wdt:P141 wd:Q237350.
+                                         ?item wdt:P171* wd:Q23038290
+                                       }
+                                    }
+                                  GROUP BY ?item
+                                } as %allBirds
 
-                        WITH {
-                          SELECT DISTINCT ?name WHERE {
-                            {Include %allBirds}
-                            FILTER NOT EXISTS{Include %selectedBird}
-                          } 
-                          LIMIT 3
-                        } as %decoyBirds
+                                WITH{
+                                    SELECT (GROUP_CONCAT(DISTINCT SAMPLE(?img); SEPARATOR=', ') as ?image) ?name
+                                    WHERE{
+                                      {include %allBirds}
+                                      ?item wdt:P18 ?img.
+                                    }
+                                  GROUP BY ?name
+                                } as %allImages
 
-                        WHERE {
-                           {INCLUDE %selectedBird} UNION {INCLUDE %decoyBirds}       
-                           BIND(?image as ?question)
-                         } ORDER BY DESC(?question)
+                                WITH {
+                                  SELECT DISTINCT ?image ?name WHERE {
+                                    {Include %allImages}
+                                  }  
+                                  ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                                  LIMIT 1
+                                } as %selectedBird
+
+                                WITH {
+                                  SELECT DISTINCT ?name WHERE {
+                                    {Include %allImages}
+                                     BIND(lcase(?name) as ?caseName)
+                                    FILTER NOT EXISTS{
+                                        {
+                                          select ?caseName
+                                          where{
+                                            include %selectedBird.
+                                            BIND(lcase(?name) as ?caseName)
+                                          }
+                                        }
+                                    } 
+                                  } 
+                                  ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                                  LIMIT 3
+                                } as %decoyBirds
+
+                                WHERE {
+                                  {INCLUDE %selectedBird} UNION {INCLUDE %decoyBirds}       
+                                   BIND(?image as ?question)
+                                 } ORDER BY DESC(?question)
                         ",
                             Status = 2,
                             TaskDescription = "Which animal is this?"
@@ -2598,44 +2800,69 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        SELECT DISTINCT ?question (?name as ?answer)
+                                # which of these species is {endangered || heavily endangered} ?
+                                SELECT DISTINCT ?question (?name as ?answer)
 
-                        #seperated animals in variables befor unionizing for performance/quicker response
-                        WITH{
-                            SELECT DISTINCT (SAMPLE(?image) as ?image) (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                            WHERE{
-                              ?item wdt:P171* wd:Q127282;
-                                    wdt:P1843 ?name;
-                                    wdt:P141 wd:Q211005;
-                                    wdt:P18 ?image.
-                              filter(lang(?name) = 'en').
-                            }
-                          GROUP BY ?item
-                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                          LIMIT 4
-                        } as %allFishes
+                                #seperated animals in variables befor unionizing for performance/quicker response
+                                WITH{
+                                    SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
+                                    WHERE{
+                                      ?item wdt:P171* wd:Q10908;
+                                            wdt:P1843 ?name;
+                                            wdt:P141 wd:Q211005;
+                                            wdt:P18 ?image.
+                                      filter(lang(?name) = 'en').
+                                       FILTER NOT EXISTS{
+                                         ?item wdt:P141 wd:Q237350.
+                                         ?item wdt:P171* wd:Q23038290
+                                       }
+                                    }
+                                  GROUP BY ?item
+                                  ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                                  LIMIT 400
+                                } as %allAmphibia
 
-                        WITH {
-                          SELECT DISTINCT ?image ?name WHERE {
-                            {Include %allFishes}
-                          }  
-                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                          LIMIT 1
-                        } as %selectedFish
+                                WITH{
+                                    SELECT (GROUP_CONCAT(DISTINCT SAMPLE(?img); SEPARATOR=', ') as ?image) ?name
+                                    WHERE{
+                                      {include %allAmphibia}
+                                      ?item wdt:P18 ?img.
+                                    }
+                                  GROUP BY ?name
+                                } as %allImages
 
-                        WITH {
-                          SELECT DISTINCT ?name WHERE {
-                            {Include %allFishes}
-                            FILTER NOT EXISTS{Include %selectedFish}
-                          } 
-                          LIMIT 3
-                        } as %decoyFish
+                                WITH {
+                                  SELECT DISTINCT ?image ?name WHERE {
+                                    {Include %allImages}
+                                  }  
+                                  ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                                  LIMIT 1
+                                } as %selectedAmphibia
 
-                        WHERE {
-                          {
-                           INCLUDE %selectedFish} UNION {INCLUDE %decoyFish}       
-                           BIND(?image as ?question)
-                         } ORDER BY DESC(?question)",
+                                WITH {
+                                  SELECT DISTINCT ?name WHERE {
+                                    {Include %allImages}
+                                     BIND(lcase(?name) as ?caseName)
+                                    FILTER NOT EXISTS{
+                                        {
+                                          select ?caseName
+                                          where{
+                                            include %selectedAmphibia.
+                                            BIND(lcase(?name) as ?caseName)
+                                          }
+                                        }
+                                    } 
+                                    FILTER NOT EXISTS{Include %selectedAmphibia}
+                                  } 
+                                  ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                                  LIMIT 3
+                                } as %decoyAmphibia
+
+                                WHERE {
+                                  {INCLUDE %selectedAmphibia} UNION {INCLUDE %decoyAmphibia}       
+                                   BIND(?image as ?question)
+                                 } ORDER BY DESC(?question)
+                                ",
                             Status = 2,
                             TaskDescription = "Which animal is this?"
                         },
@@ -2646,44 +2873,67 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        SELECT DISTINCT ?question (?name as ?answer)
+                                SELECT DISTINCT ?question (?name as ?answer)
 
-                        #seperated animals in variables befor unionizing for performance/quicker response
-                        WITH{
-                            SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                            WHERE{
-                              ?item wdt:P171* wd:Q10908;
-                                    wdt:P1843 ?name;
-                                    wdt:P141 wd:Q211005;
-                                    wdt:P18 ?image.
-                              filter(lang(?name) = 'en').
-                            }
-                          GROUP BY ?item
-                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                          LIMIT 4
-                        } as %allAmphibia
+                                #seperated animals in variables befor unionizing for performance/quicker response
+                                WITH{
+                                    SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
+                                    WHERE{
+                                      {?item wdt:P171* wd:Q150760.}
+                                      UNION
+                                      {?item wdt:P171* wd:Q840552}
+                                      ?item wdt:P18 ?image;
+                                            wdt:P1843 ?name;
+                                      filter(lang(?name) = 'en').
+                                       FILTER NOT EXISTS{
+                                         ?item wdt:P141 wd:Q237350.
+                                         ?item wdt:P171* wd:Q23038290
+                                       }
+                                    }
+                                  GROUP BY ?item
+                                  ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                                  LIMIT 400         
+                                } as %allFishes
 
-                        WITH {
-                          SELECT DISTINCT ?image ?name WHERE {
-                            {Include %allAmphibia}
-                          }  
-                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                          LIMIT 1
-                        } as %selectedAmphibia
+                                WITH{
+                                    SELECT (GROUP_CONCAT(DISTINCT SAMPLE(?img); SEPARATOR=', ') as ?image) ?name
+                                    WHERE{
+                                      {include %allFishes}
+                                      ?item wdt:P18 ?img.
+                                    }
+                                  GROUP BY ?name
+                                } as %allImages
 
-                        WITH {
-                          SELECT DISTINCT ?name WHERE {
-                            {Include %allAmphibia}
-                            FILTER NOT EXISTS{Include %selectedAmphibia}
-                          } 
-                          LIMIT 3
-                        } as %decoyAmphibia
+                                WITH {
+                                  SELECT DISTINCT ?image ?name WHERE {
+                                    {Include %allImages}
+                                  }  
+                                  ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                                  LIMIT 1
+                                } as %selectedFish
 
-                        WHERE {
-                          {
-                           INCLUDE %selectedAmphibia} UNION {INCLUDE %decoyAmphibia}       
-                           BIND(?image as ?question)
-                         } ORDER BY DESC(?question)
+                                WITH {
+                                  SELECT DISTINCT ?name WHERE {
+                                    {Include %allImages}
+                                     BIND(lcase(?name) as ?caseName)
+                                    FILTER NOT EXISTS{
+                                        {
+                                          select ?caseName
+                                          where{
+                                            include %selectedFish.
+                                            BIND(lcase(?name) as ?caseName)
+                                          }
+                                        }
+                                    } 
+                                  } 
+                                  ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                                  LIMIT 3
+                                } as %decoyFishes
+
+                                WHERE {
+                                  {INCLUDE %selectedFish} UNION {INCLUDE %decoyFishes}       
+                                   BIND(?image as ?question)
+                                 } ORDER BY DESC(?question)
                         ",
                             Status = 2,
                             TaskDescription = "Which animal is this?"
@@ -2695,45 +2945,65 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        SELECT DISTINCT ?question (?name as ?answer)
+                                SELECT DISTINCT ?question (?name as ?answer)
 
-                        #seperated animals in variables befor unionizing for performance/quicker response
-                        WITH{
-                            SELECT DISTINCT (SAMPLE(?image) as ?image) (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                            WHERE{
-                              ?item wdt:P171* wd:Q122422;
-                                    wdt:P1843 ?name;
-                                    wdt:P141 wd:Q211005;
-                                    wdt:P18 ?image.
-                              filter(lang(?name) = 'en').
-                            }
-                          GROUP BY ?item
-                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                          LIMIT 4
-                        } as %allReptiles
+                                #seperated animals in variables befor unionizing for performance/quicker response
+                                WITH{
+                                    SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
+                                    WHERE{
+                                      ?item wdt:P171* wd:Q122422.
+                                      ?item wdt:P18 ?image;
+                                            wdt:P1843 ?name;
+                                      filter(lang(?name) = 'en').
+                                      FILTER NOT EXISTS{
+                                         ?item wdt:P141 wd:Q237350.
+                                         ?item wdt:P171* wd:Q23038290
+                                      }
+                                    }
+                                  GROUP BY ?item
+                                  ORDER BY MD5(CONCAT(STR(?name), STR(NOW())))
+                                  LIMIT 400
+                                } as %allReptiles
 
-                        WITH {
-                          SELECT DISTINCT ?image ?name WHERE {
-                            {Include %allReptiles}
-                          }  
-                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                          LIMIT 1
-                        } as %selectedReptile
+                                WITH{
+                                    SELECT (GROUP_CONCAT(DISTINCT SAMPLE(?img); SEPARATOR=', ') as ?image) ?name
+                                    WHERE{
+                                      {include %allReptiles}
+                                      ?item wdt:P18 ?img.
+                                    }
+                                  GROUP BY ?name
+                                } as %allImages
 
-                        WITH {
-                          SELECT DISTINCT ?name WHERE {
-                            {Include %allReptiles}
-                            FILTER NOT EXISTS{Include %selectedReptile}
-                          } 
-                          LIMIT 3
-                        } as %decoyReptiles
+                                WITH {
+                                  SELECT DISTINCT ?image ?name WHERE {
+                                    {Include %allImages}
+                                  }  
+                                  ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                                  LIMIT 1
+                                } as %selectedReptile
 
-                        WHERE {
-                          {
-                           INCLUDE %selectedReptile} UNION {INCLUDE %decoyReptiles}       
-                           BIND(?image as ?question)
-                         }
-                        ORDER BY DESC(?question)
+                                WITH {
+                                  SELECT DISTINCT ?name WHERE {
+                                    {Include %allImages}
+                                     BIND(lcase(?name) as ?caseName)
+                                    FILTER NOT EXISTS{
+                                        {
+                                          select ?caseName
+                                          where{
+                                            include %selectedReptile.
+                                            BIND(lcase(?name) as ?caseName)
+                                          }
+                                        }
+                                    } 
+                                  } 
+                                  ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                                  LIMIT 3
+                                } as %decoyReptiles
+
+                                WHERE {
+                                  {INCLUDE %selectedReptile} UNION {INCLUDE %decoyReptiles}       
+                                   BIND(?image as ?question)
+                                 } ORDER BY DESC(?question)
                         ",
                             Status = 2,
                             TaskDescription = "Which animal is this?"
@@ -2745,97 +3015,71 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        # which of these 
-                        SELECT DISTINCT ?question (?name as ?answer)
+                                SELECT DISTINCT ?question (?name as ?answer)
 
-                        #seperated animals in variables befor unionizing for performance/quicker response
-                        WITH{
-                            SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                            WHERE{
-                              ?item wdt:P171* wd:Q25329;
-                                    wdt:P1843 ?name;
-                                    wdt:P141 wd:Q211005;
-                                    wdt:P18 ?image.
-                               FILTER NOT EXISTS{
-                                 ?item wdt:P141 wd:Q237350.
-                                 ?item wdt:P171* wd:Q23038290
-                               }
-                              filter(lang(?name) = 'en').
-                            }
-                          GROUP BY ?item
-                        } as %allArtiodactyla
+                                #seperated animals in variables befor unionizing for performance/quicker response
+                                WITH{
+                                    SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
+                                    WHERE{
+                                      #artiodactyla
+                                      {?item wdt:P171* wd:Q25329;}
+                                      UNION
+                                      #primates
+                                      {?item wdt:P171* wd:Q7380;}
+                                      UNION
+                                      #carnivores
+                                      {?item wdt:P171* wd:Q25306;}
+                                      ?item wdt:P18 ?image;
+                                            wdt:P1843 ?name;
+                                      filter(lang(?name) = 'en').
+                                      FILTER NOT EXISTS{
+                                         ?item wdt:P141 wd:Q237350.
+                                      }
+                                    }
+                                  GROUP BY ?item
+                                  ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                                  LIMIT 400        
+                                } as %allAnimals
 
-                        WITH{
-                            SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                            WHERE{
-                              ?item wdt:P171* wd:Q7380;
-                                    wdt:P1843 ?name;
-                                    wdt:P141 wd:Q211005;
-                                    wdt:P18 ?image.
-                               FILTER NOT EXISTS{
-                                 ?item wdt:P141 wd:Q237350.
-                                 ?item wdt:P171* wd:Q23038290
-                               }
-                              filter(lang(?name) = 'en').
-                            }
-                          GROUP BY ?item
-                        } as %allPrimates
+                                WITH{
+                                    SELECT (GROUP_CONCAT(DISTINCT SAMPLE(?img); SEPARATOR=', ') as ?image) ?name
+                                    WHERE{
+                                      {include %allAnimals}
+                                      ?item wdt:P18 ?img.
+                                    }
+                                  GROUP BY ?name
+                                } as %allImages
 
+                                WITH {
+                                  SELECT DISTINCT ?image ?name WHERE {
+                                    {Include %allImages}
+                                  }  
+                                  ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                                  LIMIT 1
+                                } as %selectedAnimal
 
-                        WITH{
-                            SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                            WHERE{
-                              ?item wdt:P171* wd:Q25306;
-                                    wdt:P1843 ?name;
-                                    wdt:P141 wd:Q211005;
-                                    wdt:P18 ?image.
-                               FILTER NOT EXISTS{
-                                 ?item wdt:P141 wd:Q237350.
-                                 ?item wdt:P171* wd:Q23038290
-                               }
-                              filter(lang(?name) = 'en').
-                            }
-                          GROUP BY ?item
-                        } as %allCarnivora
+                                WITH {
+                                  SELECT DISTINCT ?name WHERE {
+                                    {Include %allImages}
+                                     BIND(lcase(?name) as ?caseName)
+                                    FILTER NOT EXISTS{
+                                        {
+                                          select ?caseName
+                                          where{
+                                            include %selectedAnimal.
+                                            BIND(lcase(?name) as ?caseName)
+                                          }
+                                        }
+                                    } 
+                                  } 
+                                  ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                                  LIMIT 3
+                                } as %decoyAnimals
 
-
-                        WITH{
-                         SELECT *
-                          WHERE{
-                             {include %allArtiodactyla}
-                             UNION
-                            {include %allPrimates}
-                             UNION
-                            {include %allCarnivora}
-                          }
-                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                          #LIMIT 4
-                        } as %allAnimals
-
-
-                        WITH {
-                          SELECT DISTINCT ?image ?name WHERE {
-                            {Include %allAnimals}
-                          }  
-                            ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                          LIMIT 1
-                        } as %selectedAnimal
-
-                        WITH {
-                          SELECT DISTINCT ?name WHERE {
-                            {Include %allAnimals}
-                            FILTER NOT EXISTS{Include %selectedAnimal}
-                          } 
-                          LIMIT 3
-                        } as %decoyAnimals
-
-                        WHERE {
-                           {INCLUDE %selectedAnimal} 
-                           UNION 
-                           {INCLUDE %decoyAnimals}       
-                           BIND(?image as ?question)
-                         }
-                        ORDER BY DESC(?question)
+                                WHERE {
+                                  {INCLUDE %selectedAnimal} UNION {INCLUDE %decoyAnimals}       
+                                   BIND(?image as ?question)
+                                 } ORDER BY DESC(?question)
                         ",
                             Status = 2,
                             TaskDescription = "Which animal is this?"
@@ -2847,78 +3091,67 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        # which of these 
-                        SELECT DISTINCT ?question (?name as ?answer)
+                                # which of these species is {endangered || heavily endangered} ?
+                                SELECT DISTINCT ?question (?name as ?answer)
 
-                        #seperated animals in variables befor unionizing for performance/quicker response
-                        WITH{
-                            SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                            WHERE{
-                              ?item wdt:P171* wd:Q25336;
-                                    wdt:P1843 ?name;
-                                    wdt:P141 wd:Q211005;
-                                    wdt:P18 ?image.
-                               FILTER NOT EXISTS{
-                                 ?item wdt:P141 wd:Q237350.
-                                 ?item wdt:P171* wd:Q23038290
-                               }
-                              filter(lang(?name) = 'en').
-                            }
-                          GROUP BY ?item
-                        } as %allMarsupials
+                                #seperated animals in variables befor unionizing for performance/quicker response
+                                WITH{
+                                    SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
+                                    WHERE{
+                                      #marsupials
+                                      {?item wdt:P171* wd:Q25336;}
+                                      UNION
+                                      #rodents
+                                      {?item wdt:P171* wd:Q10850;}
+                                      ?item wdt:P18 ?image;
+                                            wdt:P1843 ?name;
+                                      filter(lang(?name) = 'en').
+                                      FILTER NOT EXISTS{
+                                         ?item wdt:P141 wd:Q237350.
+                                      }
+                                    }
+                                  GROUP BY ?item
+                                } as %allAnimals
 
-                        WITH{
-                            SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                            WHERE{
-                              ?item wdt:P171* wd:Q10850;
-                                    wdt:P1843 ?name;
-                                    wdt:P141 wd:Q211005;
-                                    wdt:P18 ?image.
-                               FILTER NOT EXISTS{
-                                 ?item wdt:P141 wd:Q237350.
-                                 ?item wdt:P171* wd:Q23038290
-                               }
-                              filter(lang(?name) = 'en').
-                            }
-                          GROUP BY ?item
-                        } as %allRodentias
+                                WITH{
+                                    SELECT (GROUP_CONCAT(DISTINCT SAMPLE(?img); SEPARATOR=', ') as ?image) ?name
+                                    WHERE{
+                                      {include %allAnimals}
+                                      ?item wdt:P18 ?img.
+                                    }
+                                  GROUP BY ?name
+                                } as %allImages
 
+                                WITH {
+                                  SELECT DISTINCT ?image ?name WHERE {
+                                    {Include %allImages}
+                                  }  
+                                  ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                                  LIMIT 1
+                                } as %selectedAnimal
 
-                        WITH{
-                         SELECT *
-                          WHERE{
-                             {include %allMarsupials}
-                             UNION
-                            {include %allRodentias}
-                          }
-                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                          #LIMIT 4
-                        } as %allAnimals
+                                WITH {
+                                  SELECT DISTINCT ?name WHERE {
+                                    {Include %allImages}
+                                     BIND(lcase(?name) as ?caseName)
+                                    FILTER NOT EXISTS{
+                                        {
+                                          select ?caseName
+                                          where{
+                                            include %selectedAnimal.
+                                            BIND(lcase(?name) as ?caseName)
+                                          }
+                                        }
+                                    } 
+                                  } 
+                                  ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                                  LIMIT 3
+                                } as %decoyAnimals
 
-
-                        WITH {
-                          SELECT DISTINCT ?image ?name WHERE {
-                            {Include %allAnimals}
-                          }  
-                            ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                          LIMIT 1
-                        } as %selectedAnimal
-
-                        WITH {
-                          SELECT DISTINCT ?name WHERE {
-                            {Include %allAnimals}
-                            FILTER NOT EXISTS{Include %selectedAnimal}
-                          } 
-                          LIMIT 3
-                        } as %decoyAnimals
-
-                        WHERE {
-                           {INCLUDE %selectedAnimal} 
-                           UNION 
-                           {INCLUDE %decoyAnimals}       
-                           BIND(?image as ?question)
-                         }
-                        ORDER BY DESC(?question)
+                                WHERE {
+                                  {INCLUDE %selectedAnimal} UNION {INCLUDE %decoyAnimals}       
+                                   BIND(?image as ?question)
+                                 } ORDER BY DESC(?question)
                         ",
                             Status = 2,
                             TaskDescription = "Which animal is this?"
@@ -2930,78 +3163,69 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                       # which of these 
-                        SELECT DISTINCT ?question (?name as ?answer)
+                            # which of these species is {endangered || heavily endangered} ?
+                            SELECT DISTINCT ?question (?name as ?answer)
 
-                        #seperated animals in variables befor unionizing for performance/quicker response
-                        WITH{
-                            SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                            WHERE{
-                              ?item wdt:P171* wd:Q28425;
-                                    wdt:P1843 ?name;
-                                    wdt:P141 wd:Q211005;
-                                    wdt:P18 ?image.
-                               FILTER NOT EXISTS{
-                                 ?item wdt:P141 wd:Q237350.
-                                 ?item wdt:P171* wd:Q23038290
-                               }
-                              filter(lang(?name) = 'en').
-                            }
-                          GROUP BY ?item
-                        } as %allBats
+                            #seperated animals in variables befor unionizing for performance/quicker response
+                            WITH{
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
+                                WHERE{
+                                  #bats
+                                  {?item wdt:P171* wd:Q28425;}
+                                  UNION
+                                  #rodents
+                                  {?item wdt:P171* wd:Q10850;}
+                                  ?item wdt:P18 ?image;
+                                        wdt:P1843 ?name;
+                                  filter(lang(?name) = 'en').
+                                  FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                  }
+                                }
+                              GROUP BY ?item
+                              ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                              LIMIT 300
+                            } as %allAnimals
 
-                        WITH{
-                            SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                            WHERE{
-                              ?item wdt:P171* wd:Q10850;
-                                    wdt:P1843 ?name;
-                                    wdt:P141 wd:Q211005;
-                                    wdt:P18 ?image.
-                               FILTER NOT EXISTS{
-                                 ?item wdt:P141 wd:Q237350.
-                                 ?item wdt:P171* wd:Q23038290
-                               }
-                              filter(lang(?name) = 'en').
-                            }
-                          GROUP BY ?item
-                        } as %allRodentias
+                            WITH{
+                                SELECT (GROUP_CONCAT(DISTINCT SAMPLE(?img); SEPARATOR=', ') as ?image) ?name
+                                WHERE{
+                                  {include %allAnimals}
+                                  ?item wdt:P18 ?img.
+                                }
+                              GROUP BY ?name
+                            } as %allImages
 
+                            WITH {
+                              SELECT DISTINCT ?image ?name WHERE {
+                                {Include %allImages}
+                              }  
+                              ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                              LIMIT 1
+                            } as %selectedAnimal
 
-                        WITH{
-                         SELECT *
-                          WHERE{
-                             {include %allBats}
-                             UNION
-                            {include %allRodentias}
-                          }
-                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                          #LIMIT 4
-                        } as %allAnimals
+                            WITH {
+                              SELECT DISTINCT ?name WHERE {
+                                {Include %allImages}
+                                 BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                        include %selectedAnimal.
+                                        BIND(lcase(?name) as ?caseName)
+                                      }
+                                    }
+                                } 
+                              } 
+                              ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                              LIMIT 3
+                            } as %decoyAnimals
 
-
-                        WITH {
-                          SELECT DISTINCT ?image ?name WHERE {
-                            {Include %allAnimals}
-                          }  
-                            ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                          LIMIT 1
-                        } as %selectedAnimal
-
-                        WITH {
-                          SELECT DISTINCT ?name WHERE {
-                            {Include %allAnimals}
-                            FILTER NOT EXISTS{Include %selectedAnimal}
-                          } 
-                          LIMIT 3
-                        } as %decoyAnimals
-
-                        WHERE {
-                           {INCLUDE %selectedAnimal} 
-                           UNION 
-                           {INCLUDE %decoyAnimals}       
-                           BIND(?image as ?question)
-                         }
-                        ORDER BY DESC(?question)
+                            WHERE {
+                              {INCLUDE %selectedAnimal} UNION {INCLUDE %decoyAnimals}       
+                               BIND(?image as ?question)
+                             } ORDER BY DESC(?question)
                         ",
                             Status = 2,
                             TaskDescription = "Which animal is this?"
@@ -3013,74 +3237,67 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                        SELECT DISTINCT ?question (?name as ?answer)
+                            # which of these species is {endangered || heavily endangered} ?
+                            SELECT DISTINCT ?question (?name as ?answer)
 
-                        #seperated animals in variables befor unionizing for performance/quicker response
-                        WITH{
-                            SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                            WHERE{
-                              ?item wdt:P171* wd:Q25336;
-                                    wdt:P1843 ?name;
-                                    wdt:P141 wd:Q211005;
-                                    wdt:P18 ?image.
-                               FILTER NOT EXISTS{
-                                 ?item wdt:P141 wd:Q237350.
-                                 ?item wdt:P171* wd:Q23038290
-                               }
-                              filter(lang(?name) = 'en').
-                            }
-                          GROUP BY ?item
-                        } as %allMarsupials
+                            #seperated animals in variables befor unionizing for performance/quicker response
+                            WITH{
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
+                                WHERE{
+                                  #marsupials
+                                  {?item wdt:P171* wd:Q25336;}
+                                  UNION
+                                  #carnivores
+                                  {?item wdt:P171* wd:Q1194816;}
+                                  ?item wdt:P18 ?image;
+                                        wdt:P1843 ?name;
+                                  filter(lang(?name) = 'en').
+                                  FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                  }
+                                }
+                              GROUP BY ?item
+                            } as %allAnimals
 
-                        WITH{
-                            SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                            WHERE{
-                              ?item wdt:P171* wd:Q25306;
-                                    wdt:P1843 ?name;
-                                    wdt:P141 wd:Q211005;
-                                    wdt:P18 ?image.
-                               FILTER NOT EXISTS{
-                                 ?item wdt:P141 wd:Q237350.
-                                 ?item wdt:P171* wd:Q23038290
-                               }
-                              filter(lang(?name) = 'en').
-                            }
-                          GROUP BY ?item
-                        } as %allCarnivora
+                            WITH{
+                                SELECT (GROUP_CONCAT(DISTINCT SAMPLE(?img); SEPARATOR=', ') as ?image) ?name
+                                WHERE{
+                                  {include %allAnimals}
+                                  ?item wdt:P18 ?img.
+                                }
+                              GROUP BY ?name
+                            } as %allImages
 
-                        WITH{
-                         SELECT *
-                          WHERE{
-                            {include %allMarsupials}
-                             UNION
-                            {include %allCarnivora}
-                          }
-                          ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                        } as %allAnimals
+                            WITH {
+                              SELECT DISTINCT ?image ?name WHERE {
+                                {Include %allImages}
+                              }  
+                              ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                              LIMIT 1
+                            } as %selectedAnimal
 
+                            WITH {
+                              SELECT DISTINCT ?name WHERE {
+                                {Include %allImages}
+                                 BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                        include %selectedAnimal.
+                                        BIND(lcase(?name) as ?caseName)
+                                      }
+                                    }
+                                } 
+                              } 
+                              ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                              LIMIT 3
+                            } as %decoyAnimals
 
-                        WITH {
-                          SELECT DISTINCT ?image ?name WHERE {
-                            {Include %allAnimals}
-                          }  
-                            ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                          LIMIT 1
-                        } as %selectedAnimal
-
-                        WITH {
-                          SELECT DISTINCT ?name WHERE {
-                            {Include %allAnimals}
-                            FILTER NOT EXISTS{Include %selectedAnimal}
-                          } 
-                          LIMIT 3
-                        } as %decoyAnimals
-
-                        WHERE {
-                           {INCLUDE %selectedAnimal} 
-                           UNION 
-                           {INCLUDE %decoyAnimals}       
-                           BIND(?image as ?question)
-                         } ORDER BY DESC(?question)
+                            WHERE {
+                              {INCLUDE %selectedAnimal} UNION {INCLUDE %decoyAnimals}       
+                               BIND(?image as ?question)
+                             } ORDER BY DESC(?question)
                         ",
                             Status = 2,
                             TaskDescription = "Which animal is this?"
@@ -3092,72 +3309,65 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
+                            # which of these species is {endangered || heavily endangered} ?
                             SELECT DISTINCT ?question (?name as ?answer)
 
                             #seperated animals in variables befor unionizing for performance/quicker response
                             WITH{
-                                SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
                                 WHERE{
-                                  ?item wdt:P171* wd:Q25336;
+                                  #marsupials
+                                  {?item wdt:P171* wd:Q25336;}
+                                  UNION
+                                  #primates
+                                  {?item wdt:P171* wd:Q7380;}
+                                  ?item wdt:P18 ?image;
                                         wdt:P1843 ?name;
-                                        wdt:P141 wd:Q211005;
-                                        wdt:P18 ?image.
-                                   FILTER NOT EXISTS{
-                                     ?item wdt:P141 wd:Q237350.
-                                     ?item wdt:P171* wd:Q23038290
-                                   }
                                   filter(lang(?name) = 'en').
+                                  FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                  }
                                 }
                               GROUP BY ?item
-                            } as %allMarsupials
-
-                            WITH{
-                                SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                                WHERE{
-                                  ?item wdt:P171* wd:Q7380;
-                                        wdt:P1843 ?name;
-                                        wdt:P141 wd:Q211005;
-                                        wdt:P18 ?image.
-                                   FILTER NOT EXISTS{
-                                     ?item wdt:P141 wd:Q237350.
-                                     ?item wdt:P171* wd:Q23038290
-                                   }
-                                  filter(lang(?name) = 'en').
-                                }
-                              GROUP BY ?item
-                            } as %allPrimates
-
-                            WITH{
-                             SELECT *
-                              WHERE{
-                                 {include %allMarsupials}
-                                 UNION
-                                {include %allPrimates}
-                              }
-                              ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
                             } as %allAnimals
 
+                            WITH{
+                                SELECT (GROUP_CONCAT(DISTINCT SAMPLE(?img); SEPARATOR=', ') as ?image) ?name
+                                WHERE{
+                                  {include %allAnimals}
+                                  ?item wdt:P18 ?img.
+                                }
+                              GROUP BY ?name
+                            } as %allImages
 
                             WITH {
                               SELECT DISTINCT ?image ?name WHERE {
-                                {Include %allAnimals}
+                                {Include %allImages}
                               }  
-                                ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                              ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
                               LIMIT 1
                             } as %selectedAnimal
 
                             WITH {
                               SELECT DISTINCT ?name WHERE {
-                                {Include %allAnimals}
-                                FILTER NOT EXISTS{Include %selectedAnimal}
+                                {Include %allImages}
+                                 BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                        include %selectedAnimal.
+                                        BIND(lcase(?name) as ?caseName)
+                                      }
+                                    }
+                                } 
                               } 
+                              ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
                               LIMIT 3
                             } as %decoyAnimals
 
                             WHERE {
-                               {INCLUDE %selectedAnimal} 
-                               UNION 
-                               {INCLUDE %decoyAnimals}       
+                              {INCLUDE %selectedAnimal} UNION {INCLUDE %decoyAnimals}       
                                BIND(?image as ?question)
                              } ORDER BY DESC(?question)
                             ",
@@ -3171,172 +3381,67 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
                             MiniGameType = 1,
                             SparqlQuery = @"
+                            # which of these species is {endangered || heavily endangered} ?
                             SELECT DISTINCT ?question (?name as ?answer)
 
                             #seperated animals in variables befor unionizing for performance/quicker response
                             WITH{
-                                SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
                                 WHERE{
-                                  ?item wdt:P171* wd:Q10850;
+                                  #rodents
+                                  {?item wdt:P171* wd:Q10850;}
+                                  UNION
+                                  #artiodactyla
+                                  {?item wdt:P171* wd:Q25329;}
+                                  ?item wdt:P18 ?image;
                                         wdt:P1843 ?name;
-                                        wdt:P141 wd:Q211005;
-                                        wdt:P18 ?image.
-                                   FILTER NOT EXISTS{
-                                     ?item wdt:P141 wd:Q237350.
-                                     ?item wdt:P171* wd:Q23038290
-                                   }
                                   filter(lang(?name) = 'en').
+                                  FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                  }
                                 }
                               GROUP BY ?item
-                            } as %allRodents
-
-                            WITH{
-                                SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                                WHERE{
-                                  ?item wdt:P171* wd:Q25329;
-                                        wdt:P1843 ?name;
-                                        wdt:P141 wd:Q211005;
-                                        wdt:P18 ?image.
-                                   FILTER NOT EXISTS{
-                                     ?item wdt:P141 wd:Q237350.
-                                     ?item wdt:P171* wd:Q23038290
-                                   }
-                                  filter(lang(?name) = 'en').
-                                }
-                              GROUP BY ?item
-                            } as %allArtiodactyla
-
-                            WITH{
-                             SELECT *
-                              WHERE{
-                                 {include %allRodents}
-                                 UNION
-                                {include %allArtiodactyla}
-                              }
-                              ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
                             } as %allAnimals
 
+                            WITH{
+                                SELECT (GROUP_CONCAT(DISTINCT SAMPLE(?img); SEPARATOR=', ') as ?image) ?name
+                                WHERE{
+                                  {include %allAnimals}
+                                  ?item wdt:P18 ?img.
+                                }
+                              GROUP BY ?name
+                            } as %allImages
 
                             WITH {
                               SELECT DISTINCT ?image ?name WHERE {
-                                {Include %allAnimals}
+                                {Include %allImages}
                               }  
-                                ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
+                              ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
                               LIMIT 1
                             } as %selectedAnimal
 
                             WITH {
                               SELECT DISTINCT ?name WHERE {
-                                {Include %allAnimals}
-                                FILTER NOT EXISTS{Include %selectedAnimal}
+                                {Include %allImages}
+                                 BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                        include %selectedAnimal.
+                                        BIND(lcase(?name) as ?caseName)
+                                      }
+                                    }
+                                } 
                               } 
+                              ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
                               LIMIT 3
                             } as %decoyAnimals
 
                             WHERE {
-                               {INCLUDE %selectedAnimal} 
-                               UNION 
-                               {INCLUDE %decoyAnimals}       
+                              {INCLUDE %selectedAnimal} UNION {INCLUDE %decoyAnimals}       
                                BIND(?image as ?question)
                              } ORDER BY DESC(?question)
-                            ",
-                            Status = 2,
-                            TaskDescription = "Which animal is this?"
-                        },
-                        new
-                        {
-                            Id = new Guid("025286ac-d6d1-4e9f-954c-f659e83d7d6d"),
-                            CategoryId = new Guid("e9019ee1-0eed-492d-8aa7-feb1974fb265"),
-                            GroupId = new Guid("a2f299e0-493c-425e-b338-19a29b723847"),
-                            MiniGameType = 1,
-                            SparqlQuery = @"
-                                # This query includes: primates + artiodactyla + rodentia
-                                SELECT DISTINCT ?question (?name as ?answer)
-
-                                #seperated animals in variables befor unionizing for performance/quicker response
-                                WITH{
-                                    SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                                    WHERE{
-                                      ?item wdt:P171* wd:Q7380;
-                                            wdt:P1843 ?name;
-                                            wdt:P141 wd:Q211005;
-                                            wdt:P18 ?image.
-                                       FILTER NOT EXISTS{
-                                         ?item wdt:P141 wd:Q237350.
-                                         ?item wdt:P171* wd:Q23038290
-                                       }
-                                      filter(lang(?name) = 'en').
-                                    }
-                                  GROUP BY ?item
-                                } as %allPrimates
-
-
-                                WITH{
-                                    SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                                    WHERE{
-                                      ?item wdt:P171* wd:Q25329;
-                                            wdt:P1843 ?name;
-                                            wdt:P141 wd:Q211005;
-                                            wdt:P18 ?image.
-                                       FILTER NOT EXISTS{
-                                         ?item wdt:P141 wd:Q237350.
-                                         ?item wdt:P171* wd:Q23038290
-                                       }
-                                      filter(lang(?name) = 'en').
-                                    }
-                                  GROUP BY ?item
-                                } as %allArtiodactyla
-
-                                WITH{
-                                    SELECT DISTINCT (SAMPLE(?image) as ?image) ?item (SAMPLE(GROUP_CONCAT(DISTINCT Sample(?name); SEPARATOR=', ')) as ?name)
-                                    WHERE{
-                                      ?item wdt:P171* wd:Q10850;
-                                            wdt:P1843 ?name;
-                                            wdt:P141 wd:Q211005;
-                                            wdt:P18 ?image.
-                                       FILTER NOT EXISTS{
-                                         ?item wdt:P141 wd:Q237350.
-                                         ?item wdt:P171* wd:Q23038290
-                                       }
-                                      filter(lang(?name) = 'en').
-                                    }
-                                  GROUP BY ?item
-                                } as %allRodents
-
-                                WITH{
-                                 SELECT *
-                                  WHERE{
-                                     {include %allPrimates}
-                                     UNION
-                                    {include %allRodents}
-                                    UNION
-                                    {include %allArtiodactyla}
-                                  }
-                                  ORDER BY MD5(CONCAT(STR(?image), STR(NOW())))
-                                } as %allAnimals
-
-
-                                WITH {
-                                  SELECT DISTINCT ?image ?name WHERE {
-                                    {Include %allAnimals}
-                                  }  
-                                  LIMIT 1
-                                } as %selectedAnimal
-
-                                WITH {
-                                  SELECT DISTINCT ?name WHERE {
-                                    {Include %allAnimals}
-                                    FILTER NOT EXISTS{Include %selectedAnimal}
-                                  } 
-                                  LIMIT 3
-                                } as %decoyAnimals
-
-                                WHERE {
-                                   {INCLUDE %selectedAnimal} 
-                                   UNION 
-                                   {INCLUDE %decoyAnimals}       
-                                   BIND(?image as ?question)
-                                 } ORDER BY DESC(?question)
                             ",
                             Status = 2,
                             TaskDescription = "Which animal is this?"
@@ -3360,6 +3465,7 @@ namespace WikidataGame.Backend.Migrations
                                         ?inventor rdfs:label ?inventorLabel
                                       }
                                       filter(lang(?inventorLabel) = 'en').
+                                      filter(lang(?itemLabel) = 'en').
                                     }
                                   group by ?inventorLabel
                                   ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
@@ -3404,7 +3510,7 @@ namespace WikidataGame.Backend.Migrations
                             Id = new Guid("30556891-ae34-4151-b55f-cd5a8b814235"),
                             CategoryId = new Guid("ddd333f7-ef45-4e13-a2ca-fb4494dce324"),
                             GroupId = new Guid("70a291e1-4513-4e41-87c5-2746f40a4e0c"),
-                            MiniGameType = 2,
+                            MiniGameType = 0,
                             SparqlQuery = @"
                                SELECT ?question ?answer
                                 WITH{
@@ -3578,7 +3684,7 @@ namespace WikidataGame.Backend.Migrations
                                     ORDER BY DESC(?question)
                                        ",
                             Status = 2,
-                            TaskDescription = "Where is {0} from?"
+                            TaskDescription = "Where is the cocktail {0} from?"
                         },
                         new
                         {
@@ -3648,7 +3754,7 @@ namespace WikidataGame.Backend.Migrations
                                 order by DESC(?question)
                                     ",
                             Status = 2,
-                            TaskDescription = "Where is {0} from?"
+                            TaskDescription = "Where is the dish {0} from?"
                         },
                         new
                         {
@@ -3696,7 +3802,7 @@ namespace WikidataGame.Backend.Migrations
                             order by ?year
                             ",
                             Status = 2,
-                            TaskDescription = "Sort these softdrinks by inception."
+                            TaskDescription = "Sort these softdrinks by release."
                         },
                         new
                         {
@@ -3711,10 +3817,16 @@ namespace WikidataGame.Backend.Migrations
                               WHERE{
                                  ?dish wdt:P279 wd:Q746549.
                                  ?dish wdt:P18 ?image.
-                                FILTER NOT EXISTS{?dish wdt:P31 wd:Q19861951}
+                                 FILTER NOT EXISTS{
+                                   {?dish wdt:P31 wd:Q19861951}
+                                   UNION
+                                   {?dish wdt:P31 wd:Q8148}
+                                 }
+                                 FILTER NOT EXISTS{FILTER(?dish = wd:Q748611)}
                                  SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. 
-                                                        ?dish rdfs:label ?dishLabel}
-                                 filter(lang(?dishLabel) = 'en').
+                                                        ?dish rdfs:label ?dL}
+                                 filter(lang(?dL) = 'en').
+                                 BIND(CONCAT(UCASE(SUBSTR(?dL, 1, 1)), SUBSTR(?dL, 2)) as ?dishLabel)
                               }
                               group by ?dish ?dishLabel
                               ORDER BY MD5(CONCAT(STR(?dish), STR(NOW())))
@@ -3725,7 +3837,6 @@ namespace WikidataGame.Backend.Migrations
                               WHERE { 
                                 INCLUDE %allDishes
                               }
-                              ORDER BY MD5(CONCAT(STR(?dish), STR(NOW())))
                               LIMIT 1
                             } as %selectedDish
 
@@ -3735,7 +3846,6 @@ namespace WikidataGame.Backend.Migrations
                                 INCLUDE %allDishes
                                 FILTER NOT EXISTS{INCLUDE %selectedDish}
                               }
-                              ORDER BY MD5(CONCAT(STR(?dish), STR(NOW())))
                               LIMIT 3
                             } as %decoyDishes
 
@@ -3820,43 +3930,69 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("ac3e0a15-376e-4dbc-a8f8-6df4c9fe39e7"),
                             MiniGameType = 2,
                             SparqlQuery = @"
-                            SELECT DISTINCT ?question ?answer ?awardLabel ?movieLabel
+                            SELECT DISTINCT ?question ?answer
                             WITH{
-                              SELECT DISTINCT ?actor ?actorLabel ?movieLabel ?awardLabel
+                              SELECT DISTINCT ?actor ?actorLabel ?award ?awardLabel ?movie
                             WHERE{
                               ?actor wdt:P31 wd:Q5;
-                                     wdt:P106 wd:Q33999;
-                                     wdt:P166 ?award.
-                              ?award wdt:P31+ wd:Q19020.
+                                     wdt:P106 wd:Q33999.
                               ?actor p:P166 ?statement.
+                              ?statement ps:P166 ?award.
                               ?statement pq:P1686 ?movie.
-                              ?statement pq:P805+ ?awardCeremony.
-                              ?awardCeremony wdt:P31+ wd:Q16913666.
+                              ?award wdt:P31+ wd:Q19020.
                               SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
-                                                     ?movie rdfs:label ?movieLabel.
                                                      ?actor rdfs:label ?actorLabel.
                                                      ?award rdfs:label ?awardLabel}
-                            }
-                            ORDER BY ?actor ?actorLabel
+                              }
+                              ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
+                              LIMIT 50
                             } as %allWinners
                                        
                             WITH{
-                              SELECT ?actor ?actorLabel ?question ?movieLabel ?awardLabel
+                              SELECT ?actor ?actorLabel ?question
                               WHERE{
                                  INCLUDE %allWinners.
-                                 BIND(CONCAT('Who won the ', CONCAT(STR(?awardLabel), CONCAT(' for ', CONCAT(STR(?movieLabel), '?'))))  as ?question)
+                                 SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                     ?movie rdfs:label ?movieLabel.}
+                                 BIND(CONCAT('Who won the ', CONCAT(STR(?awardLabel), CONCAT(' for the movie ', CONCAT(STR(?movieLabel), '?'))))  as ?question)
                               }
                               ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
                               LIMIT 1
                             } as %selectedActor
 
                             WITH{
-                              SELECT DISTINCT ?actor ?actorLabel
+                              SELECT ?gender
+                              WHERE{
+                                 INCLUDE %selectedActor
+                                 {?actor wdt:P21 ?gender}
+                              }
+                            } as %selectedGender
+
+                            WITH{
+                              SELECT ?gender
+                              WHERE{
+                                 INCLUDE %allWinners
+                                 ?actor wdt:P21 ?gender
+                                 Filter NOT EXISTS {
+                                  include %selectedGender
+                                 }
+                              }
+                              LIMIT 1
+                            } as %filteredGenders
+
+                            WITH{
+                              SELECT DISTINCT ?actorLabel
                               WHERE{
                                 INCLUDE %allWinners
-                                Filter NOT EXISTS {INCLUDE %selectedActor}
+                                Filter NOT EXISTS {
+                                  include %selectedActor
+                                }     
+                                ?actor wdt:P21 ?gender
+                                Filter NOT EXISTS {
+                                  include %filteredGenders
+                                }
                               }
-                              ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
+                              ORDER BY MD5(CONCAT(STR(?actorLabel), STR(NOW())))
                               LIMIT 3
                             } as %decoyActors
 
@@ -3867,6 +4003,7 @@ namespace WikidataGame.Backend.Migrations
                                 BIND(?actorLabel as ?answer)
                             }
                             ORDER BY DESC(?question)
+
                             ",
                             Status = 2,
                             TaskDescription = "{0}"
@@ -4015,7 +4152,7 @@ namespace WikidataGame.Backend.Migrations
                             ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Who is the trainer of {0}?"
+                            TaskDescription = "Who is the coach of {0}?"
                         },
                         new
                         {
@@ -4194,7 +4331,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "dce9d630-8fce-4b75-b559-2fe21364709c",
+                            ConcurrencyStamp = "847fd22d-3644-4da9-8d8b-3ffc06b9a9e7",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,

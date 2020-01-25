@@ -12,7 +12,7 @@ namespace WikidataGame.Backend.Migrations
                 keyColumn: "Id",
                 keyValue: new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                 column: "ConcurrencyStamp",
-                value: "847fd22d-3644-4da9-8d8b-3ffc06b9a9e7");
+                value: "31ec723d-889b-4006-9d8e-ff336b588a0c");
 
             migrationBuilder.UpdateData(
                 table: "Questions",
@@ -1144,6 +1144,64 @@ namespace WikidataGame.Backend.Migrations
                 keyValue: new Guid("ac86282f-1fa1-48ba-a088-f4c202ea0177"),
                 column: "TaskDescription",
                 value: "Where is the cocktail {0} from?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("b32fe12c-4016-4eed-a6d6-0bbb505553a0"),
+                column: "SparqlQuery",
+                value: @"
+                                SELECT ?question ?answer
+                                WITH{
+                                SELECT DISTINCT ?painting ?image ?paintingLabel
+                                       WHERE {
+                                         ?painting wdt:P1343 wd:Q66362718.
+                                         ?painting wdt:P18 ?image.
+                                         SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                                 ?painting rdfs:label ?paintingLabel}
+                                         filter(lang(?paintingLabel) = 'en').
+                                         BIND(REPLACE(?paintingLabel,'-',' ') AS ?paintingLabel) .
+                                       }
+                                } as %allPaintings
+
+                                WITH{
+                                  SELECT DISTINCT ?painting ?paintingLabel ?image
+                                         WHERE{
+                                           INCLUDE %allPaintings.
+                                         }
+                                  ORDER BY (MD5(CONCAT(STR(?painting), STR(NOW()))))
+                                  LIMIT 1
+                                } as %selectedPainting
+
+                                WITH{
+                                  select ?paintingLabel
+                                  where{
+                                     INCLUDE %selectedPainting.
+                                  }
+                                } as %selectedName
+
+                                WITH{
+                                  SELECT DISTINCT ?paintingLabel
+                                         WHERE{
+                                           INCLUDE %allPaintings.
+                                           FILTER NOT EXISTS{
+                                             INCLUDE %selectedName
+                                           }
+                                         }
+                                  ORDER BY (MD5(CONCAT(STR(?painting), STR(NOW()))))
+                                  LIMIT 3
+                                } as %decoyPainting
+
+                                WHERE{
+                                  {INCLUDE %selectedPainting.}
+                                  UNION
+                                  {INCLUDE %decoyPainting}
+  
+                                  BIND(?paintingLabel as ?answer)
+                                  BIND(?image as ?question)
+                                }
+                                order by DESC(?question)
+                            ");
 
             migrationBuilder.UpdateData(
                 table: "Questions",
@@ -2840,6 +2898,55 @@ namespace WikidataGame.Backend.Migrations
                 keyValue: new Guid("ac86282f-1fa1-48ba-a088-f4c202ea0177"),
                 column: "TaskDescription",
                 value: "Where is {0} from?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("b32fe12c-4016-4eed-a6d6-0bbb505553a0"),
+                column: "SparqlQuery",
+                value: @"
+                            SELECT ?question ?answer
+                            WITH{
+                            SELECT DISTINCT ?creator ?painting ?image ?paintingLabel
+                              WHERE 
+                              { 
+                                ?painting wdt:P1343 wd:Q66362718.
+                                ?painting wdt:P18 ?image.
+                                SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. 
+                                                       ?painting rdfs:label ?paintingLabel}
+                                filter(lang(?paintingLabel) = 'en').
+                              }   
+                               ORDER BY (MD5(CONCAT(STR(?painting), STR(NOW())))) 
+                               LIMIT 4
+                            } as %allPaintings
+
+                            WITH{
+                                SELECT DISTINCT ?painting ?paintingLabel ?image
+                                     WHERE{
+                                          INCLUDE %allPaintings.
+                                        }
+                               LIMIT 1
+                            } as %selectedPainting
+
+                            WITH{
+                              SELECT DISTINCT ?painting ?paintingLabel
+                                     WHERE{
+                                          INCLUDE %allPaintings
+                                          FILTER NOT EXISTS{INCLUDE %selectedPainting}
+                                        }
+                               LIMIT 3
+                            } as %decoyPainting
+
+                            WHERE{
+                                {INCLUDE %selectedPainting.}
+                                UNION
+                                {INCLUDE %decoyPainting}
+
+                                BIND(?paintingLabel as ?answer)
+                                BIND(?image as ?question)
+                            }
+                              order by DESC(?question)
+                            ");
 
             migrationBuilder.UpdateData(
                 table: "Questions",

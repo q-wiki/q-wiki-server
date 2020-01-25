@@ -3564,47 +3564,56 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("d834932d-1203-4039-9baf-68322b176bae"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                            SELECT ?question ?answer
-                            WITH{
-                            SELECT DISTINCT ?creator ?painting ?image ?paintingLabel
-                              WHERE 
-                              { 
-                                ?painting wdt:P1343 wd:Q66362718.
-                                ?painting wdt:P18 ?image.
-                                SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. 
-                                                       ?painting rdfs:label ?paintingLabel}
-                                filter(lang(?paintingLabel) = 'en').
-                              }   
-                               ORDER BY (MD5(CONCAT(STR(?painting), STR(NOW())))) 
-                               LIMIT 4
-                            } as %allPaintings
+                                SELECT ?question ?answer
+                                WITH{
+                                SELECT DISTINCT ?painting ?image ?paintingLabel
+                                       WHERE {
+                                         ?painting wdt:P1343 wd:Q66362718.
+                                         ?painting wdt:P18 ?image.
+                                         SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                                 ?painting rdfs:label ?paintingLabel}
+                                         filter(lang(?paintingLabel) = 'en').
+                                         BIND(REPLACE(?paintingLabel,'-',' ') AS ?paintingLabel) .
+                                       }
+                                } as %allPaintings
 
-                            WITH{
-                                SELECT DISTINCT ?painting ?paintingLabel ?image
-                                     WHERE{
-                                          INCLUDE %allPaintings.
-                                        }
-                               LIMIT 1
-                            } as %selectedPainting
+                                WITH{
+                                  SELECT DISTINCT ?painting ?paintingLabel ?image
+                                         WHERE{
+                                           INCLUDE %allPaintings.
+                                         }
+                                  ORDER BY (MD5(CONCAT(STR(?painting), STR(NOW()))))
+                                  LIMIT 1
+                                } as %selectedPainting
 
-                            WITH{
-                              SELECT DISTINCT ?painting ?paintingLabel
-                                     WHERE{
-                                          INCLUDE %allPaintings
-                                          FILTER NOT EXISTS{INCLUDE %selectedPainting}
-                                        }
-                               LIMIT 3
-                            } as %decoyPainting
+                                WITH{
+                                  select ?paintingLabel
+                                  where{
+                                     INCLUDE %selectedPainting.
+                                  }
+                                } as %selectedName
 
-                            WHERE{
-                                {INCLUDE %selectedPainting.}
-                                UNION
-                                {INCLUDE %decoyPainting}
+                                WITH{
+                                  SELECT DISTINCT ?paintingLabel
+                                         WHERE{
+                                           INCLUDE %allPaintings.
+                                           FILTER NOT EXISTS{
+                                             INCLUDE %selectedName
+                                           }
+                                         }
+                                  ORDER BY (MD5(CONCAT(STR(?painting), STR(NOW()))))
+                                  LIMIT 3
+                                } as %decoyPainting
 
-                                BIND(?paintingLabel as ?answer)
-                                BIND(?image as ?question)
-                            }
-                              order by DESC(?question)
+                                WHERE{
+                                  {INCLUDE %selectedPainting.}
+                                  UNION
+                                  {INCLUDE %decoyPainting}
+  
+                                  BIND(?paintingLabel as ?answer)
+                                  BIND(?image as ?question)
+                                }
+                                order by DESC(?question)
                             ",
                             Status = 2,
                             TaskDescription = "What is the name of this painting?"
@@ -4331,7 +4340,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "847fd22d-3644-4da9-8d8b-3ffc06b9a9e7",
+                            ConcurrencyStamp = "31ec723d-889b-4006-9d8e-ff336b588a0c",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,

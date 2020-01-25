@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using WikidataGame.Backend.Services;
 using Xunit.Abstractions;
 using System.Threading.Tasks;
+using WikidataGame.Backend.Helpers;
+using System.Collections.ObjectModel;
 
 namespace WikidataGame.Backend.Tests
 {
@@ -356,6 +358,32 @@ namespace WikidataGame.Backend.Tests
 
             Assert.True(Helpers.TileHelper.HasIslands(ex1, 10, 10));
             Assert.True(Helpers.TileHelper.HasIslands(ex2, 8, 8));
+        }
+
+        [Fact]
+        public void FindShortestPathBetweenAnyTiles_ForRandomMap_ReturnsNeighbour()
+        {
+            var user1Id = Guid.NewGuid();
+            var user2Id = Guid.NewGuid();
+            var map = MapGeneratorService.GenerateMap(GameConstants.DefaultMapWidth, GameConstants.DefaultMapHeight, GameConstants.DefaultAccessibleTilesCount);
+            map.ToList().ForEach(t => t.Id = Guid.NewGuid());
+            MapGeneratorService.SetStartPositions(map, new List<Guid>{ user1Id, user2Id }, GameConstants.DefaultMapWidth, GameConstants.DefaultMapHeight);
+            var game = new Game
+            {
+                MapWidth = GameConstants.DefaultMapWidth,
+                MapHeight = GameConstants.DefaultMapHeight,
+                Tiles = map.ToList()
+            };
+
+            var user1Tiles = map.Where(t => t.OwnerId == user1Id);
+            var user2Tiles = map.Where(t => t.OwnerId == user2Id);
+
+            var nextTile = TileHelper.FindTileForShortestPath(user1Tiles, user2Tiles, game);
+            var startX = user1Tiles.First().MapIndex % GameConstants.DefaultMapWidth;
+            var startY = user1Tiles.First().MapIndex / GameConstants.DefaultMapWidth;
+            var neighbours = TileHelper.GetNeighbors(map, startX, startY, GameConstants.DefaultMapWidth, GameConstants.DefaultMapHeight);
+
+            Assert.Contains(nextTile, neighbours.Values);
         }
     }
 }

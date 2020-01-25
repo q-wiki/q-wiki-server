@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using WikidataGame.Backend.Dto;
 using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Repos;
+using WikidataGame.Backend.Services;
 
 namespace WikidataGame.Backend.Controllers
 {
@@ -27,6 +28,7 @@ namespace WikidataGame.Backend.Controllers
         public async Task<ActionResult<PlatformStats>> GetPlatformStats(
             [FromServices] IRepository<Models.Category, Guid> categoryRepo,
             [FromServices] IGameRepository gameRepo,
+            [FromServices] IMinigameRepository minigameRepo,
             [FromServices] IQuestionRepository questionRepo)
         {
             return Ok(new PlatformStats
@@ -34,7 +36,7 @@ namespace WikidataGame.Backend.Controllers
                 NumberOfCategories = await categoryRepo.CountAsync(),
                 NumberOfGamesPlayed = await gameRepo.CountAsync(),
                 NumberOfQuestions = await questionRepo.CountAsync(q => q.Status == Models.QuestionStatus.Approved),
-                NumberOfContributions = 0 //TODO: Add contributions ability and handle count here
+                NumberOfMinigames = await minigameRepo.CountAsync()
             });
         }
 
@@ -177,6 +179,50 @@ namespace WikidataGame.Backend.Controllers
             await dataContext.SaveChangesAsync();
 
             return Created(string.Empty, reportModel);
+        }
+
+        /// <summary>
+        /// Retrieves information for the specified commons image url
+        /// </summary>
+        /// <param name="imageUrl">commons FilePath url</param>
+        /// <returns>image info (license text, thumbnail url)</returns>
+        [HttpGet("ImageInfo")]
+        [ProducesResponseType(typeof(CommonsImageInfo), StatusCodes.Status200OK)]
+        public async Task<ActionResult> PlatformRetrieveLicense(
+            string imageUrl)
+        {
+            try
+            {
+                (var thumbUrl, var licenseInfo) = await CommonsImageService.RetrieveImageInfoStringByUrlAsync(imageUrl, true);
+                var infoDto = new CommonsImageInfo
+                {
+                    ThumbUrl = thumbUrl,
+                    LicenseInfo = licenseInfo
+                };
+                return Ok(infoDto);
+            }
+            catch(UnableToRetrieveLicenseException)
+            {
+                return BadRequest("Unable to retrieve image info");
+            }
+        }
+
+        /// <summary>
+        /// Automatic OAuth flow
+        /// </summary>
+        /// <param name="code">GitHub code for authorization</param>
+        /// <param name="sourceUrl">Source url for frontend</param>
+        /// <returns></returns>
+        [HttpGet("GithubOAuth")]
+        public async Task<ActionResult> AuthenticatePlatformWithGitHub(
+            string code,
+            string sourceUrl,
+#pragma warning disable CS1573 // no xml comments for service injection
+            [FromServices] GitHubAuthService gitHubAuthService)
+#pragma warning restore CS1573
+        {
+            var gitHubBearer = await gitHubAuthService.RetrieveGitHubBearerTokenAsync(code);
+            return Redirect($"https://q-wiki.github.io/#/login?sourceUrl={sourceUrl}&bearer={gitHubBearer}");
         }
     }
 }

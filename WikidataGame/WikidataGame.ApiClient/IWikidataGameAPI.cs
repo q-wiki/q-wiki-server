@@ -201,13 +201,16 @@ namespace WikidataGame
         /// <summary>
         /// Creates a new game and matches the player with an opponent
         /// </summary>
+        /// <param name='withAiOpponent'>
+        /// Set to true, to match up with an AI opponent
+        /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
         /// </param>
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<GameInfo>> CreateNewGameWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<GameInfo>> CreateNewGameWithHttpMessagesAsync(bool? withAiOpponent = false, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Retrieves information on the specified game
@@ -384,6 +387,37 @@ namespace WikidataGame
         /// The cancellation token.
         /// </param>
         Task<HttpOperationResponse<Report>> AddPlatformReportWithHttpMessagesAsync(Report report = default(Report), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Retrieves information for the specified commons image url
+        /// </summary>
+        /// <param name='imageUrl'>
+        /// commons FilePath url
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<CommonsImageInfo>> PlatformRetrieveLicenseWithHttpMessagesAsync(string imageUrl = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Automatic OAuth flow
+        /// </summary>
+        /// <param name='code'>
+        /// GitHub code for authorization
+        /// </param>
+        /// <param name='sourceUrl'>
+        /// Source url for frontend
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse> AuthenticatePlatformWithGitHubWithHttpMessagesAsync(string code = default(string), string sourceUrl = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
     }
 }

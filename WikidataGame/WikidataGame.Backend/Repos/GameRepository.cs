@@ -62,7 +62,7 @@ namespace WikidataGame.Backend.Repos
             });
             game.NextMovePlayerId = player.Id;
             game.MoveStartedAt = DateTime.UtcNow;
-            game.Tiles = MapGeneratorService.SetStartPositions(game.Tiles, game.GameUsers.Select(gu => gu.UserId)).ToList();
+            MapGeneratorService.SetStartPositions(game.Tiles.OrderBy(t => t.MapIndex), game.GameUsers.Select(gu => gu.UserId), game.MapWidth, game.MapHeight).ToList();
             return game;
         }
 
@@ -122,6 +122,7 @@ namespace WikidataGame.Backend.Repos
 
         public async Task SetGameWonAsync(Game game, INotificationService notificationService)
         {
+            game.NextMovePlayerId = null;
             var winningPlayerIds = await WinningPlayerIdsAsync(game.Id);
             foreach (var winnerId in winningPlayerIds)
             {

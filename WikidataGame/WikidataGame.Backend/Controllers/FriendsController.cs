@@ -55,7 +55,7 @@ namespace WikidataGame.Backend.Controllers
         {
             var user = await userManager.GetUserAsync(User);
             var friendUser = await userManager.FindByIdAsync(friendId.ToString());
-            if(friendUser == null) //user does not exist
+            if(friendUser == null || friendUser.Id == DatabaseSeeds.BotGuid) //user does not exist
             {
                 return NotFound("User not found");
             }
@@ -126,7 +126,7 @@ namespace WikidataGame.Backend.Controllers
             var user = await userManager.GetUserAsync(User);
             var friends = await friendsRepo.FindAsync(f => f.UserId == user.Id);
             var friendUserIds = friends.Select(f => f.FriendId);
-            var users = await userManager.Users.Where(u => u.Id != user.Id && !friendUserIds.Contains(u.Id) && EF.Functions.Like(u.UserName, $"%{query.Replace("%","")}%")).Take(10).ToListAsync();
+            var users = await userManager.Users.Where(u => u.Id != user.Id && u.Id != DatabaseSeeds.BotGuid && !friendUserIds.Contains(u.Id) && EF.Functions.Like(u.UserName, $"%{query.Replace("%","")}%")).Take(10).ToListAsync();
             return Ok(users.Select(f => mapper.Map<Player>(f)).ToList());
         }
     }

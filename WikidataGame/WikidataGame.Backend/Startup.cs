@@ -144,6 +144,7 @@ namespace WikidataGame.Backend
             ).CreateMapper());
             services.AddTransient<IUserValidator<User>, UserValidator>();
             services.AddSingleton<INotificationService>(new NotificationService(Configuration.GetConnectionString("NotificationHub")));
+            services.AddSingleton(new GitHubAuthService(Configuration.GetConnectionString("GitHubClientId"), Configuration.GetConnectionString("GitHubClientSecret")));
             services.AddScoped<UserManager<User>>();
             services.AddSingleton(new AuthService(Configuration.GetConnectionString("GoogleClientSecret")));
             services.AddScoped<IGameRepository, GameRepository>();
@@ -156,7 +157,7 @@ namespace WikidataGame.Backend
             services.AddScoped<IMinigameService, MultipleChoiceMinigameService>();
             services.AddScoped<IMinigameService, SortingMinigameService>();
             services.AddSingleton<CategoryCacheService, CategoryCacheService>();
-            services.AddScoped<IMinigameService, BlurryImageMinigameService>();
+            services.AddScoped<IMinigameService, ImageMinigameService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

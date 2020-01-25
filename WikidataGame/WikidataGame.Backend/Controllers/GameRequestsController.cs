@@ -60,11 +60,11 @@ namespace WikidataGame.Backend.Controllers
         {
             var user = await userManager.GetUserAsync(User);
             var friendUser = await userManager.FindByIdAsync(userId.ToString());
-            if (friendUser == null) //user does not exist
+            if (friendUser == null || friendUser.Id == DatabaseSeeds.BotGuid) //user does not exist
             {
                 return NotFound("User not found");
             }
-            var similarGameRequests = await gameRequestRepo.FindAsync(gr => gr.RecipientId == user.Id && gr.SenderId == user.Id);
+            var similarGameRequests = await gameRequestRepo.FindAsync(gr => gr.RecipientId == friendUser.Id && gr.SenderId == user.Id);
             var runningGames = await gameRepo.RunningGamesForPlayerAsync(user);
             if (similarGameRequests.Any() || runningGames.Any(g => g.GameUsers.Any(gu => gu.UserId == friendUser.Id)))
             {

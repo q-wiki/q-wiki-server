@@ -99,7 +99,9 @@ namespace WikidataGame.ApiClient.Tests
             Assert.NotEmpty(mgr.CorrectAnswer);
             Assert.All(mgr.CorrectAnswer, a => Assert.False(string.IsNullOrEmpty(a)));
             Assert.True(mgr.IsWin.HasValue);
-            AssertGuid(mgr.NextMovePlayerId);
+            if(!mgr.IsWin.Value)
+                AssertGuid(mgr.NextMovePlayerId); //null on win
+
             Assert.All(mgr.Tiles, tilelist =>
             {
                 Assert.NotEmpty(tilelist);
@@ -117,7 +119,7 @@ namespace WikidataGame.ApiClient.Tests
 
             Assert.True(stats.NumberOfGamesPlayed.HasValue);
 
-            Assert.True(stats.NumberOfContributions.HasValue);
+            Assert.True(stats.NumberOfMinigames.HasValue);
         }
 
         public static void AssertDetailedMinigame(DetailedMiniGame dmg)

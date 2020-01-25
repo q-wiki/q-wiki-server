@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WikidataGame.Models;
 using Xunit;
 
 namespace WikidataGame.ApiClient.Tests
@@ -96,13 +97,46 @@ namespace WikidataGame.ApiClient.Tests
             else
             {
                 Assert.True(updatedTile3.OwnerId == game.Opponent.Id);
+                Assert.True(minigameAnswer3.NextMovePlayerId == game.Opponent.Id);
             }
-            Assert.True(minigameAnswer3.NextMovePlayerId == game.Opponent.Id);
 
             //cleanup
             await apiClient.DeleteGameAsync(gameInfo.GameId);
         }
 
-        
+        [Fact]
+        public async void AnswerMinigames_GameWithAiBot_Succeeds()
+        {
+            var authInfo = await RetrieveBearerAsync();
+            var apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo.Bearer));
+            var gameInfo = await apiClient.CreateNewGameAsync(true);
+            var game = await apiClient.RetrieveGameStateAsync(gameInfo.GameId);
+            if (game.AwaitingOpponentToJoin.Value)
+            {
+                var authInfo2 = await RetrieveBearerAsync();
+                apiClient = new WikidataGameAPI(new Uri(BaseUrl), new TokenCredentials(authInfo2.Bearer));
+                var gameInfo2 = await apiClient.CreateNewGameAsync();
+                game = await apiClient.RetrieveGameStateAsync(gameInfo2.GameId);
+            }
+
+            var flattenedTiles = game.Tiles.SelectMany(t => t).ToList();
+
+            //occupy 3 new tiles
+            MiniGameResult result = null;
+            for (int turn = 1; turn <= 3; turn++)
+            {
+                var tile = flattenedTiles.Where(t => t != null && string.IsNullOrEmpty(t.OwnerId)).First();
+                string id;
+                (result, id) = await CreateAndAnswerMinigameRandomly(apiClient, game.Id, tile);
+                ModelAssertion.AssertMinigameResult(result);
+                var updatedTile2 = result.Tiles.SelectMany(t => t).SingleOrDefault(t => t != null && t.Id == tile.Id);
+                flattenedTiles = result.Tiles.SelectMany(t => t).ToList();
+            }
+
+            Assert.True(result.NextMovePlayerId == game.Me.Id); //no player change in bot game
+
+            //cleanup
+            await apiClient.DeleteGameAsync(gameInfo.GameId);
+        }
     }
 }

@@ -59,28 +59,40 @@ namespace WikidataGame.Backend.Controllers
         /// <summary>
         /// Creates a new game and matches the player with an opponent
         /// </summary>
+        /// <param name="withAiOpponent">Set to true, to match up with an AI opponent</param>
         /// <returns>Info about the newly created game</returns>
         [HttpPost]
         [ProducesResponseType(typeof(GameInfo), StatusCodes.Status201Created)]
         public async Task<ActionResult<GameInfo>> CreateNewGame(
+#pragma warning disable CS1573 // no xml comments for service injection
             [FromServices] UserManager<Models.User> userManager,
             [FromServices] IGameRepository gameRepo,
             [FromServices] DataContext dataContext,
-            [FromServices] IMapper mapper)
+            [FromServices] IMapper mapper,
+#pragma warning restore CS1573
+            bool withAiOpponent = false)
         {
             var user = await userManager.GetUserAsync(User);
-            
-            //find matching player
-            var availableGames = await gameRepo.GetGamesForUserToJoinAsync(user);
             Models.Game game;
-            if (availableGames.Count() <= 0)
+            if (withAiOpponent)
             {
-                //no open games, or only games opened by current player, or only open games with a player the current user is already playing with
-                game = await gameRepo.CreateNewGameAsync(user);
+                var aiUser = await userManager.FindByIdAsync(DatabaseSeeds.BotGuid.ToString());
+                game = await gameRepo.CreateNewGameAsync(aiUser);
+                gameRepo.JoinGame(game, user);
             }
             else
             {
-                game = gameRepo.JoinGame(availableGames.First(), user);
+                //find matching player
+                var availableGames = await gameRepo.GetGamesForUserToJoinAsync(user);
+                if (availableGames.Count() <= 0)
+                {
+                    //no open games, or only games opened by current player, or only open games with a player the current user is already playing with
+                    game = await gameRepo.CreateNewGameAsync(user);
+                }
+                else
+                {
+                    game = gameRepo.JoinGame(availableGames.First(), user);
+                }
             }
 
             await dataContext.SaveChangesAsync();
@@ -94,9 +106,11 @@ namespace WikidataGame.Backend.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<GameInfo>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<GameInfo>>> GetGames(
+#pragma warning disable CS1573 // no xml comments for service injection
             [FromServices] UserManager<Models.User> userManager,
             [FromServices] IGameRepository gameRepo,
             [FromServices] IMapper mapper)
+#pragma warning restore CS1573
         {
             var user = await userManager.GetUserAsync(User);
             var games = await gameRepo.RunningGamesForPlayerAsync(user);

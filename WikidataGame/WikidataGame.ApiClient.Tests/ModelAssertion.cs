@@ -91,6 +91,19 @@ namespace WikidataGame.ApiClient.Tests
             Assert.All(minigame.AnswerOptions, option => Assert.False(string.IsNullOrEmpty(option)));
             Assert.False(string.IsNullOrEmpty(minigame.TaskDescription));
             Assert.NotNull(minigame.Type);
+            if(minigame.Type == 1) //image
+            {
+                Assert.False(string.IsNullOrEmpty(minigame.ImageUrl));
+                AssertImageInfo(minigame.ImageInfo);
+            }
+        }
+
+        public static void AssertImageInfo(ImageInfo imageInfo)
+        {
+            Assert.NotNull(imageInfo);
+            Assert.False(string.IsNullOrEmpty(imageInfo.Artist));
+            Assert.False(string.IsNullOrEmpty(imageInfo.Name));
+            Assert.False(string.IsNullOrEmpty(imageInfo.LicenseName));
         }
 
         public static void AssertMinigameResult(MiniGameResult mgr)

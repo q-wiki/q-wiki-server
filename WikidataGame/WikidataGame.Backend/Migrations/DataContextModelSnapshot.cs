@@ -14,7 +14,7 @@ namespace WikidataGame.Backend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
@@ -273,9 +273,9 @@ namespace WikidataGame.Backend.Migrations
 
                     b.Property<Guid>("GameId");
 
-                    b.Property<string>("ImageUrl");
+                    b.Property<string>("ImageInfoJson");
 
-                    b.Property<string>("LicenseInfo");
+                    b.Property<string>("ImageUrl");
 
                     b.Property<Guid>("PlayerId");
 
@@ -616,7 +616,8 @@ namespace WikidataGame.Backend.Migrations
                             CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
                             GroupId = new Guid("f88bb7ba-a1dc-45c1-8c6f-1c918bf87217"),
                             MiniGameType = 2,
-                            SparqlQuery = @"# What is the longest river in {continent}?
+                            SparqlQuery = @"
+                            # What is the longest river in {continent}?
                             SELECT DISTINCT ?answer ?question 
                             WITH {
                               SELECT DISTINCT ?continent WHERE {
@@ -628,7 +629,7 @@ namespace WikidataGame.Backend.Migrations
                               { 
                                 SELECT DISTINCT ?river ?continent (avg(?length2) as ?length) WHERE {
                                   INCLUDE %continent.
-                                  ?river wdt:P31/wdt:P279* wd:Q355304;
+                                  ?river wdt:P31/wdt:P279* wd:Q55659167;
                                          wdt:P2043 ?length2;
                                          wdt:P30 ?continent.
                                 }
@@ -949,6 +950,54 @@ namespace WikidataGame.Backend.Migrations
                             } ORDER BY DESC(?question)",
                             Status = 2,
                             TaskDescription = "Which of these moons belongs to {0}?"
+                        },
+                        new
+                        {
+                            Id = new Guid("39508588-107a-4220-a748-a72eaad711db"),
+                            CategoryId = new Guid("1b9185c0-c46b-4abf-bf82-e464f5116c7d"),
+                            GroupId = new Guid("7446071a-c64f-4b5a-97f3-10170a0824ac"),
+                            MiniGameType = 1,
+                            SparqlQuery = @"
+                            SELECT ?question ?answer
+                            WITH{
+                              Select distinct ?planet ?planetLabel ?image
+                              WHERE{
+                                  ?planet wdt:P31/wdt:P279+ wd:Q17362350.
+                                  ?planet wdt:P18 ?image
+                                  SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                         ?planet rdfs:label ?planetLabel}
+                              }
+                            } as %allPlanets
+
+                            WITH{
+                                SELECT ?planetLabel ?image
+                                WHERE{
+                                  INCLUDE %allPlanets
+                                }
+                              LIMIT 1
+                            } as %selectedPlanet
+
+                            WITH {
+                               SELECT ?planetLabel  
+                               WHERE{
+                                  INCLUDE %allPlanets
+                                  FILTER NOT EXISTS{INCLUDE %selectedPlanet}
+                                }
+                              LIMIT 3
+                            } as %decoyPlanets
+
+                            WHERE{
+                              {INCLUDE %selectedPlanet}
+                              UNION
+                              {INCLUDE %decoyPlanets}
+                              Bind(?image as ?question)
+                              Bind(?planetLabel as ?answer)
+                            }
+
+                            ORDER BY DESC(?question)
+                    ",
+                            Status = 2,
+                            TaskDescription = "Which planet is this?"
                         },
                         new
                         {
@@ -3564,47 +3613,56 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("d834932d-1203-4039-9baf-68322b176bae"),
                             MiniGameType = 1,
                             SparqlQuery = @"
-                            SELECT ?question ?answer
-                            WITH{
-                            SELECT DISTINCT ?creator ?painting ?image ?paintingLabel
-                              WHERE 
-                              { 
-                                ?painting wdt:P1343 wd:Q66362718.
-                                ?painting wdt:P18 ?image.
-                                SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. 
-                                                       ?painting rdfs:label ?paintingLabel}
-                                filter(lang(?paintingLabel) = 'en').
-                              }   
-                               ORDER BY (MD5(CONCAT(STR(?painting), STR(NOW())))) 
-                               LIMIT 4
-                            } as %allPaintings
+                                SELECT ?question ?answer
+                                WITH{
+                                SELECT DISTINCT ?painting ?image ?paintingLabel
+                                       WHERE {
+                                         ?painting wdt:P1343 wd:Q66362718.
+                                         ?painting wdt:P18 ?image.
+                                         SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                                 ?painting rdfs:label ?paintingLabel}
+                                         filter(lang(?paintingLabel) = 'en').
+                                         BIND(REPLACE(?paintingLabel,'-',' ') AS ?paintingLabel) .
+                                       }
+                                } as %allPaintings
 
-                            WITH{
-                                SELECT DISTINCT ?painting ?paintingLabel ?image
-                                     WHERE{
-                                          INCLUDE %allPaintings.
-                                        }
-                               LIMIT 1
-                            } as %selectedPainting
+                                WITH{
+                                  SELECT DISTINCT ?painting ?paintingLabel ?image
+                                         WHERE{
+                                           INCLUDE %allPaintings.
+                                         }
+                                  ORDER BY (MD5(CONCAT(STR(?painting), STR(NOW()))))
+                                  LIMIT 1
+                                } as %selectedPainting
 
-                            WITH{
-                              SELECT DISTINCT ?painting ?paintingLabel
-                                     WHERE{
-                                          INCLUDE %allPaintings
-                                          FILTER NOT EXISTS{INCLUDE %selectedPainting}
-                                        }
-                               LIMIT 3
-                            } as %decoyPainting
+                                WITH{
+                                  select ?paintingLabel
+                                  where{
+                                     INCLUDE %selectedPainting.
+                                  }
+                                } as %selectedName
 
-                            WHERE{
-                                {INCLUDE %selectedPainting.}
-                                UNION
-                                {INCLUDE %decoyPainting}
+                                WITH{
+                                  SELECT DISTINCT ?paintingLabel
+                                         WHERE{
+                                           INCLUDE %allPaintings.
+                                           FILTER NOT EXISTS{
+                                             INCLUDE %selectedName
+                                           }
+                                         }
+                                  ORDER BY (MD5(CONCAT(STR(?painting), STR(NOW()))))
+                                  LIMIT 3
+                                } as %decoyPainting
 
-                                BIND(?paintingLabel as ?answer)
-                                BIND(?image as ?question)
-                            }
-                              order by DESC(?question)
+                                WHERE{
+                                  {INCLUDE %selectedPainting.}
+                                  UNION
+                                  {INCLUDE %decoyPainting}
+  
+                                  BIND(?paintingLabel as ?answer)
+                                  BIND(?image as ?question)
+                                }
+                                order by DESC(?question)
                             ",
                             Status = 2,
                             TaskDescription = "What is the name of this painting?"
@@ -3867,12 +3925,10 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("f8717bdd-75df-4064-9394-af163034a1c0"),
                             MiniGameType = 0,
                             SparqlQuery = @"
-                            # Fetch how many successful (measured by box office revenue) movies an actor played in
-
-                            SELECT ?question ?answer ?movieCount
-                            WITH{
-                               # select the 500 movies with the highest box office revenue
-                             SELECT DISTINCT ?movie WHERE {
+                            SELECT DISTINCT ?question ?answer ?awardCount
+                                WITH{
+                                                               # select the 500 movies with the highest box office revenue
+                                SELECT DISTINCT ?movie WHERE {
                                   ?movie wdt:P31 wd:Q11424.
                                   ?movie p:P2142/psv:P2142 [wikibase:quantityAmount ?boxOffice; wikibase:quantityUnit ?currency].
                                   # only look at us dollars
@@ -3880,48 +3936,54 @@ namespace WikidataGame.Backend.Migrations
                                 }
                                 ORDER BY DESC(?boxOffice)
                                 LIMIT 500
-                            } as %topGrossingMovies
+                                } as %topGrossingMovies
 
-                            WITH{
-                            SELECT DISTINCT ?actor ?actorLabel (COUNT(?movie) as ?movieCount) 
-                            WHERE {
-                              {
-                               INCLUDE %topGrossingMovies
-                              }
-                              # get all actors that played in those movies
-                              ?movie wdt:P161 ?actor.
-                              #filter(lang(?actorLabel) = 'en').
-                              SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. }
-                            }
-                            GROUP BY ?actor ?actorLabel
-                            ORDER BY DESC(?movieCount)
-                            } as %countedMovies
+                                WITH{
+                                SELECT DISTINCT ?actor ?award
+                                WHERE{
+                                   {INCLUDE %topGrossingMovies}
+                                  # get all actors that played in those movies
+                                  ?movie wdt:P161 ?actor.
+                                  ?actor wdt:P166 ?award.
+                                  }
+                                  ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
+                                  limit 500
+                                } as %allWinners
 
-                            WITH{
-                              #group actors by number of appearances
-                              SELECT DISTINCT (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?actor); SEPARATOR=', ')) as ?actors)
-                              (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?actorLabel); SEPARATOR=', ')) as ?actorsLabel) ?movieCount
-                              WHERE{
-                                INCLUDE %countedMovies.
-                                 SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. 
-                                                         ?actor rdfs:label ?actorLabel
-                                                        }
-                              }
-                              GROUP BY ?movieCount
-                              ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
-                              LIMIT 4
-                            } as %summedMovies
+                                WITH{
+                                SELECT DISTINCT ?actorLabel (count(?award) as ?awardCount)
+                                  WHERE {
+                                         {INCLUDE %allWinners.}
+                                         ?award wdt:P31*/wdt:P279* wd:Q4220917
+                                         #?baseAward. logic if we want to count movie and television awards
+                                         #VALUES ?baseAward {wd:Q4220917 wd:Q1407225}
+                                         SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. 
+                                                                                         ?actor rdfs:label ?actorLabel
+                                                                                        }
+                                  }
+                                  group by ?actorLabel
+                                } as %countedMovies
 
-                            WHERE{
-                              INCLUDE %summedMovies.
-                              BIND(?actorsLabel as ?answer)
-                              BIND('Sort these actors by the number of movies they appeared in' as ?question)
-                            }
-                            order by ?movieCount
+                                WITH{
+                                   select (Group_Concat(distinct sample(?actorLabel); separator=', ') as ?actors) ?awardCount
+                                   where {
+                                        include %countedMovies
+                                        filter(?awardCount > 1)
+                                   }
+                                   group by ?awardCount
+                                   ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
+                                   limit 4
+                                } as %summedActors
 
+                                WHERE{
+                                    {INCLUDE %summedActors}
+                                    BIND(?actors as ?answer)
+                                    BIND('Sort actors by oscars received.' as ?question)
+                                }
+                                ORDER BY asc(?awardCount)
                             ",
                             Status = 2,
-                            TaskDescription = "Sort these actors by the number of movies they appeared in."
+                            TaskDescription = "Sort these actors by the number of movie awards they have received."
                         },
                         new
                         {
@@ -4075,6 +4137,87 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
+                            Id = new Guid("1e5551e1-a6a3-42df-8447-b0ac0effc8e6"),
+                            CategoryId = new Guid("2a388146-e32c-4a08-a246-472eff12849a"),
+                            GroupId = new Guid("37c3f290-ec79-4639-a8b8-c8a2ff2c2987"),
+                            MiniGameType = 1,
+                            SparqlQuery = @"
+                            SELECT DISTINCT ?question ?answer
+                            WITH{
+                              SELECT DISTINCT ?actor ?actorLabel
+                            WHERE{
+                              ?actor wdt:P31 wd:Q5;
+                                     wdt:P106 wd:Q33999;
+                                     wdt:P166 ?award.
+                              ?award wdt:P31+ wd:Q19020.
+                              ?actor wdt:P18 ?image
+                              SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                     ?movie rdfs:label ?movieLabel.
+                                                     ?actor rdfs:label ?actorLabel.
+                                                     ?award rdfs:label ?awardLabel}
+                            }
+                              ORDER BY ?actor ?actorLabel
+                            } as %allWinners
+                                       
+                            WITH{
+                              SELECT ?actor ?actorLabel ?image
+                              WHERE{
+                                 INCLUDE %allWinners.
+                                ?actor wdt:P18 ?image
+                              }
+                              ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
+                              LIMIT 1
+                            } as %selectedActor
+
+                            WITH{
+                              SELECT ?gender
+                              WHERE{
+                                 INCLUDE %selectedActor
+                                 {?actor wdt:P21 ?gender}
+                              }
+                            } as %selectedGender
+                            WITH{
+                              SELECT ?gender
+                              WHERE{
+                                 INCLUDE %allWinners
+                                 ?actor wdt:P21 ?gender
+                                 Filter NOT EXISTS {
+                                  include %selectedGender
+                                 }
+                              }
+                              LIMIT 1
+                            } as %filteredGenders
+
+                            WITH{
+                              SELECT DISTINCT ?actor ?actorLabel
+                              WHERE{
+                                INCLUDE %allWinners
+                                Filter NOT EXISTS {INCLUDE %selectedActor}
+                                ?actor wdt:P21 ?gender
+                                Filter NOT EXISTS {
+                                  include %filteredGenders
+                                }
+                                SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                     ?actor rdfs:label ?actorLabel.}
+                              }
+                              ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
+                              LIMIT 3
+                            } as %decoyActors
+
+                            WHERE{
+                                {INCLUDE %selectedActor}
+                                UNION
+                                {INCLUDE %decoyActors}
+                                BIND(?image as ?question)
+                                BIND(?actorLabel as ?answer)
+                            }
+                            ORDER BY DESC(?question)
+                            ",
+                            Status = 2,
+                            TaskDescription = "Who is this actor?"
+                        },
+                        new
+                        {
                             Id = new Guid("a79cb648-dbfd-4e03-a5a4-315fd4146120"),
                             CategoryId = new Guid("3d6c54d3-0fda-4923-a00e-e930640430b3"),
                             GroupId = new Guid("039acc70-30d3-40fe-a28a-0b44964d49e7"),
@@ -4195,6 +4338,60 @@ namespace WikidataGame.Backend.Migrations
                             ",
                             Status = 2,
                             TaskDescription = "Sort these sports by participating players."
+                        },
+                        new
+                        {
+                            Id = new Guid("fa1e5667-cc80-4526-99bd-fd4fc539d4fd"),
+                            CategoryId = new Guid("3d6c54d3-0fda-4923-a00e-e930640430b3"),
+                            GroupId = new Guid("28f59994-6a6b-4c9a-bc7a-a5c245c11ddb"),
+                            MiniGameType = 1,
+                            SparqlQuery = @"
+                            SELECT DISTINCT ?question ?answer
+                            WITH {
+                                 SELECT ?sport ?sportLabel ?image
+                                 WHERE {
+	                                   ?sport wdt:P31 wd:Q31629.
+                                       ?sport wdt:P18 ?image
+                                       SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                                ?sport rdfs:label ?sL
+                                                              }
+                                 filter(lang(?sportLabel) = 'en').
+                                 BIND(CONCAT(UCASE(SUBSTR(?sL, 1, 1)), SUBSTR(?sL, 2)) as ?sportLabel)
+                                 }
+                                 ORDER BY MD5(CONCAT(STR(?sport), STR(NOW())))
+                            } as %allSports
+                        
+                            WITH{
+                            SELECT DISTINCT ?sportLabel ?image
+                                    WHERE {
+                                      INCLUDE %allSports.
+                                    }
+                                    ORDER BY MD5(CONCAT(STR(?sport), STR(NOW())))
+                                    LIMIT 1
+                            } AS %selectedSport
+
+                            WITH{
+                              SELECT DISTINCT ?sportLabel
+                              WHERE{
+                                INCLUDE %allSports.
+                                FILTER NOT EXISTS {INCLUDE %selectedSport}
+    
+                              }
+                              ORDER BY MD5(CONCAT(STR(?sport), STR(NOW())))
+                              LIMIT 3
+                            } as %decoySport
+
+                            WHERE {
+                                   {INCLUDE %selectedSport}
+                                    union
+                                   {INCLUDE %decoySport}
+                                   BIND(?image as ?question)
+                                   BIND(?sportLabel as ?answer)
+                            }
+                            ORDER BY DESC(?question)
+                            ",
+                            Status = 2,
+                            TaskDescription = "Which sport is this?"
                         });
                 });
 
@@ -4331,7 +4528,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "847fd22d-3644-4da9-8d8b-3ffc06b9a9e7",
+                            ConcurrencyStamp = "c4a7b1e6-8067-4fe9-a8f4-ed76b64e02f2",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,

@@ -6,15 +6,19 @@ using WikidataGame.Backend.Models;
 using WikidataGame.Backend.Helpers;
 using WikidataGame.Backend.Repos;
 using System.Text.RegularExpressions;
+using AutoMapper;
 
 namespace WikidataGame.Backend.Services
 {
     public class ImageMinigameService : MinigameServiceBase, IMinigameService
     {
+        private IMapper _mapper;
         public ImageMinigameService(
             IMinigameRepository minigameRepo,
+            IMapper mapper,
             DataContext dataContext) : base(minigameRepo, dataContext)
         {
+            _mapper = mapper;
         }
 
         public MiniGameType MiniGameType => MiniGameType.Image;
@@ -30,9 +34,9 @@ namespace WikidataGame.Backend.Services
             var templist = data.Select(item => item.Item2).ToList();
             minigame.AnswerOptions = templist.OrderBy(a => Guid.NewGuid()).ToList(); // shuffle answer options
 
-            (var thumbUrl, var licenseString) = await CommonsImageService.RetrieveImageInfoStringByUrlAsync(data[0].Item1);
-            minigame.LicenseInfo = licenseString;
-            minigame.ImageUrl = thumbUrl;
+            var imageInfo = await CommonsImageService.RetrieveImageInfoByUrlAsync(data[0].Item1, _mapper);
+            minigame.ImageInfo = imageInfo;
+            minigame.ImageUrl = imageInfo.ThumbUrl;
             await _dataContext.SaveChangesAsync();
 
             return minigame;

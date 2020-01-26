@@ -12,7 +12,7 @@ namespace WikidataGame.Backend.Migrations
                 keyColumn: "Id",
                 keyValue: new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                 column: "ConcurrencyStamp",
-                value: "847fd22d-3644-4da9-8d8b-3ffc06b9a9e7");
+                value: "40bbb96b-16ea-439c-9724-b52a068a0b5b");
 
             migrationBuilder.UpdateData(
                 table: "Questions",
@@ -305,6 +305,40 @@ namespace WikidataGame.Backend.Migrations
             migrationBuilder.UpdateData(
                 table: "Questions",
                 keyColumn: "Id",
+                keyValue: new Guid("29fed1d0-d306-4946-8109-63b8aaf0262e"),
+                column: "SparqlQuery",
+                value: @"
+                            # What is the longest river in {continent}?
+                            SELECT DISTINCT ?answer ?question 
+                            WITH {
+                              SELECT DISTINCT ?continent WHERE {
+                                VALUES ?continent { wd:Q49 wd:Q48 wd:Q46 wd:Q18 wd:Q15  } # ohne Ozeanien
+                              } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW()))) LIMIT 1
+                            } as %continent
+
+                            WHERE {
+                              { 
+                                SELECT DISTINCT ?river ?continent (avg(?length2) as ?length) WHERE {
+                                  INCLUDE %continent.
+                                  ?river wdt:P31/wdt:P279* wd:Q55659167;
+                                         wdt:P2043 ?length2;
+                                         wdt:P30 ?continent.
+                                }
+                                group by ?river ?continent
+                              }
+                              OPTIONAL {
+                                ?continent rdfs:label ?question;
+                                           filter(lang(?question) = 'en')
+                                           ?river rdfs:label ?answer ;
+                                           filter(lang(?answer) = 'en')
+                              }
+                            }
+                            order by desc(?length)
+                            limit 4");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
                 keyValue: new Guid("30556891-ae34-4151-b55f-cd5a8b814235"),
                 column: "MiniGameType",
                 value: 0);
@@ -384,6 +418,70 @@ namespace WikidataGame.Backend.Migrations
                                BIND(?image as ?question)
                              } ORDER BY DESC(?question)
                             ");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("3803ddc5-f8ea-4bd6-93a2-855407f8178f"),
+                columns: new[] { "SparqlQuery", "TaskDescription" },
+                values: new object[] { @"
+                            SELECT DISTINCT ?question ?answer ?awardCount
+                                WITH{
+                                                               # select the 500 movies with the highest box office revenue
+                                SELECT DISTINCT ?movie WHERE {
+                                  ?movie wdt:P31 wd:Q11424.
+                                  ?movie p:P2142/psv:P2142 [wikibase:quantityAmount ?boxOffice; wikibase:quantityUnit ?currency].
+                                  # only look at us dollars
+                                  FILTER(?currency = wd:Q4917)
+                                }
+                                ORDER BY DESC(?boxOffice)
+                                LIMIT 500
+                                } as %topGrossingMovies
+
+                                WITH{
+                                SELECT DISTINCT ?actor ?award
+                                WHERE{
+                                   {INCLUDE %topGrossingMovies}
+                                  # get all actors that played in those movies
+                                  ?movie wdt:P161 ?actor.
+                                  ?actor wdt:P166 ?award.
+                                  }
+                                  ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
+                                  limit 500
+                                } as %allWinners
+
+                                WITH{
+                                SELECT DISTINCT ?actorLabel (count(?award) as ?awardCount)
+                                  WHERE {
+                                         {INCLUDE %allWinners.}
+                                         ?award wdt:P31*/wdt:P279* wd:Q4220917
+                                         #?baseAward. logic if we want to count movie and television awards
+                                         #VALUES ?baseAward {wd:Q4220917 wd:Q1407225}
+                                         SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. 
+                                                                                         ?actor rdfs:label ?actorLabel
+                                                                                        }
+                                  }
+                                  group by ?actorLabel
+                                } as %countedMovies
+
+                                WITH{
+                                   select (Group_Concat(distinct sample(?actorLabel); separator=', ') as ?actors) ?awardCount
+                                   where {
+                                        include %countedMovies
+                                        filter(?awardCount > 1)
+                                   }
+                                   group by ?awardCount
+                                   ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
+                                   limit 4
+                                } as %summedActors
+
+                                WHERE{
+                                    {INCLUDE %summedActors}
+                                    BIND(?actors as ?answer)
+                                    BIND('Sort actors by oscars received.' as ?question)
+                                }
+                                ORDER BY asc(?awardCount)
+                            ", "Sort these actors by the number of movie awards they have received." });
 
             migrationBuilder.UpdateData(
                 table: "Questions",
@@ -1144,6 +1242,64 @@ namespace WikidataGame.Backend.Migrations
                 keyValue: new Guid("ac86282f-1fa1-48ba-a088-f4c202ea0177"),
                 column: "TaskDescription",
                 value: "Where is the cocktail {0} from?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("b32fe12c-4016-4eed-a6d6-0bbb505553a0"),
+                column: "SparqlQuery",
+                value: @"
+                                SELECT ?question ?answer
+                                WITH{
+                                SELECT DISTINCT ?painting ?image ?paintingLabel
+                                       WHERE {
+                                         ?painting wdt:P1343 wd:Q66362718.
+                                         ?painting wdt:P18 ?image.
+                                         SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                                 ?painting rdfs:label ?paintingLabel}
+                                         filter(lang(?paintingLabel) = 'en').
+                                         BIND(REPLACE(?paintingLabel,'-',' ') AS ?paintingLabel) .
+                                       }
+                                } as %allPaintings
+
+                                WITH{
+                                  SELECT DISTINCT ?painting ?paintingLabel ?image
+                                         WHERE{
+                                           INCLUDE %allPaintings.
+                                         }
+                                  ORDER BY (MD5(CONCAT(STR(?painting), STR(NOW()))))
+                                  LIMIT 1
+                                } as %selectedPainting
+
+                                WITH{
+                                  select ?paintingLabel
+                                  where{
+                                     INCLUDE %selectedPainting.
+                                  }
+                                } as %selectedName
+
+                                WITH{
+                                  SELECT DISTINCT ?paintingLabel
+                                         WHERE{
+                                           INCLUDE %allPaintings.
+                                           FILTER NOT EXISTS{
+                                             INCLUDE %selectedName
+                                           }
+                                         }
+                                  ORDER BY (MD5(CONCAT(STR(?painting), STR(NOW()))))
+                                  LIMIT 3
+                                } as %decoyPainting
+
+                                WHERE{
+                                  {INCLUDE %selectedPainting.}
+                                  UNION
+                                  {INCLUDE %decoyPainting}
+  
+                                  BIND(?paintingLabel as ?answer)
+                                  BIND(?image as ?question)
+                                }
+                                order by DESC(?question)
+                            ");
 
             migrationBuilder.UpdateData(
                 table: "Questions",
@@ -2030,6 +2186,39 @@ namespace WikidataGame.Backend.Migrations
             migrationBuilder.UpdateData(
                 table: "Questions",
                 keyColumn: "Id",
+                keyValue: new Guid("29fed1d0-d306-4946-8109-63b8aaf0262e"),
+                column: "SparqlQuery",
+                value: @"# What is the longest river in {continent}?
+                            SELECT DISTINCT ?answer ?question 
+                            WITH {
+                              SELECT DISTINCT ?continent WHERE {
+                                VALUES ?continent { wd:Q49 wd:Q48 wd:Q46 wd:Q18 wd:Q15  } # ohne Ozeanien
+                              } ORDER BY MD5(CONCAT(STR(?continent), STR(NOW()))) LIMIT 1
+                            } as %continent
+
+                            WHERE {
+                              { 
+                                SELECT DISTINCT ?river ?continent (avg(?length2) as ?length) WHERE {
+                                  INCLUDE %continent.
+                                  ?river wdt:P31/wdt:P279* wd:Q355304;
+                                         wdt:P2043 ?length2;
+                                         wdt:P30 ?continent.
+                                }
+                                group by ?river ?continent
+                              }
+                              OPTIONAL {
+                                ?continent rdfs:label ?question;
+                                           filter(lang(?question) = 'en')
+                                           ?river rdfs:label ?answer ;
+                                           filter(lang(?answer) = 'en')
+                              }
+                            }
+                            order by desc(?length)
+                            limit 4");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
                 keyValue: new Guid("30556891-ae34-4151-b55f-cd5a8b814235"),
                 column: "MiniGameType",
                 value: 2);
@@ -2116,6 +2305,66 @@ namespace WikidataGame.Backend.Migrations
                                BIND(?image as ?question)
                              } ORDER BY DESC(?question)
                             ");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("3803ddc5-f8ea-4bd6-93a2-855407f8178f"),
+                columns: new[] { "SparqlQuery", "TaskDescription" },
+                values: new object[] { @"
+                            # Fetch how many successful (measured by box office revenue) movies an actor played in
+
+                            SELECT ?question ?answer ?movieCount
+                            WITH{
+                               # select the 500 movies with the highest box office revenue
+                             SELECT DISTINCT ?movie WHERE {
+                                  ?movie wdt:P31 wd:Q11424.
+                                  ?movie p:P2142/psv:P2142 [wikibase:quantityAmount ?boxOffice; wikibase:quantityUnit ?currency].
+                                  # only look at us dollars
+                                  FILTER(?currency = wd:Q4917)
+                                }
+                                ORDER BY DESC(?boxOffice)
+                                LIMIT 500
+                            } as %topGrossingMovies
+
+                            WITH{
+                            SELECT DISTINCT ?actor ?actorLabel (COUNT(?movie) as ?movieCount) 
+                            WHERE {
+                              {
+                               INCLUDE %topGrossingMovies
+                              }
+                              # get all actors that played in those movies
+                              ?movie wdt:P161 ?actor.
+                              #filter(lang(?actorLabel) = 'en').
+                              SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. }
+                            }
+                            GROUP BY ?actor ?actorLabel
+                            ORDER BY DESC(?movieCount)
+                            } as %countedMovies
+
+                            WITH{
+                              #group actors by number of appearances
+                              SELECT DISTINCT (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?actor); SEPARATOR=', ')) as ?actors)
+                              (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?actorLabel); SEPARATOR=', ')) as ?actorsLabel) ?movieCount
+                              WHERE{
+                                INCLUDE %countedMovies.
+                                 SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. 
+                                                         ?actor rdfs:label ?actorLabel
+                                                        }
+                              }
+                              GROUP BY ?movieCount
+                              ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
+                              LIMIT 4
+                            } as %summedMovies
+
+                            WHERE{
+                              INCLUDE %summedMovies.
+                              BIND(?actorsLabel as ?answer)
+                              BIND('Sort these actors by the number of movies they appeared in' as ?question)
+                            }
+                            order by ?movieCount
+
+                            ", "Sort these actors by the number of movies they appeared in." });
 
             migrationBuilder.UpdateData(
                 table: "Questions",
@@ -2840,6 +3089,55 @@ namespace WikidataGame.Backend.Migrations
                 keyValue: new Guid("ac86282f-1fa1-48ba-a088-f4c202ea0177"),
                 column: "TaskDescription",
                 value: "Where is {0} from?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("b32fe12c-4016-4eed-a6d6-0bbb505553a0"),
+                column: "SparqlQuery",
+                value: @"
+                            SELECT ?question ?answer
+                            WITH{
+                            SELECT DISTINCT ?creator ?painting ?image ?paintingLabel
+                              WHERE 
+                              { 
+                                ?painting wdt:P1343 wd:Q66362718.
+                                ?painting wdt:P18 ?image.
+                                SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. 
+                                                       ?painting rdfs:label ?paintingLabel}
+                                filter(lang(?paintingLabel) = 'en').
+                              }   
+                               ORDER BY (MD5(CONCAT(STR(?painting), STR(NOW())))) 
+                               LIMIT 4
+                            } as %allPaintings
+
+                            WITH{
+                                SELECT DISTINCT ?painting ?paintingLabel ?image
+                                     WHERE{
+                                          INCLUDE %allPaintings.
+                                        }
+                               LIMIT 1
+                            } as %selectedPainting
+
+                            WITH{
+                              SELECT DISTINCT ?painting ?paintingLabel
+                                     WHERE{
+                                          INCLUDE %allPaintings
+                                          FILTER NOT EXISTS{INCLUDE %selectedPainting}
+                                        }
+                               LIMIT 3
+                            } as %decoyPainting
+
+                            WHERE{
+                                {INCLUDE %selectedPainting.}
+                                UNION
+                                {INCLUDE %decoyPainting}
+
+                                BIND(?paintingLabel as ?answer)
+                                BIND(?image as ?question)
+                            }
+                              order by DESC(?question)
+                            ");
 
             migrationBuilder.UpdateData(
                 table: "Questions",

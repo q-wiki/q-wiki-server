@@ -124,16 +124,18 @@ namespace WikidataGame.Backend.Repos
         {
             game.NextMovePlayerId = null;
             var winningPlayerIds = await WinningPlayerIdsAsync(game.Id);
+
             foreach (var winnerId in winningPlayerIds)
             {
                 var user = game.GameUsers.SingleOrDefault(gu => gu.UserId == winnerId);
                 user.IsWinner = true;
                 await notificationService.SendNotificationAsync(
-                    PushType.YouWon,
+                    winningPlayerIds.Count() > 1 ? PushType.Draw : PushType.YouWon,
                     user.User,
                     game.GameUsers.SingleOrDefault(gu => gu.UserId != winnerId)?.User,
                     game.Id);
             }
+
             foreach (var looser in game.GameUsers.Where(gu => !winningPlayerIds.Contains(gu.UserId)))
             {
                 await notificationService.SendNotificationAsync(

@@ -856,7 +856,7 @@ namespace WikidataGame
             /// <param name='imageUrl'>
             /// commons FilePath url
             /// </param>
-            public static CommonsImageInfo PlatformRetrieveLicense(this IWikidataGameAPI operations, string imageUrl = default(string))
+            public static PlatformImageInfo PlatformRetrieveLicense(this IWikidataGameAPI operations, string imageUrl = default(string))
             {
                 return operations.PlatformRetrieveLicenseAsync(imageUrl).GetAwaiter().GetResult();
             }
@@ -873,7 +873,7 @@ namespace WikidataGame
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<CommonsImageInfo> PlatformRetrieveLicenseAsync(this IWikidataGameAPI operations, string imageUrl = default(string), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<PlatformImageInfo> PlatformRetrieveLicenseAsync(this IWikidataGameAPI operations, string imageUrl = default(string), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.PlatformRetrieveLicenseWithHttpMessagesAsync(imageUrl, null, cancellationToken).ConfigureAwait(false))
                 {

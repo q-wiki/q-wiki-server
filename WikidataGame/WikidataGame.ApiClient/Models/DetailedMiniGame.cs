@@ -24,7 +24,7 @@ namespace WikidataGame.Models
         /// <summary>
         /// Initializes a new instance of the DetailedMiniGame class.
         /// </summary>
-        public DetailedMiniGame(Question question = default(Question), IList<string> correctAnswer = default(IList<string>), string id = default(string), int? type = default(int?), string taskDescription = default(string), IList<string> answerOptions = default(IList<string>), string imageUrl = default(string), string licenseInfo = default(string))
+        public DetailedMiniGame(Question question = default(Question), IList<string> correctAnswer = default(IList<string>), string id = default(string), int? type = default(int?), string taskDescription = default(string), IList<string> answerOptions = default(IList<string>), string imageUrl = default(string), ImageInfo imageInfo = default(ImageInfo))
         {
             Question = question;
             CorrectAnswer = correctAnswer;
@@ -33,7 +33,7 @@ namespace WikidataGame.Models
             TaskDescription = taskDescription;
             AnswerOptions = answerOptions;
             ImageUrl = imageUrl;
-            LicenseInfo = licenseInfo;
+            ImageInfo = imageInfo;
             CustomInit();
         }
 
@@ -79,8 +79,8 @@ namespace WikidataGame.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "licenseInfo")]
-        public string LicenseInfo { get; set; }
+        [JsonProperty(PropertyName = "imageInfo")]
+        public ImageInfo ImageInfo { get; set; }
 
         /// <summary>
         /// Validate the object.

@@ -14,7 +14,7 @@ namespace WikidataGame.Backend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
@@ -957,7 +957,7 @@ namespace WikidataGame.Backend.Migrations
                             CategoryId = new Guid("1b9185c0-c46b-4abf-bf82-e464f5116c7d"),
                             GroupId = new Guid("7446071a-c64f-4b5a-97f3-10170a0824ac"),
                             MiniGameType = 1,
-                            SparqlQuery = @"
+                            SparqlQuery = @"
                             SELECT ?question ?answer
                             WITH{
                               Select distinct ?planet ?planetLabel ?image
@@ -994,7 +994,7 @@ namespace WikidataGame.Backend.Migrations
                               Bind(?planetLabel as ?answer)
                             }
 
-                            ORDER BY DESC(?question)
+                            ORDER BY DESC(?question)
                     ",
                             Status = 2,
                             TaskDescription = "Which planet is this?"
@@ -4528,7 +4528,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "40bbb96b-16ea-439c-9724-b52a068a0b5b",
+                            ConcurrencyStamp = "be45143a-8aa2-4bdd-9f91-21ca550ba06f",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,

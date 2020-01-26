@@ -616,7 +616,8 @@ namespace WikidataGame.Backend.Migrations
                             CategoryId = new Guid("cf3111af-8b18-4c6f-8ee6-115157d54b79"),
                             GroupId = new Guid("f88bb7ba-a1dc-45c1-8c6f-1c918bf87217"),
                             MiniGameType = 2,
-                            SparqlQuery = @"# What is the longest river in {continent}?
+                            SparqlQuery = @"
+                            # What is the longest river in {continent}?
                             SELECT DISTINCT ?answer ?question 
                             WITH {
                               SELECT DISTINCT ?continent WHERE {
@@ -628,7 +629,7 @@ namespace WikidataGame.Backend.Migrations
                               { 
                                 SELECT DISTINCT ?river ?continent (avg(?length2) as ?length) WHERE {
                                   INCLUDE %continent.
-                                  ?river wdt:P31/wdt:P279* wd:Q355304;
+                                  ?river wdt:P31/wdt:P279* wd:Q55659167;
                                          wdt:P2043 ?length2;
                                          wdt:P30 ?continent.
                                 }
@@ -3876,12 +3877,10 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("f8717bdd-75df-4064-9394-af163034a1c0"),
                             MiniGameType = 0,
                             SparqlQuery = @"
-                            # Fetch how many successful (measured by box office revenue) movies an actor played in
-
-                            SELECT ?question ?answer ?movieCount
-                            WITH{
-                               # select the 500 movies with the highest box office revenue
-                             SELECT DISTINCT ?movie WHERE {
+                            SELECT DISTINCT ?question ?answer ?awardCount
+                                WITH{
+                                                               # select the 500 movies with the highest box office revenue
+                                SELECT DISTINCT ?movie WHERE {
                                   ?movie wdt:P31 wd:Q11424.
                                   ?movie p:P2142/psv:P2142 [wikibase:quantityAmount ?boxOffice; wikibase:quantityUnit ?currency].
                                   # only look at us dollars
@@ -3889,48 +3888,54 @@ namespace WikidataGame.Backend.Migrations
                                 }
                                 ORDER BY DESC(?boxOffice)
                                 LIMIT 500
-                            } as %topGrossingMovies
+                                } as %topGrossingMovies
 
-                            WITH{
-                            SELECT DISTINCT ?actor ?actorLabel (COUNT(?movie) as ?movieCount) 
-                            WHERE {
-                              {
-                               INCLUDE %topGrossingMovies
-                              }
-                              # get all actors that played in those movies
-                              ?movie wdt:P161 ?actor.
-                              #filter(lang(?actorLabel) = 'en').
-                              SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. }
-                            }
-                            GROUP BY ?actor ?actorLabel
-                            ORDER BY DESC(?movieCount)
-                            } as %countedMovies
+                                WITH{
+                                SELECT DISTINCT ?actor ?award
+                                WHERE{
+                                   {INCLUDE %topGrossingMovies}
+                                  # get all actors that played in those movies
+                                  ?movie wdt:P161 ?actor.
+                                  ?actor wdt:P166 ?award.
+                                  }
+                                  ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
+                                  limit 500
+                                } as %allWinners
 
-                            WITH{
-                              #group actors by number of appearances
-                              SELECT DISTINCT (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?actor); SEPARATOR=', ')) as ?actors)
-                              (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?actorLabel); SEPARATOR=', ')) as ?actorsLabel) ?movieCount
-                              WHERE{
-                                INCLUDE %countedMovies.
-                                 SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. 
-                                                         ?actor rdfs:label ?actorLabel
-                                                        }
-                              }
-                              GROUP BY ?movieCount
-                              ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
-                              LIMIT 4
-                            } as %summedMovies
+                                WITH{
+                                SELECT DISTINCT ?actorLabel (count(?award) as ?awardCount)
+                                  WHERE {
+                                         {INCLUDE %allWinners.}
+                                         ?award wdt:P31*/wdt:P279* wd:Q4220917
+                                         #?baseAward. logic if we want to count movie and television awards
+                                         #VALUES ?baseAward {wd:Q4220917 wd:Q1407225}
+                                         SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. 
+                                                                                         ?actor rdfs:label ?actorLabel
+                                                                                        }
+                                  }
+                                  group by ?actorLabel
+                                } as %countedMovies
 
-                            WHERE{
-                              INCLUDE %summedMovies.
-                              BIND(?actorsLabel as ?answer)
-                              BIND('Sort these actors by the number of movies they appeared in' as ?question)
-                            }
-                            order by ?movieCount
+                                WITH{
+                                   select (Group_Concat(distinct sample(?actorLabel); separator=', ') as ?actors) ?awardCount
+                                   where {
+                                        include %countedMovies
+                                        filter(?awardCount > 1)
+                                   }
+                                   group by ?awardCount
+                                   ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
+                                   limit 4
+                                } as %summedActors
 
+                                WHERE{
+                                    {INCLUDE %summedActors}
+                                    BIND(?actors as ?answer)
+                                    BIND('Sort actors by oscars received.' as ?question)
+                                }
+                                ORDER BY asc(?awardCount)
                             ",
                             Status = 2,
-                            TaskDescription = "Sort these actors by the number of movies they appeared in."
+                            TaskDescription = "Sort these actors by the number of movie awards they have received."
                         },
                         new
                         {
@@ -4340,7 +4345,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "31ec723d-889b-4006-9d8e-ff336b588a0c",
+                            ConcurrencyStamp = "40bbb96b-16ea-439c-9724-b52a068a0b5b",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,

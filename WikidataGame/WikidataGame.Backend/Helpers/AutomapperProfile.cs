@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WikidataGame.Backend.Services;
 
@@ -100,6 +101,41 @@ namespace WikidataGame.Backend.Helpers
                     dto => (Models.MiniGameType)Enum.Parse(typeof(Models.MiniGameType), dto.MinigameType.ToString())))
                 .ForMember(model => model.ProblemType, opt => opt.MapFrom(
                     dto => (Models.ProblemType)Enum.Parse(typeof(Models.ProblemType), dto.ProblemType.ToString())));
+
+            CreateMap<Models.ImageInfo, Dto.ImageInfo>()
+                .ForMember(dto => dto.Name, opt => opt.MapFrom(
+                    model => TextLinkHelper.LinkFromTextAndUrl(model.Name, model.DescriptionUrl, false)))
+                .ForMember(dto => dto.Artist, opt => opt.MapFrom(
+                    model => TextLinkHelper.LinkFromTextAndUrl(model.Artist, model.ArtistUrl, false)));
+
+            CreateMap<Models.ImageInfo, Dto.PlatformImageInfo>()
+                .ForMember(dto => dto.LicenseInfo, opt => opt.MapFrom(
+                    model => $"{TextLinkHelper.LinkFromTextAndUrl(model.Artist, model.ArtistUrl, true)}, {TextLinkHelper.LinkFromTextAndUrl(model.Name, model.DescriptionUrl, true)}, {TextLinkHelper.LinkFromTextAndUrl(model.LicenseName, model.LicenseUrl, true)}"));
+
+            //internal
+            CreateMap<WikiImageInfo, Models.ImageInfo>()
+                .ConstructUsing((wii, _) =>
+                {
+                    var imageInfo = new Models.ImageInfo();
+                    var regex = new Regex("href=\"(?<link>.*?)\".*?>(?<name>.*?)</");
+                    var match = regex.Match(wii.LicenseInfo.Artist?.Value);
+                    if (match.Success)
+                    {
+                        imageInfo.Artist = match.Groups["name"].Value;
+                        imageInfo.ArtistUrl = match.Groups["link"].Value;
+                    }
+                    else
+                    {
+                        imageInfo.Artist = wii.LicenseInfo.Artist?.Value;
+                    }
+                    return imageInfo;
+                })
+                .ForMember(model => model.LicenseName, opt => opt.MapFrom(
+                    wii => wii.LicenseInfo.LicenseShortName == null ? string.Empty : wii.LicenseInfo.LicenseShortName.Value))
+                .ForMember(model => model.LicenseUrl, opt => opt.MapFrom(
+                    wii => wii.LicenseInfo.LicenseUrl == null ? string.Empty : wii.LicenseInfo.LicenseUrl.Value))
+                .ForMember(model => model.Name, opt => opt.MapFrom(
+                    wii => wii.LicenseInfo.ObjectName == null ? string.Empty : wii.LicenseInfo.ObjectName.Value));
         }
     }
 }

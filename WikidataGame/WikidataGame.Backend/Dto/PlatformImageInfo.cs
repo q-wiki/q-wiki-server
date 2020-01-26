@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace WikidataGame.Backend.Dto
 {
-    public class CommonsImageInfo
+    public class PlatformImageInfo
     {
         public string ThumbUrl { get; set; }
         public string LicenseInfo { get; set; }

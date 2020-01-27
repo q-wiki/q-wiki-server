@@ -19,6 +19,10 @@ namespace WikidataGame.Backend.Helpers
                 return $"<a href=\"{url}\" target=\"_blank\">{text}</a>";
             }
 
+            if (url.StartsWith("//")) //non web environments, need protocol in url
+            {
+                url = $"https:{url}";
+            }
             return $"<link=\"{url}\">{text}</link>";
         }
     }

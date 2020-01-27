@@ -82,7 +82,21 @@ namespace WikidataGame.Backend.Models
 
         public string ImageUrl { get; set; }
 
-        public string LicenseInfo { get; set; }
+        public string ImageInfoJson { get; set; }
+
+        [NotMapped]
+        public ImageInfo ImageInfo
+        {
+            get
+            {
+                return string.IsNullOrEmpty(ImageInfoJson) ? null : JsonConvert.DeserializeObject<ImageInfo>(ImageInfoJson);
+            }
+            set
+            {
+                ImageInfoJson = JsonConvert.SerializeObject(value);
+            }
+        }
+
     }
 
     public enum MiniGameType

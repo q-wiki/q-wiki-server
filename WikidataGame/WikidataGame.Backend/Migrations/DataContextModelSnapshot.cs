@@ -14,7 +14,7 @@ namespace WikidataGame.Backend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
@@ -273,9 +273,9 @@ namespace WikidataGame.Backend.Migrations
 
                     b.Property<Guid>("GameId");
 
-                    b.Property<string>("ImageUrl");
+                    b.Property<string>("ImageInfoJson");
 
-                    b.Property<string>("LicenseInfo");
+                    b.Property<string>("ImageUrl");
 
                     b.Property<Guid>("PlayerId");
 
@@ -950,6 +950,54 @@ namespace WikidataGame.Backend.Migrations
                             } ORDER BY DESC(?question)",
                             Status = 2,
                             TaskDescription = "Which of these moons belongs to {0}?"
+                        },
+                        new
+                        {
+                            Id = new Guid("39508588-107a-4220-a748-a72eaad711db"),
+                            CategoryId = new Guid("1b9185c0-c46b-4abf-bf82-e464f5116c7d"),
+                            GroupId = new Guid("7446071a-c64f-4b5a-97f3-10170a0824ac"),
+                            MiniGameType = 1,
+                            SparqlQuery = @"
+                            SELECT ?question ?answer
+                            WITH{
+                              Select distinct ?planet ?planetLabel ?image
+                              WHERE{
+                                  ?planet wdt:P31/wdt:P279+ wd:Q17362350.
+                                  ?planet wdt:P18 ?image
+                                  SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                         ?planet rdfs:label ?planetLabel}
+                              }
+                            } as %allPlanets
+
+                            WITH{
+                                SELECT ?planetLabel ?image
+                                WHERE{
+                                  INCLUDE %allPlanets
+                                }
+                              LIMIT 1
+                            } as %selectedPlanet
+
+                            WITH {
+                               SELECT ?planetLabel  
+                               WHERE{
+                                  INCLUDE %allPlanets
+                                  FILTER NOT EXISTS{INCLUDE %selectedPlanet}
+                                }
+                              LIMIT 3
+                            } as %decoyPlanets
+
+                            WHERE{
+                              {INCLUDE %selectedPlanet}
+                              UNION
+                              {INCLUDE %decoyPlanets}
+                              Bind(?image as ?question)
+                              Bind(?planetLabel as ?answer)
+                            }
+
+                            ORDER BY DESC(?question)
+                    ",
+                            Status = 2,
+                            TaskDescription = "Which planet is this?"
                         },
                         new
                         {
@@ -4089,6 +4137,87 @@ namespace WikidataGame.Backend.Migrations
                         },
                         new
                         {
+                            Id = new Guid("1e5551e1-a6a3-42df-8447-b0ac0effc8e6"),
+                            CategoryId = new Guid("2a388146-e32c-4a08-a246-472eff12849a"),
+                            GroupId = new Guid("37c3f290-ec79-4639-a8b8-c8a2ff2c2987"),
+                            MiniGameType = 1,
+                            SparqlQuery = @"
+                            SELECT DISTINCT ?question ?answer
+                            WITH{
+                              SELECT DISTINCT ?actor ?actorLabel
+                            WHERE{
+                              ?actor wdt:P31 wd:Q5;
+                                     wdt:P106 wd:Q33999;
+                                     wdt:P166 ?award.
+                              ?award wdt:P31+ wd:Q19020.
+                              ?actor wdt:P18 ?image
+                              SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                     ?movie rdfs:label ?movieLabel.
+                                                     ?actor rdfs:label ?actorLabel.
+                                                     ?award rdfs:label ?awardLabel}
+                            }
+                              ORDER BY ?actor ?actorLabel
+                            } as %allWinners
+                                       
+                            WITH{
+                              SELECT ?actor ?actorLabel ?image
+                              WHERE{
+                                 INCLUDE %allWinners.
+                                ?actor wdt:P18 ?image
+                              }
+                              ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
+                              LIMIT 1
+                            } as %selectedActor
+
+                            WITH{
+                              SELECT ?gender
+                              WHERE{
+                                 INCLUDE %selectedActor
+                                 {?actor wdt:P21 ?gender}
+                              }
+                            } as %selectedGender
+                            WITH{
+                              SELECT ?gender
+                              WHERE{
+                                 INCLUDE %allWinners
+                                 ?actor wdt:P21 ?gender
+                                 Filter NOT EXISTS {
+                                  include %selectedGender
+                                 }
+                              }
+                              LIMIT 1
+                            } as %filteredGenders
+
+                            WITH{
+                              SELECT DISTINCT ?actor ?actorLabel
+                              WHERE{
+                                INCLUDE %allWinners
+                                Filter NOT EXISTS {INCLUDE %selectedActor}
+                                ?actor wdt:P21 ?gender
+                                Filter NOT EXISTS {
+                                  include %filteredGenders
+                                }
+                                SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                     ?actor rdfs:label ?actorLabel.}
+                              }
+                              ORDER BY MD5(CONCAT(STR(?actor), STR(NOW())))
+                              LIMIT 3
+                            } as %decoyActors
+
+                            WHERE{
+                                {INCLUDE %selectedActor}
+                                UNION
+                                {INCLUDE %decoyActors}
+                                BIND(?image as ?question)
+                                BIND(?actorLabel as ?answer)
+                            }
+                            ORDER BY DESC(?question)
+                            ",
+                            Status = 2,
+                            TaskDescription = "Who is this actor?"
+                        },
+                        new
+                        {
                             Id = new Guid("a79cb648-dbfd-4e03-a5a4-315fd4146120"),
                             CategoryId = new Guid("3d6c54d3-0fda-4923-a00e-e930640430b3"),
                             GroupId = new Guid("039acc70-30d3-40fe-a28a-0b44964d49e7"),
@@ -4209,6 +4338,60 @@ namespace WikidataGame.Backend.Migrations
                             ",
                             Status = 2,
                             TaskDescription = "Sort these sports by participating players."
+                        },
+                        new
+                        {
+                            Id = new Guid("fa1e5667-cc80-4526-99bd-fd4fc539d4fd"),
+                            CategoryId = new Guid("3d6c54d3-0fda-4923-a00e-e930640430b3"),
+                            GroupId = new Guid("28f59994-6a6b-4c9a-bc7a-a5c245c11ddb"),
+                            MiniGameType = 1,
+                            SparqlQuery = @"
+                            SELECT DISTINCT ?question ?answer
+                            WITH {
+                                 SELECT ?sport ?sportLabel ?image
+                                 WHERE {
+	                                   ?sport wdt:P31 wd:Q31629.
+                                       ?sport wdt:P18 ?image
+                                       SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                                ?sport rdfs:label ?sL
+                                                              }
+                                 filter(lang(?sportLabel) = 'en').
+                                 BIND(CONCAT(UCASE(SUBSTR(?sL, 1, 1)), SUBSTR(?sL, 2)) as ?sportLabel)
+                                 }
+                                 ORDER BY MD5(CONCAT(STR(?sport), STR(NOW())))
+                            } as %allSports
+                        
+                            WITH{
+                            SELECT DISTINCT ?sportLabel ?image
+                                    WHERE {
+                                      INCLUDE %allSports.
+                                    }
+                                    ORDER BY MD5(CONCAT(STR(?sport), STR(NOW())))
+                                    LIMIT 1
+                            } AS %selectedSport
+
+                            WITH{
+                              SELECT DISTINCT ?sportLabel
+                              WHERE{
+                                INCLUDE %allSports.
+                                FILTER NOT EXISTS {INCLUDE %selectedSport}
+    
+                              }
+                              ORDER BY MD5(CONCAT(STR(?sport), STR(NOW())))
+                              LIMIT 3
+                            } as %decoySport
+
+                            WHERE {
+                                   {INCLUDE %selectedSport}
+                                    union
+                                   {INCLUDE %decoySport}
+                                   BIND(?image as ?question)
+                                   BIND(?sportLabel as ?answer)
+                            }
+                            ORDER BY DESC(?question)
+                            ",
+                            Status = 2,
+                            TaskDescription = "Which sport is this?"
                         });
                 });
 
@@ -4345,7 +4528,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "40bbb96b-16ea-439c-9724-b52a068a0b5b",
+                            ConcurrencyStamp = "c4a7b1e6-8067-4fe9-a8f4-ed76b64e02f2",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,

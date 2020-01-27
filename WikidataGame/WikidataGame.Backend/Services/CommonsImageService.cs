@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using AutoMapper;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace WikidataGame.Backend.Services
     {
         public const string CommonsInfoEndpoint = "https://en.wikipedia.org/w/api.php?action=query&prop=imageinfo&iiprop=extmetadata|url&format=json&iiurlwidth=800&titles=File%3a{0}";
 
-        public static async Task<ImageInfo> RetrieveImageInfoByUrlAsync(string url)
+        public static async Task<Models.ImageInfo> RetrieveImageInfoByUrlAsync(string url, IMapper mapper)
         {
             var regex = new Regex("FilePath/(?<filename>.*?)$");
             var match = regex.Match(url);
@@ -29,14 +30,14 @@ namespace WikidataGame.Backend.Services
                 {
                     var infoJson = await webClient.DownloadStringTaskAsync(string.Format(CommonsInfoEndpoint, filename));
                     var jObject = JObject.Parse(infoJson);
-                    var imageInfo = jObject.SelectToken("query.pages..imageinfo[0]").ToObject<ImageInfo>();
+                    var imageInfo = jObject.SelectToken("query.pages..imageinfo[0]").ToObject<WikiImageInfo>();
                     var htmlregex = new Regex("<(\\s*[(/?)\\w+]*)");
                     if (htmlregex.IsMatch(imageInfo.LicenseInfo.ObjectName?.Value))
                     {
-                        imageInfo.LicenseInfo.ObjectName = new ValueSource { Value = HttpUtility.UrlDecode(filename), Source = "Q-Wiki" };
+                        imageInfo.LicenseInfo.ObjectName = new WikiValueSource { Value = HttpUtility.UrlDecode(filename), Source = "Q-Wiki" };
                     }
 
-                    return imageInfo;
+                    return mapper.Map<Models.ImageInfo>(imageInfo);
                 }
             }
             catch (Exception)
@@ -44,43 +45,9 @@ namespace WikidataGame.Backend.Services
                 throw new UnableToRetrieveLicenseException();
             }
         }
-
-        public static async Task<(string, string)> RetrieveImageInfoStringByUrlAsync(string url, bool asHtml = false)
-        {
-            string licenseOutput;
-            var imageInfo = await RetrieveImageInfoByUrlAsync(url);
-            var regex = new Regex("href=\"(?<link>.*?)\".*?>(?<name>.*?)</");
-            var match = regex.Match(imageInfo.LicenseInfo.Artist?.Value);
-            if (match.Success)
-            {
-                licenseOutput = $"{LinkFromTextAndUrl(match.Groups["name"].Value, match.Groups["link"].Value, asHtml)}, ";
-            }
-            else
-            {
-                licenseOutput = $"{imageInfo.LicenseInfo.Artist} ,";
-            }
-            licenseOutput += $"{LinkFromTextAndUrl(imageInfo.LicenseInfo.ObjectName?.Value, imageInfo.DescriptionUrl, asHtml)}, ";
-            if (imageInfo.LicenseInfo.LicenseUrl != null)
-            {
-                licenseOutput += $"{LinkFromTextAndUrl(imageInfo.LicenseInfo.LicenseShortName?.Value, imageInfo.LicenseInfo.LicenseUrl?.Value, asHtml)}";
-            }
-            else
-            {
-                licenseOutput += imageInfo.LicenseInfo.LicenseShortName?.Value;
-            }
-            return (imageInfo.ThumbUrl, licenseOutput);
-        }
-        
-        private static string LinkFromTextAndUrl(string text, string url, bool asHtml)
-        {
-            if (asHtml)
-                return $"<a href=\"{url}\" target=\"_blank\">{text}</a>";
-
-            return $"<link=\"{url}\">{text}</link>";
-        }
     }
 
-    public class ImageInfo
+    public class WikiImageInfo
     {
         [JsonProperty("url")]
         public string Url { get; set; }
@@ -92,18 +59,18 @@ namespace WikidataGame.Backend.Services
         public string ThumbUrl { get; set; }
 
         [JsonProperty("extmetadata")]
-        public LicenseInfo LicenseInfo { get; set; }
+        public WikiLicenseInfo LicenseInfo { get; set; }
     }
 
-    public class LicenseInfo
+    public class WikiLicenseInfo
     {
-        public ValueSource ObjectName { get; set; }
-        public ValueSource Artist { get; set; }
-        public ValueSource LicenseUrl { get; set; }
-        public ValueSource LicenseShortName { get; set; }
+        public WikiValueSource ObjectName { get; set; }
+        public WikiValueSource Artist { get; set; }
+        public WikiValueSource LicenseUrl { get; set; }
+        public WikiValueSource LicenseShortName { get; set; }
     }
 
-    public class ValueSource
+    public class WikiValueSource
     {
         [JsonProperty("value")]
         public string Value { get; set; }

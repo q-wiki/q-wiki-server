@@ -76,6 +76,15 @@ namespace WikidataGame.Backend.Services
                     Body = "{0} wants to challenge you! Open Q-Wiki to accept the request.",
                     Data = new PushData { Action = "request" }
                 }
+            },
+            {
+                PushType.Draw,
+                new PushTemplate
+                {
+                    Title = "Draw!",
+                    Body = "Your game against {0} ended in a draw.",
+                    Data = new PushData { Action = "draw" }
+                }
             }
         };
 
@@ -196,6 +205,7 @@ namespace WikidataGame.Backend.Services
         YouWon,
         YouLostTimeout,
         YouWonTimeout,
+        Draw,
         Delete,
         GameRequest
     }

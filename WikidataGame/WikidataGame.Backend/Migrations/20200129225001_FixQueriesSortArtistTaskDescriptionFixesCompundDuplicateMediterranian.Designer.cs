@@ -9,8 +9,8 @@ using WikidataGame.Backend.Helpers;
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200127204225_FixQueriesAwardsParticipatingPlayers")]
-    partial class FixQueriesAwardsParticipatingPlayers
+    [Migration("20200129225001_FixQueriesSortArtistTaskDescriptionFixesCompundDuplicateMediterranian")]
+    partial class FixQueriesSortArtistTaskDescriptionFixesCompundDuplicateMediterranian
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -573,7 +573,7 @@ namespace WikidataGame.Backend.Migrations
                             SELECT DISTINCT ?question ?answer
                             WITH {
                               SELECT DISTINCT (?state as ?country) WHERE {
-                                ?state wdt:P31/wdt:P279* wd:Q3624078;
+                                ?state wdt:P31/wdt:P279 wd:Q3624078;
                                        p:P463 ?memberOfStatement.
                                 ?memberOfStatement a wikibase:BestRank;
                                                      ps:P463 wd:Q1065.
@@ -876,80 +876,69 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("98a751f6-eee0-4d79-9401-992417283aa9"),
                             MiniGameType = 2,
                             SparqlQuery = @"#Which of these moons belongs to the planet {0}?
-                            SELECT ?question ?answer 
-                            WITH {
-                              # subquery 1: get all moons of planets of our solar system
-                              SELECT ?moon ?parent ?question ?answer WHERE {
-                              {
-                                SELECT ?moon ?moonLabel ?parent WHERE {
+                            SELECT ?question ?answer
+                            WITH{
+                              Select distinct ?planet ?planetLabel ?image
+                              WHERE{
+                                #get all planets that have a moon
+                                  ?planet wdt:P31/wdt:P279+ wd:Q17362350.
                                   ?moon wdt:P31/wdt:P279* wd:Q2537;
-                                        wdt:P397 ?parent.
-                                  ?parent wdt:P361+ wd:Q544.
-                                  BIND (?parent as ?planet).
-                                  SERVICE wikibase:label { bd:serviceParam wikibase:language '[AUTO_LANGUAGE],en'. }
-                                }
+                                                          wdt:P397 ?planet.
+                                  SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                         ?planet rdfs:label ?planetLabel}
                               }
-                              FILTER(!CONTAINS(?moonLabel, '/'))
-                            } ORDER BY MD5(CONCAT(STR(?moonLabel), STR(NOW()))) # order by random
-                            } as %moons
+                            } as %allPlanets
 
-                            WITH {
-                              # subquery 2:
-                              # get one random planet
-                              # get all moons out of list 1 which belong to that planet
-                              SELECT ?moon ?parent WHERE {
-                                INCLUDE %moons.
-                                {
-                                  SELECT DISTINCT ?parent WHERE {
-                                    {
-                                      SELECT ?moon ?moonLabel ?parentLabel ?parent WHERE {
-                                        ?moon wdt:P31/wdt:P279* wd:Q2537;
-                                              wdt:P397 ?parent.
-                                        ?parent wdt:P361+ wd:Q544.
-                                        SERVICE wikibase:label { bd:serviceParam wikibase:language '[AUTO_LANGUAGE],en'. }
-                                      }
-                                    }
-                                    FILTER(!CONTAINS(?moonLabel, '/'))
-                                  } 
-                                  GROUP BY ?parent
+                            WITH{
+                                SELECT ?planetLabel ?planet
+                                WHERE{
+                                  INCLUDE %allPlanets
                                 }
-                              } ORDER BY MD5(CONCAT(STR(?moon), STR(NOW()))) # order by random
-                                LIMIT 1
-                            } AS %selectedPlanet
-
-                            WITH {
-                              # subquery 3: get one moon out of list 2 (= correct answer)
-                              SELECT DISTINCT ?moon ?parent WHERE {
-                                INCLUDE %selectedPlanet.
-                              } ORDER BY MD5(CONCAT(STR(?moon), STR(NOW()))) 
+                              ORDER BY MD5(CONCAT(STR(?planet), STR(NOW()))) 
                               LIMIT 1
-  
-                            } AS %oneMoon
+                            } as %selectedPlanet
+
+                            #get moon of one selected planet
+                            WITH{
+                              SELECT ?moon ?moonLabel ?planet ?planetLabel
+                              WHERE{
+                                include %selectedPlanet
+                                ?moon wdt:P31/wdt:P279* wd:Q2537;
+                                                          wdt:P397 ?planet.
+                                SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                         ?planet rdfs:label ?planetLabel.
+                                                          ?moon rdfs:label ?moonLabel}
+                                 FILTER(!CONTAINS(?moonLabel, '/'))
+                              }
+                              ORDER BY MD5(CONCAT(STR(?planet), STR(NOW()))) 
+                              limit 1
+                            } as %selectedMoon
 
                             WITH {
-                            # subquery 4 get three false answers (question/parent must be empty here!)
-                              SELECT DISTINCT ?moon ?empty WHERE {
-                                INCLUDE %moons.
-                                FILTER NOT EXISTS { INCLUDE %selectedPlanet. }
-                              } ORDER BY MD5(CONCAT(STR(?moon), STR(NOW()))) 
+                               SELECT DISTINCT ?moonLabel 
+                               WHERE{
+                                  INCLUDE %allPlanets
+                                  FILTER NOT EXISTS{INCLUDE %selectedPlanet}
+                                  ?moon wdt:P31/wdt:P279* wd:Q2537;
+                                                          wdt:P397 ?planet.
+                                  SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                          ?moon rdfs:label ?moonLabel}
+                                  FILTER(!CONTAINS(?moonLabel, '/'))
+                                }
+                              ORDER BY MD5(CONCAT(STR(?moonLabel), STR(NOW()))) 
                               LIMIT 3
-                            } AS %threeMoons
+                            } as %decoyMoons
 
-                            WITH {
-                              # another subquery because of dubios server errors
-                              SELECT * WHERE {
+                            WHERE{
+                              {INCLUDE %selectedMoon}
+                              UNION
+                              {INCLUDE %decoyMoons}
+                              Bind(?planetLabel as ?question)
+                              Bind(?moonLabel as ?answer)
+                            }
 
-                                 {INCLUDE %threeMoons } UNION {INCLUDE %oneMoon}
-                              }
-                            } AS %final WHERE {
-                              INCLUDE %final.
-  
-                              SERVICE wikibase:label {
-                                bd:serviceParam wikibase:language 'en'.
-                                ?parent  rdfs:label ?question.
-                                ?moon rdfs:label ?answer.
-                              }
-                            } ORDER BY DESC(?question)",
+                            ORDER BY DESC(?question)
+                            ",
                             Status = 2,
                             TaskDescription = "Which of these moons belongs to {0}?"
                         },
@@ -1351,7 +1340,7 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("ba587fa0-9601-4d99-a56b-7e92a5ccbe13"),
                             MiniGameType = 2,
                             SparqlQuery = @"# Which chemical compound has the formula {0}?
-                            SELECT DISTINCT ?chemicalCompound ?answer (?chemical_formula AS ?question) ?sitelinks WHERE {
+                            SELECT DISTINCT ?chemicalCompound ?answer (sample(?chemical_formula) AS ?question) ?sitelinks WHERE {
                               ?chemicalCompound wdt:P31 wd:Q11173;
                                 wdt:P274 ?chemical_formula;
                                 wikibase:sitelinks ?sitelinks.
@@ -1359,6 +1348,7 @@ namespace WikidataGame.Backend.Migrations
                               ?chemicalCompound rdfs:label ?answer.
                               FILTER((LANG(?answer)) = 'en')
                             }
+                            group by ?chemicalCompound ?answer ?sitelinks
                             ORDER BY (MD5(CONCAT(STR(?answer), STR(NOW()))))
                             LIMIT 4",
                             Status = 2,
@@ -1988,7 +1978,7 @@ namespace WikidataGame.Backend.Migrations
                             ORDER BY ASC(?biteForce)
                             ",
                             Status = 2,
-                            TaskDescription = "Order these animals by bite force quotient (ascending)."
+                            TaskDescription = "Order these animals by bite strenght relatively to their size (ascending)."
                         },
                         new
                         {
@@ -2080,7 +2070,7 @@ namespace WikidataGame.Backend.Migrations
                              } ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Which species is {0}?"
+                            TaskDescription = "Which one of these species is {0}?"
                         },
                         new
                         {
@@ -3563,7 +3553,7 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("70a291e1-4513-4e41-87c5-2746f40a4e0c"),
                             MiniGameType = 0,
                             SparqlQuery = @"
-                               SELECT ?question ?answer
+                                SELECT ?question ?answer
                                 WITH{
                                 SELECT DISTINCT ?creator
                                   WHERE 
@@ -3572,41 +3562,47 @@ namespace WikidataGame.Backend.Migrations
                                             wdt:P170 ?creator.
                                   }
                                    ORDER BY (MD5(CONCAT(STR(?creator), STR(NOW()))))                    
-                                   LIMIT 16
+                                   LIMIT 20
                                   } as %selectedArtists
 
                                 WITH{
-                                    SELECT DISTINCT ?creator ?creatorLabel (SAMPLE(?inception) as ?firstPaintingInception) (SAMPLE(?painting) as ?firstPainting) (GROUP_CONCAT(DISTINCT ?paintingLabel; SEPARATOR=', ') AS ?paintingNames)
+                                    SELECT DISTINCT ?creator ?creatorLabel  (MIN(?inception) AS ?inception1) 
                                             WHERE{
                                                   INCLUDE %selectedArtists.
-                                                  {SELECT *
-                                                    where{ 
-                                                   ?creator wdt:P106 wd:Q1028181.
                                                    ?painting wdt:P170 ?creator.
                                                    ?painting wdt:P571 ?inception.
-                                                   Filter(datatype(YEAR(?inception))!='') .  
+                                                   Filter(datatype(YEAR(?inception))!='') .
+                                                   Filter(?creator != wd:Q4233718) 
                                                    SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
                                                                           ?creator rdfs:label ?creatorLabel}
-                                                  }
-                                              order by ?inception
-                                            }}
+                                            SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                                                          ?creator rdfs:label ?creatorLabel}
+                                            }
                                   group by ?creator ?creatorLabel
-                                  ORDER BY (MD5(CONCAT(STR(?creator), STR(NOW()))))  
-                                  LIMIT 4
                                 } as %firstPainting
 
-                                    WHERE{
-                                    INCLUDE %firstPainting.
+                                WITH{
+                                   select distinct (GROUP_CONCAT ( distinct sample(?creatorLabel); separator=', ') as ?painter) ?year
+                                   WHERE{
+                                     include %firstPainting
+                                     bind(year(?inception1) as ?year)
+                                   }
+                                  group by ?year
+                                  ORDER BY (MD5(CONCAT(STR(?year), STR(NOW()))))                    
+                                  LIMIT 4
+                                } as %groupedPainter
+
+                                WHERE{
+                                    INCLUDE %groupedPainter.
                                     SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. 
-                                                           ?creator rdfs:label ?answer.
                                                            ?painting rdfs:label ?paintingLabel}
-                                    BIND(?creatorLabel as ?answer)
+                                    BIND(?painter as ?answer)
                                     BIND('order the artists by the inception of their first painting' as ?question)
                                 }
-                                  order by ?firstPaintingInception
+                                  order by ?year
                                 ",
                             Status = 2,
-                            TaskDescription = "Sort artist by release of first painting."
+                            TaskDescription = "Sort artist by release of first painting (ascending)."
                         },
                         new
                         {
@@ -3862,7 +3858,7 @@ namespace WikidataGame.Backend.Migrations
                             order by ?year
                             ",
                             Status = 2,
-                            TaskDescription = "Sort these softdrinks by release."
+                            TaskDescription = "Sort these softdrinks by release (ascending)."
                         },
                         new
                         {
@@ -3897,22 +3893,12 @@ namespace WikidataGame.Backend.Migrations
                               WHERE { 
                                 INCLUDE %allDishes
                               }
-                              LIMIT 1
+                              ORDER BY MD5(CONCAT(STR(?dish), STR(NOW())))
+                              LIMIT 4
                             } as %selectedDish
 
-                            WITH{
-                              SELECT ?dishLabel ?dish
-                              WHERE{
-                                INCLUDE %allDishes
-                                FILTER NOT EXISTS{INCLUDE %selectedDish}
-                              }
-                              LIMIT 3
-                            } as %decoyDishes
-
                             WHERE{
-                              {INCLUDE %selectedDish}
-                              UNION
-                              {INCLUDE %decoyDishes}
+                              INCLUDE %selectedDish
                               BIND(?image as ?question)
                             }
                             ORDER BY DESC(?question)
@@ -3989,7 +3975,7 @@ namespace WikidataGame.Backend.Migrations
                             ORDER BY asc(?awardCount)
                             ",
                             Status = 2,
-                            TaskDescription = "Sort these actors by the number of movie awards they have received."
+                            TaskDescription = "Sort these actors by the number of movie awards they have received (ascending)."
                         },
                         new
                         {
@@ -4301,7 +4287,7 @@ namespace WikidataGame.Backend.Migrations
                             ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Who is the coach of {0}?"
+                            TaskDescription = "Who is the current coach of {0}?"
                         },
                         new
                         {
@@ -4343,7 +4329,7 @@ namespace WikidataGame.Backend.Migrations
                             ORDER BY ?playerCount
                             ",
                             Status = 2,
-                            TaskDescription = "Sort these sports by maximum amount ofparticipating players.(ascending)"
+                            TaskDescription = "Sort these sports by maximum amount ofparticipating players (ascending)."
                         },
                         new
                         {
@@ -4534,7 +4520,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "3090246e-346f-45f3-b13c-9636768a87c7",
+                            ConcurrencyStamp = "7463a0d0-4a07-437c-a304-101cfd474318",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,

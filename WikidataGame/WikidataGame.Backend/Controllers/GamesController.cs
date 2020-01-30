@@ -161,10 +161,13 @@ namespace WikidataGame.Backend.Controllers
                 return Forbid();
 
             var game = await gameRepo.GetAsync(gameId);
-            var opponents = game.GameUsers.Select(gu => gu.User).Where(u => u.Id != user.Id).ToList();
-            foreach(var opponent in opponents)
+            if (!game.GameUsers.Any(gu => gu.IsWinner)) //game still running
             {
-                await notificationService.SendNotificationAsync(PushType.Delete, opponent, user, game.Id);
+                var opponents = game.GameUsers.Select(gu => gu.User).Where(u => u.Id != user.Id).ToList();
+                foreach (var opponent in opponents)
+                {
+                    await notificationService.SendNotificationAsync(PushType.Delete, opponent, user, game.Id);
+                }
             }
             dataContext.Set<Models.Tile>().RemoveRange(game.Tiles);
             gameRepo.Remove(game);

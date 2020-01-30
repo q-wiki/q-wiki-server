@@ -400,7 +400,7 @@ namespace WikidataGame
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<CommonsImageInfo>> PlatformRetrieveLicenseWithHttpMessagesAsync(string imageUrl = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<PlatformImageInfo>> PlatformRetrieveLicenseWithHttpMessagesAsync(string imageUrl = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Automatic OAuth flow

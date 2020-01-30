@@ -3666,7 +3666,7 @@ namespace WikidataGame
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<CommonsImageInfo>> PlatformRetrieveLicenseWithHttpMessagesAsync(string imageUrl = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<PlatformImageInfo>> PlatformRetrieveLicenseWithHttpMessagesAsync(string imageUrl = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -3756,7 +3756,7 @@ namespace WikidataGame
                 throw ex;
             }
             // Create Result
-            var _result = new HttpOperationResponse<CommonsImageInfo>();
+            var _result = new HttpOperationResponse<PlatformImageInfo>();
             _result.Request = _httpRequest;
             _result.Response = _httpResponse;
             // Deserialize Response
@@ -3765,7 +3765,7 @@ namespace WikidataGame
                 _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                 try
                 {
-                    _result.Body = SafeJsonConvert.DeserializeObject<CommonsImageInfo>(_responseContent, DeserializationSettings);
+                    _result.Body = SafeJsonConvert.DeserializeObject<PlatformImageInfo>(_responseContent, DeserializationSettings);
                 }
                 catch (JsonException ex)
                 {

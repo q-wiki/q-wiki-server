@@ -187,19 +187,17 @@ namespace WikidataGame.Backend.Controllers
         /// <param name="imageUrl">commons FilePath url</param>
         /// <returns>image info (license text, thumbnail url)</returns>
         [HttpGet("ImageInfo")]
-        [ProducesResponseType(typeof(CommonsImageInfo), StatusCodes.Status200OK)]
-        public async Task<ActionResult> PlatformRetrieveLicense(
-            string imageUrl)
+        [ProducesResponseType(typeof(PlatformImageInfo), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PlatformImageInfo>> PlatformRetrieveLicense(
+            string imageUrl,
+#pragma warning disable CS1573 // no xml comments for service injection
+            [FromServices] IMapper mapper)
+#pragma warning restore CS1573
         {
             try
             {
-                (var thumbUrl, var licenseInfo) = await CommonsImageService.RetrieveImageInfoStringByUrlAsync(imageUrl, true);
-                var infoDto = new CommonsImageInfo
-                {
-                    ThumbUrl = thumbUrl,
-                    LicenseInfo = licenseInfo
-                };
-                return Ok(infoDto);
+                var imageInfo = await CommonsImageService.RetrieveImageInfoByUrlAsync(imageUrl, mapper);
+                return Ok(mapper.Map<PlatformImageInfo>(imageInfo));
             }
             catch(UnableToRetrieveLicenseException)
             {

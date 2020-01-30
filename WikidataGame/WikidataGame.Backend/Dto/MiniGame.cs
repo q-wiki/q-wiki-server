@@ -17,7 +17,7 @@ namespace WikidataGame.Backend.Dto
 
         public string ImageUrl { get; set; }
 
-        public string LicenseInfo { get; set; }
+        public ImageInfo ImageInfo { get; set; }
     }
 
     public enum MiniGameType

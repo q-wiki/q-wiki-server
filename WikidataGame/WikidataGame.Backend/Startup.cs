@@ -46,7 +46,7 @@ namespace WikidataGame.Backend
         {
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowAny", builder => builder.AllowAnyOrigin());
+                options.AddPolicy("AllowAny", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddJsonOptions(

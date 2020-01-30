@@ -2149,19 +2149,20 @@ namespace WikidataGame.Backend.Migrations
                               LIMIT 1
                             } as %selectedSpecies
 
-                            WHERE {
-                              {INCLUDE %selectedSpecies} 
-                               UNION 
-                              {INCLUDE %noproblem}
-                              SERVICE wikibase:label { 
-                                bd:serviceParam wikibase:language 'en'.
-                                ?item  rdfs:label ?itemLabel.
-                                ?status rdfs:label ?question.
-                              } 
-                             } ORDER BY DESC(?question)
+                         WHERE {
+                          {INCLUDE %selectedSpecies} 
+                           UNION 
+                          {INCLUDE %noproblem}
+                          SERVICE wikibase:label { 
+                            bd:serviceParam wikibase:language 'en'.
+                            ?item  rdfs:label ?itemLabel.
+                            ?status rdfs:label ?statusLabel.
+                          } 
+                           BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
+                         } ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Which species is {0}?"
+                            TaskDescription = "Which one of these species is {0}?"
                         },
                         new
                         {
@@ -2249,12 +2250,13 @@ namespace WikidataGame.Backend.Migrations
                               SERVICE wikibase:label { 
                                 bd:serviceParam wikibase:language 'en'.
                                 ?item  rdfs:label ?itemLabel.
-                                ?status rdfs:label ?question.
+                                ?status rdfs:label ?statusLabel.
                               } 
+                               BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
                              } ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Which species is {0}?"
+                            TaskDescription = "Which one of these species is {0}?"
                         },
                         new
                         {
@@ -2342,12 +2344,13 @@ namespace WikidataGame.Backend.Migrations
                               SERVICE wikibase:label { 
                                 bd:serviceParam wikibase:language 'en'.
                                 ?item  rdfs:label ?itemLabel.
-                                ?status rdfs:label ?question.
+                                ?status rdfs:label ?statusLabel.
                               } 
+                               BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
                              } ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Which species is {0}?"
+                            TaskDescription = "Which one of these species is {0}?"
                         },
                         new
                         {
@@ -2428,19 +2431,20 @@ namespace WikidataGame.Backend.Migrations
                               LIMIT 1
                             } as %selectedSpecies
 
-                            WHERE {
+                          WHERE {
                               {INCLUDE %selectedSpecies} 
                                UNION 
                               {INCLUDE %noproblem}
                               SERVICE wikibase:label { 
                                 bd:serviceParam wikibase:language 'en'.
                                 ?item  rdfs:label ?itemLabel.
-                                ?status rdfs:label ?question.
+                                ?status rdfs:label ?statusLabel.
                               } 
+                               BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
                              } ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Which species is {0}?"
+                            TaskDescription = "Which one of these species is {0}?"
                         },
                         new
                         {
@@ -4518,7 +4522,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "7463a0d0-4a07-437c-a304-101cfd474318",
+                            ConcurrencyStamp = "c78fd9fd-2559-4d61-9288-2427b67bc6d2",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,

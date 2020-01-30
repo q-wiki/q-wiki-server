@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WikidataGame.Backend.Migrations
 {
-    public partial class FixQueriesSortArtistTaskDescriptionFixesCompundDuplicateMediterranian : Migration
+    public partial class FixEndangeredSpeciesOutput : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,7 +12,7 @@ namespace WikidataGame.Backend.Migrations
                 keyColumn: "Id",
                 keyValue: new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                 column: "ConcurrencyStamp",
-                value: "7463a0d0-4a07-437c-a304-101cfd474318");
+                value: "c78fd9fd-2559-4d61-9288-2427b67bc6d2");
 
             migrationBuilder.UpdateData(
                 table: "Questions",
@@ -305,9 +305,191 @@ namespace WikidataGame.Backend.Migrations
             migrationBuilder.UpdateData(
                 table: "Questions",
                 keyColumn: "Id",
+                keyValue: new Guid("428ac495-541e-48a9-82a2-f94a503a4f26"),
+                columns: new[] { "SparqlQuery", "TaskDescription" },
+                values: new object[] { @"
+                            # which of these species is {endangered || heavily endangered} ?
+                            SELECT DISTINCT ?question (?name as ?answer)
+
+                            #seperated animals in variables befor unionizing for performance/quicker response
+
+                            WITH{
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', ')) as ?name)
+                                WHERE{
+                                  #rodents
+                                  {?item wdt:P171* wd:Q10850.}
+                                  UNION
+                                  #carnivores
+                                  {?item wdt:P171* wd:Q25306.}
+                                  UNION
+                                  #marsupials
+                                  {?item wdt:p171* wd:Q25336}
+                                  ?item wdt:P1843 ?name.
+                                  filter(lang(?name) = 'en').
+                                   FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                     ?item wdt:P171* wd:Q23038290
+                                   }
+                                }
+                              GROUP BY ?item
+                              ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                              #LIMIT 800
+                            } as %allAnimals
+
+                            WITH {
+                              SELECT DISTINCT (GROUP_CONCAT(DISTINCT SAMPLE(?sLabel); SEPARATOR=', ') as ?status)  ?name
+                              WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?s.
+                                ?s wdt:P279 wd:Q515487.
+                                SERVICE wikibase:label { 
+                                 bd:serviceParam wikibase:language 'en'.
+                                  ?s  rdfs:label ?sLabel.
+                                } 
+                                ?s wdt:P279 wd:Q515487.
+                              } 
+                              GROUP BY ?name
+                            } as %endangered
+
+                            WITH {
+                              SELECT DISTINCT ?empty ?name WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?status.
+                                BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                        include %endangered.
+                                        BIND(lcase(?name) as ?caseName)
+                                      }
+                                    }
+                                } 
+                                VALUES ?status {wd:Q211005}.
+                              } 
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 3
+                            } as %noproblem
+
+                            WITH{
+                              SELECT *
+                              WHERE{
+                                include %endangered 
+                              }
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 1
+                            } as %selectedSpecies
+
+                            WHERE {
+                              {INCLUDE %selectedSpecies} 
+                               UNION 
+                              {INCLUDE %noproblem}
+                              SERVICE wikibase:label { 
+                                bd:serviceParam wikibase:language 'en'.
+                                ?item  rdfs:label ?itemLabel.
+                                ?status rdfs:label ?statusLabel.
+                              } 
+                               BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
+                             } ORDER BY DESC(?question)
+                            ", "Which one of these species is {0}?" });
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
                 keyValue: new Guid("4f42f192-1dc7-44b2-b648-1fee97766b98"),
                 column: "TaskDescription",
                 value: "Sort these softdrinks by release (ascending).");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("5abd274b-0826-4a30-832b-9e072a2cd0a4"),
+                columns: new[] { "SparqlQuery", "TaskDescription" },
+                values: new object[] { @"
+                            # which of these species is {endangered || heavily endangered} ?
+                            SELECT DISTINCT ?question (?name as ?answer)
+
+                            #seperated animals in variables befor unionizing for performance/quicker response
+
+                            WITH{
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', ')) as ?name)
+                                WHERE{
+                                  #artiodactyla
+                                  {?item wdt:P171* wd:Q25329.}
+                                  UNION
+                                  #carnivores
+                                  {?item wdt:P171* wd:Q25306.}
+                                  UNION
+                                  #primates
+                                  {?item wdt:p171* wd:Q7380}
+                                  ?item wdt:P1843 ?name.
+                                  filter(lang(?name) = 'en').
+                                   FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                     ?item wdt:P171* wd:Q23038290
+                                   }
+                                }
+                              GROUP BY ?item
+                              ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                              #LIMIT 800
+                            } as %allAnimals
+
+                            WITH {
+                              SELECT DISTINCT (GROUP_CONCAT(DISTINCT SAMPLE(?sLabel); SEPARATOR=', ') as ?status)  ?name
+                              WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?s.
+                                ?s wdt:P279 wd:Q515487.
+                                SERVICE wikibase:label { 
+                                 bd:serviceParam wikibase:language 'en'.
+                                  ?s  rdfs:label ?sLabel.
+                                } 
+                                ?s wdt:P279 wd:Q515487.
+                              } 
+                              GROUP BY ?name
+                            } as %endangered
+
+                            WITH {
+                              SELECT DISTINCT ?empty ?name WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?status.
+                                BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                        include %endangered.
+                                        BIND(lcase(?name) as ?caseName)
+                                      }
+                                    }
+                                } 
+                                VALUES ?status {wd:Q211005}.
+                              } 
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 3
+                            } as %noproblem
+
+                            WITH{
+                              SELECT *
+                              WHERE{
+                                include %endangered 
+                              }
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 1
+                            } as %selectedSpecies
+
+                          WHERE {
+                              {INCLUDE %selectedSpecies} 
+                               UNION 
+                              {INCLUDE %noproblem}
+                              SERVICE wikibase:label { 
+                                bd:serviceParam wikibase:language 'en'.
+                                ?item  rdfs:label ?itemLabel.
+                                ?status rdfs:label ?statusLabel.
+                              } 
+                               BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
+                             } ORDER BY DESC(?question)
+                            ", "Which one of these species is {0}?" });
 
             migrationBuilder.UpdateData(
                 table: "Questions",
@@ -386,6 +568,188 @@ namespace WikidataGame.Backend.Migrations
                 keyValue: new Guid("a79cb648-dbfd-4e03-a5a4-315fd4146120"),
                 column: "TaskDescription",
                 value: "Who is the current coach of {0}?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("b3778c74-3284-4518-a8f0-deea5a2b8363"),
+                columns: new[] { "SparqlQuery", "TaskDescription" },
+                values: new object[] { @"
+                            # which of these species is {endangered || heavily endangered} ?
+                            SELECT DISTINCT ?question (?name as ?answer)
+
+                            #seperated animals in variables befor unionizing for performance/quicker response
+
+                            WITH{
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', ')) as ?name)
+                                WHERE{
+                                  #artiadactyl
+                                  {?item wdt:P171* wd:Q25329.}
+                                  UNION
+                                  #primates
+                                  {?item wdt:P171* wd:Q7380.}
+                                  UNION
+                                  #marsupials
+                                  {?item wdt:p171* wd:Q25336}
+                                  ?item wdt:P1843 ?name.
+                                  filter(lang(?name) = 'en').
+                                   FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                     ?item wdt:P171* wd:Q23038290
+                                   }
+                                }
+                              GROUP BY ?item
+                              ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                              #LIMIT 800
+                            } as %allAnimals
+
+                            WITH {
+                              SELECT DISTINCT (GROUP_CONCAT(DISTINCT SAMPLE(?sLabel); SEPARATOR=', ') as ?status)  ?name
+                              WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?s.
+                                ?s wdt:P279 wd:Q515487.
+                                SERVICE wikibase:label { 
+                                 bd:serviceParam wikibase:language 'en'.
+                                  ?s  rdfs:label ?sLabel.
+                                } 
+                                ?s wdt:P279 wd:Q515487.
+                              } 
+                              GROUP BY ?name
+                            } as %endangered
+
+                            WITH {
+                              SELECT DISTINCT ?empty ?name WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?status.
+                                BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                        include %endangered.
+                                        BIND(lcase(?name) as ?caseName)
+                                      }
+                                    }
+                                } 
+                                VALUES ?status {wd:Q211005}.
+                              } 
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 3
+                            } as %noproblem
+
+                            WITH{
+                              SELECT *
+                              WHERE{
+                                include %endangered 
+                              }
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 1
+                            } as %selectedSpecies
+
+                         WHERE {
+                          {INCLUDE %selectedSpecies} 
+                           UNION 
+                          {INCLUDE %noproblem}
+                          SERVICE wikibase:label { 
+                            bd:serviceParam wikibase:language 'en'.
+                            ?item  rdfs:label ?itemLabel.
+                            ?status rdfs:label ?statusLabel.
+                          } 
+                           BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
+                         } ORDER BY DESC(?question)
+                            ", "Which one of these species is {0}?" });
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("d15f9f1c-9433-4964-a5e3-4e69ed0b45a9"),
+                columns: new[] { "SparqlQuery", "TaskDescription" },
+                values: new object[] { @"
+                           # which of these species is {endangered || heavily endangered} ?
+                            SELECT DISTINCT ?question (?name as ?answer)
+
+                            #seperated animals in variables befor unionizing for performance/quicker response
+
+                            WITH{
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', ')) as ?name)
+                                WHERE{
+                                  #artiodactyla
+                                  {?item wdt:P171* wd:Q25329.}
+                                  UNION
+                                  #carnivores
+                                  {?item wdt:P171* wd:Q25306.}
+                                  UNION
+                                  #primates
+                                  {?item wdt:p171* wd:Q7380}
+                                  ?item wdt:P1843 ?name.
+                                  filter(lang(?name) = 'en').
+                                   FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                     ?item wdt:P171* wd:Q23038290
+                                   }
+                                }
+                              GROUP BY ?item
+                              ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                              #LIMIT 800
+                            } as %allAnimals
+
+                            WITH {
+                              SELECT DISTINCT (GROUP_CONCAT(DISTINCT SAMPLE(?sLabel); SEPARATOR=', ') as ?status)  ?name
+                              WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?s.
+                                ?s wdt:P279 wd:Q515487.
+                                SERVICE wikibase:label { 
+                                 bd:serviceParam wikibase:language 'en'.
+                                  ?s  rdfs:label ?sLabel.
+                                } 
+                                ?s wdt:P279 wd:Q515487.
+                              } 
+                              GROUP BY ?name
+                            } as %endangered
+
+                            WITH {
+                              SELECT DISTINCT ?empty ?name WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?status.
+                                BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                        include %endangered.
+                                        BIND(lcase(?name) as ?caseName)
+                                      }
+                                    }
+                                } 
+                                VALUES ?status {wd:Q211005}.
+                              } 
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 3
+                            } as %noproblem
+
+                            WITH{
+                              SELECT *
+                              WHERE{
+                                include %endangered 
+                              }
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 1
+                            } as %selectedSpecies
+
+                            WHERE {
+                              {INCLUDE %selectedSpecies} 
+                               UNION 
+                              {INCLUDE %noproblem}
+                              SERVICE wikibase:label { 
+                                bd:serviceParam wikibase:language 'en'.
+                                ?item  rdfs:label ?itemLabel.
+                                ?status rdfs:label ?statusLabel.
+                              } 
+                               BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
+                             } ORDER BY DESC(?question)
+                            ", "Which one of these species is {0}?" });
 
             migrationBuilder.UpdateData(
                 table: "Questions",
@@ -706,9 +1070,189 @@ namespace WikidataGame.Backend.Migrations
             migrationBuilder.UpdateData(
                 table: "Questions",
                 keyColumn: "Id",
+                keyValue: new Guid("428ac495-541e-48a9-82a2-f94a503a4f26"),
+                columns: new[] { "SparqlQuery", "TaskDescription" },
+                values: new object[] { @"
+                            # which of these species is {endangered || heavily endangered} ?
+                            SELECT DISTINCT ?question (?name as ?answer)
+
+                            #seperated animals in variables befor unionizing for performance/quicker response
+
+                            WITH{
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', ')) as ?name)
+                                WHERE{
+                                  #rodents
+                                  {?item wdt:P171* wd:Q10850.}
+                                  UNION
+                                  #carnivores
+                                  {?item wdt:P171* wd:Q25306.}
+                                  UNION
+                                  #marsupials
+                                  {?item wdt:p171* wd:Q25336}
+                                  ?item wdt:P1843 ?name.
+                                  filter(lang(?name) = 'en').
+                                   FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                     ?item wdt:P171* wd:Q23038290
+                                   }
+                                }
+                              GROUP BY ?item
+                              ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                              #LIMIT 800
+                            } as %allAnimals
+
+                            WITH {
+                              SELECT DISTINCT (GROUP_CONCAT(DISTINCT SAMPLE(?sLabel); SEPARATOR=', ') as ?status)  ?name
+                              WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?s.
+                                ?s wdt:P279 wd:Q515487.
+                                SERVICE wikibase:label { 
+                                 bd:serviceParam wikibase:language 'en'.
+                                  ?s  rdfs:label ?sLabel.
+                                } 
+                                ?s wdt:P279 wd:Q515487.
+                              } 
+                              GROUP BY ?name
+                            } as %endangered
+
+                            WITH {
+                              SELECT DISTINCT ?empty ?name WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?status.
+                                BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                        include %endangered.
+                                        BIND(lcase(?name) as ?caseName)
+                                      }
+                                    }
+                                } 
+                                VALUES ?status {wd:Q211005}.
+                              } 
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 3
+                            } as %noproblem
+
+                            WITH{
+                              SELECT *
+                              WHERE{
+                                include %endangered 
+                              }
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 1
+                            } as %selectedSpecies
+
+                            WHERE {
+                              {INCLUDE %selectedSpecies} 
+                               UNION 
+                              {INCLUDE %noproblem}
+                              SERVICE wikibase:label { 
+                                bd:serviceParam wikibase:language 'en'.
+                                ?item  rdfs:label ?itemLabel.
+                                ?status rdfs:label ?question.
+                              } 
+                             } ORDER BY DESC(?question)
+                            ", "Which species is {0}?" });
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
                 keyValue: new Guid("4f42f192-1dc7-44b2-b648-1fee97766b98"),
                 column: "TaskDescription",
                 value: "Sort these softdrinks by release.");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("5abd274b-0826-4a30-832b-9e072a2cd0a4"),
+                columns: new[] { "SparqlQuery", "TaskDescription" },
+                values: new object[] { @"
+                            # which of these species is {endangered || heavily endangered} ?
+                            SELECT DISTINCT ?question (?name as ?answer)
+
+                            #seperated animals in variables befor unionizing for performance/quicker response
+
+                            WITH{
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', ')) as ?name)
+                                WHERE{
+                                  #artiodactyla
+                                  {?item wdt:P171* wd:Q25329.}
+                                  UNION
+                                  #carnivores
+                                  {?item wdt:P171* wd:Q25306.}
+                                  UNION
+                                  #primates
+                                  {?item wdt:p171* wd:Q7380}
+                                  ?item wdt:P1843 ?name.
+                                  filter(lang(?name) = 'en').
+                                   FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                     ?item wdt:P171* wd:Q23038290
+                                   }
+                                }
+                              GROUP BY ?item
+                              ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                              #LIMIT 800
+                            } as %allAnimals
+
+                            WITH {
+                              SELECT DISTINCT (GROUP_CONCAT(DISTINCT SAMPLE(?sLabel); SEPARATOR=', ') as ?status)  ?name
+                              WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?s.
+                                ?s wdt:P279 wd:Q515487.
+                                SERVICE wikibase:label { 
+                                 bd:serviceParam wikibase:language 'en'.
+                                  ?s  rdfs:label ?sLabel.
+                                } 
+                                ?s wdt:P279 wd:Q515487.
+                              } 
+                              GROUP BY ?name
+                            } as %endangered
+
+                            WITH {
+                              SELECT DISTINCT ?empty ?name WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?status.
+                                BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                        include %endangered.
+                                        BIND(lcase(?name) as ?caseName)
+                                      }
+                                    }
+                                } 
+                                VALUES ?status {wd:Q211005}.
+                              } 
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 3
+                            } as %noproblem
+
+                            WITH{
+                              SELECT *
+                              WHERE{
+                                include %endangered 
+                              }
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 1
+                            } as %selectedSpecies
+
+                            WHERE {
+                              {INCLUDE %selectedSpecies} 
+                               UNION 
+                              {INCLUDE %noproblem}
+                              SERVICE wikibase:label { 
+                                bd:serviceParam wikibase:language 'en'.
+                                ?item  rdfs:label ?itemLabel.
+                                ?status rdfs:label ?question.
+                              } 
+                             } ORDER BY DESC(?question)
+                            ", "Which species is {0}?" });
 
             migrationBuilder.UpdateData(
                 table: "Questions",
@@ -786,6 +1330,186 @@ namespace WikidataGame.Backend.Migrations
                 keyValue: new Guid("a79cb648-dbfd-4e03-a5a4-315fd4146120"),
                 column: "TaskDescription",
                 value: "Who is the coach of {0}?");
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("b3778c74-3284-4518-a8f0-deea5a2b8363"),
+                columns: new[] { "SparqlQuery", "TaskDescription" },
+                values: new object[] { @"
+                            # which of these species is {endangered || heavily endangered} ?
+                            SELECT DISTINCT ?question (?name as ?answer)
+
+                            #seperated animals in variables befor unionizing for performance/quicker response
+
+                            WITH{
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', ')) as ?name)
+                                WHERE{
+                                  #artiadactyl
+                                  {?item wdt:P171* wd:Q25329.}
+                                  UNION
+                                  #primates
+                                  {?item wdt:P171* wd:Q7380.}
+                                  UNION
+                                  #marsupials
+                                  {?item wdt:p171* wd:Q25336}
+                                  ?item wdt:P1843 ?name.
+                                  filter(lang(?name) = 'en').
+                                   FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                     ?item wdt:P171* wd:Q23038290
+                                   }
+                                }
+                              GROUP BY ?item
+                              ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                              #LIMIT 800
+                            } as %allAnimals
+
+                            WITH {
+                              SELECT DISTINCT (GROUP_CONCAT(DISTINCT SAMPLE(?sLabel); SEPARATOR=', ') as ?status)  ?name
+                              WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?s.
+                                ?s wdt:P279 wd:Q515487.
+                                SERVICE wikibase:label { 
+                                 bd:serviceParam wikibase:language 'en'.
+                                  ?s  rdfs:label ?sLabel.
+                                } 
+                                ?s wdt:P279 wd:Q515487.
+                              } 
+                              GROUP BY ?name
+                            } as %endangered
+
+                            WITH {
+                              SELECT DISTINCT ?empty ?name WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?status.
+                                BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                        include %endangered.
+                                        BIND(lcase(?name) as ?caseName)
+                                      }
+                                    }
+                                } 
+                                VALUES ?status {wd:Q211005}.
+                              } 
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 3
+                            } as %noproblem
+
+                            WITH{
+                              SELECT *
+                              WHERE{
+                                include %endangered 
+                              }
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 1
+                            } as %selectedSpecies
+
+                            WHERE {
+                              {INCLUDE %selectedSpecies} 
+                               UNION 
+                              {INCLUDE %noproblem}
+                              SERVICE wikibase:label { 
+                                bd:serviceParam wikibase:language 'en'.
+                                ?item  rdfs:label ?itemLabel.
+                                ?status rdfs:label ?question.
+                              } 
+                             } ORDER BY DESC(?question)
+                            ", "Which species is {0}?" });
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("d15f9f1c-9433-4964-a5e3-4e69ed0b45a9"),
+                columns: new[] { "SparqlQuery", "TaskDescription" },
+                values: new object[] { @"
+                           # which of these species is {endangered || heavily endangered} ?
+                            SELECT DISTINCT ?question (?name as ?answer)
+
+                            #seperated animals in variables befor unionizing for performance/quicker response
+
+                            WITH{
+                                SELECT DISTINCT ?item (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?name); SEPARATOR=', ')) as ?name)
+                                WHERE{
+                                  #artiodactyla
+                                  {?item wdt:P171* wd:Q25329.}
+                                  UNION
+                                  #carnivores
+                                  {?item wdt:P171* wd:Q25306.}
+                                  UNION
+                                  #primates
+                                  {?item wdt:p171* wd:Q7380}
+                                  ?item wdt:P1843 ?name.
+                                  filter(lang(?name) = 'en').
+                                   FILTER NOT EXISTS{
+                                     ?item wdt:P141 wd:Q237350.
+                                     ?item wdt:P171* wd:Q23038290
+                                   }
+                                }
+                              GROUP BY ?item
+                              ORDER BY MD5(CONCAT(STR(?item), STR(NOW())))
+                              #LIMIT 800
+                            } as %allAnimals
+
+                            WITH {
+                              SELECT DISTINCT (GROUP_CONCAT(DISTINCT SAMPLE(?sLabel); SEPARATOR=', ') as ?status)  ?name
+                              WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?s.
+                                ?s wdt:P279 wd:Q515487.
+                                SERVICE wikibase:label { 
+                                 bd:serviceParam wikibase:language 'en'.
+                                  ?s  rdfs:label ?sLabel.
+                                } 
+                                ?s wdt:P279 wd:Q515487.
+                              } 
+                              GROUP BY ?name
+                            } as %endangered
+
+                            WITH {
+                              SELECT DISTINCT ?empty ?name WHERE {
+                                {Include %allAnimals}
+                                ?item wdt:P141 ?status.
+                                BIND(lcase(?name) as ?caseName)
+                                FILTER NOT EXISTS{
+                                    {
+                                      select ?caseName
+                                      where{
+                                        include %endangered.
+                                        BIND(lcase(?name) as ?caseName)
+                                      }
+                                    }
+                                } 
+                                VALUES ?status {wd:Q211005}.
+                              } 
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 3
+                            } as %noproblem
+
+                            WITH{
+                              SELECT *
+                              WHERE{
+                                include %endangered 
+                              }
+                              ORDER BY MD5(CONCAT(STR(?name), STR(NOW()))) 
+                              LIMIT 1
+                            } as %selectedSpecies
+
+                            WHERE {
+                              {INCLUDE %selectedSpecies} 
+                               UNION 
+                              {INCLUDE %noproblem}
+                              SERVICE wikibase:label { 
+                                bd:serviceParam wikibase:language 'en'.
+                                ?item  rdfs:label ?itemLabel.
+                                ?status rdfs:label ?question.
+                              } 
+                             } ORDER BY DESC(?question)
+                            ", "Which species is {0}?" });
 
             migrationBuilder.UpdateData(
                 table: "Questions",

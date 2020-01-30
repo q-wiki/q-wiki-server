@@ -1869,7 +1869,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which species is {0}?",
+                    TaskDescription = "Which one of these species is {0}?",
                     SparqlQuery = @"
                             # which of these species is {endangered || heavily endangered} ?
                             SELECT DISTINCT ?question (?name as ?answer)
@@ -1943,16 +1943,17 @@ namespace WikidataGame.Backend.Helpers
                               LIMIT 1
                             } as %selectedSpecies
 
-                            WHERE {
-                              {INCLUDE %selectedSpecies} 
-                               UNION 
-                              {INCLUDE %noproblem}
-                              SERVICE wikibase:label { 
-                                bd:serviceParam wikibase:language 'en'.
-                                ?item  rdfs:label ?itemLabel.
-                                ?status rdfs:label ?question.
-                              } 
-                             } ORDER BY DESC(?question)
+                         WHERE {
+                          {INCLUDE %selectedSpecies} 
+                           UNION 
+                          {INCLUDE %noproblem}
+                          SERVICE wikibase:label { 
+                            bd:serviceParam wikibase:language 'en'.
+                            ?item  rdfs:label ?itemLabel.
+                            ?status rdfs:label ?statusLabel.
+                          } 
+                           BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
+                         } ORDER BY DESC(?question)
                             "
                 },
                 new Question
@@ -1962,7 +1963,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which species is {0}?",
+                    TaskDescription = "Which one of these species is {0}?",
                     SparqlQuery = @"
                             # which of these species is {endangered || heavily endangered} ?
                             SELECT DISTINCT ?question (?name as ?answer)
@@ -2043,8 +2044,9 @@ namespace WikidataGame.Backend.Helpers
                               SERVICE wikibase:label { 
                                 bd:serviceParam wikibase:language 'en'.
                                 ?item  rdfs:label ?itemLabel.
-                                ?status rdfs:label ?question.
+                                ?status rdfs:label ?statusLabel.
                               } 
+                               BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
                              } ORDER BY DESC(?question)
                             "
                 },
@@ -2055,7 +2057,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which species is {0}?",
+                    TaskDescription = "Which one of these species is {0}?",
                     SparqlQuery = @"
                            # which of these species is {endangered || heavily endangered} ?
                             SELECT DISTINCT ?question (?name as ?answer)
@@ -2136,8 +2138,9 @@ namespace WikidataGame.Backend.Helpers
                               SERVICE wikibase:label { 
                                 bd:serviceParam wikibase:language 'en'.
                                 ?item  rdfs:label ?itemLabel.
-                                ?status rdfs:label ?question.
+                                ?status rdfs:label ?statusLabel.
                               } 
+                               BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
                              } ORDER BY DESC(?question)
                             "
                 },
@@ -2149,7 +2152,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which species is {0}?",
+                    TaskDescription = "Which one of these species is {0}?",
                     SparqlQuery = @"
                             # which of these species is {endangered || heavily endangered} ?
                             SELECT DISTINCT ?question (?name as ?answer)
@@ -2223,15 +2226,16 @@ namespace WikidataGame.Backend.Helpers
                               LIMIT 1
                             } as %selectedSpecies
 
-                            WHERE {
+                          WHERE {
                               {INCLUDE %selectedSpecies} 
                                UNION 
                               {INCLUDE %noproblem}
                               SERVICE wikibase:label { 
                                 bd:serviceParam wikibase:language 'en'.
                                 ?item  rdfs:label ?itemLabel.
-                                ?status rdfs:label ?question.
+                                ?status rdfs:label ?statusLabel.
                               } 
+                               BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
                              } ORDER BY DESC(?question)
                             "
                 },

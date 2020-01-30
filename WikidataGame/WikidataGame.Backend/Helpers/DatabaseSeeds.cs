@@ -1869,7 +1869,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which species is {0}?",
+                    TaskDescription = "Which one of these species is {0}?",
                     SparqlQuery = @"
                             # which of these species is {endangered || heavily endangered} ?
                             SELECT DISTINCT ?question (?name as ?answer)
@@ -1943,16 +1943,17 @@ namespace WikidataGame.Backend.Helpers
                               LIMIT 1
                             } as %selectedSpecies
 
-                            WHERE {
-                              {INCLUDE %selectedSpecies} 
-                               UNION 
-                              {INCLUDE %noproblem}
-                              SERVICE wikibase:label { 
-                                bd:serviceParam wikibase:language 'en'.
-                                ?item  rdfs:label ?itemLabel.
-                                ?status rdfs:label ?question.
-                              } 
-                             } ORDER BY DESC(?question)
+                         WHERE {
+                          {INCLUDE %selectedSpecies} 
+                           UNION 
+                          {INCLUDE %noproblem}
+                          SERVICE wikibase:label { 
+                            bd:serviceParam wikibase:language 'en'.
+                            ?item  rdfs:label ?itemLabel.
+                            ?status rdfs:label ?statusLabel.
+                          } 
+                           BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
+                         } ORDER BY DESC(?question)
                             "
                 },
                 new Question
@@ -1962,7 +1963,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which species is {0}?",
+                    TaskDescription = "Which one of these species is {0}?",
                     SparqlQuery = @"
                             # which of these species is {endangered || heavily endangered} ?
                             SELECT DISTINCT ?question (?name as ?answer)
@@ -2043,8 +2044,9 @@ namespace WikidataGame.Backend.Helpers
                               SERVICE wikibase:label { 
                                 bd:serviceParam wikibase:language 'en'.
                                 ?item  rdfs:label ?itemLabel.
-                                ?status rdfs:label ?question.
+                                ?status rdfs:label ?statusLabel.
                               } 
+                               BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
                              } ORDER BY DESC(?question)
                             "
                 },
@@ -2055,7 +2057,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which species is {0}?",
+                    TaskDescription = "Which one of these species is {0}?",
                     SparqlQuery = @"
                            # which of these species is {endangered || heavily endangered} ?
                             SELECT DISTINCT ?question (?name as ?answer)
@@ -2136,8 +2138,9 @@ namespace WikidataGame.Backend.Helpers
                               SERVICE wikibase:label { 
                                 bd:serviceParam wikibase:language 'en'.
                                 ?item  rdfs:label ?itemLabel.
-                                ?status rdfs:label ?question.
+                                ?status rdfs:label ?statusLabel.
                               } 
+                               BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
                              } ORDER BY DESC(?question)
                             "
                 },
@@ -2149,7 +2152,7 @@ namespace WikidataGame.Backend.Helpers
                     GroupId = new Guid("7c2995a2-b025-4033-bc60-f938f3c95ac7"),
                     MiniGameType = MiniGameType.MultipleChoice,
                     Status = QuestionStatus.Approved,
-                    TaskDescription = "Which species is {0}?",
+                    TaskDescription = "Which one of these species is {0}?",
                     SparqlQuery = @"
                             # which of these species is {endangered || heavily endangered} ?
                             SELECT DISTINCT ?question (?name as ?answer)
@@ -2223,15 +2226,16 @@ namespace WikidataGame.Backend.Helpers
                               LIMIT 1
                             } as %selectedSpecies
 
-                            WHERE {
+                          WHERE {
                               {INCLUDE %selectedSpecies} 
                                UNION 
                               {INCLUDE %noproblem}
                               SERVICE wikibase:label { 
                                 bd:serviceParam wikibase:language 'en'.
                                 ?item  rdfs:label ?itemLabel.
-                                ?status rdfs:label ?question.
+                                ?status rdfs:label ?statusLabel.
                               } 
+                               BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
                              } ORDER BY DESC(?question)
                             "
                 },
@@ -3291,7 +3295,7 @@ namespace WikidataGame.Backend.Helpers
                       Status = QuestionStatus.Approved,
                       TaskDescription = "Who invented {0}?",
                       SparqlQuery = @"
-                                SELECT DISTINCT ?question ?answer 
+                               SELECT DISTINCT ?question ?answer 
                                 WITH{
                                  SELECT DISTINCT ?inventorLabel (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?itemLabel); SEPARATOR=',')) AS ?itemLabel)
                                   WHERE 
@@ -3306,24 +3310,32 @@ namespace WikidataGame.Backend.Helpers
                                       filter(lang(?itemLabel) = 'en').
                                     }
                                   group by ?inventorLabel
-                                  ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
                                  } as %allInventors
 
                                 WITH{
-                                 SELECT ?inventorLabel ?itemLabel
+                                 SELECT (group_concat(distinct sample(?inventorLabel); separator=', ') as ?inventors) ?itemLabel
                                   WHERE 
                                     { 
                                      INCLUDE %allInventors
+                                    }
+                                   group by ?itemLabel
+                                } as %groupedInventors
+
+                               WITH{
+                                 SELECT ?inventors ?itemLabel
+                                  WHERE 
+                                    { 
+                                     INCLUDE %groupedInventors
                                     }
                                    ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
                                    LIMIT 1
                                 } as %selectedInventor
 
                                 WITH{
-                                 SELECT Distinct ?inventorLabel
+                                 SELECT Distinct ?inventors
                                   WHERE 
                                     { 
-                                     INCLUDE %allInventors.
+                                     INCLUDE %groupedInventors.
                                      FILTER NOT EXISTS {INCLUDE %selectedInventor}
                                     }
                                    ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
@@ -3334,7 +3346,7 @@ namespace WikidataGame.Backend.Helpers
                                   {INCLUDE %selectedInventor}
                                   UNION
                                   {INCLUDE %decoyInventors}
-                                  BIND(?inventorLabel as ?answer)
+                                  BIND(?inventors as ?answer)
                                   Bind(?itemLabel as ?question)
                                 }
 

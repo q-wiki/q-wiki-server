@@ -3631,7 +3631,7 @@ namespace WikidataGame.Backend.Helpers
                             #Structure is important to get only one drink of a inception year and avoid duplicates
                             SELECT DISTINCT ?question  ?answer ?year
                             WITH{
-                                    SELECT (Sample(GROUP_CONCAT(DISTINCT sample(?softDrink); SEPARATOR=', ')) AS ?softDrink) (Sample(GROUP_CONCAT( DISTINCT sample(?softDrinkLabel); SEPARATOR=', ')) AS ?softDrinkLabel) (year(?inception) as ?year) 
+                                    SELECT (Sample(GROUP_CONCAT(DISTINCT sample(?softDrink); SEPARATOR=', ')) AS ?softDrink) (Sample(GROUP_CONCAT( DISTINCT sample(?softDrinkLabel); SEPARATOR=', ')) AS ?softDrinkLabel) ?year
                                     WHERE {
                                          ?softDrink (wd:wd31|wdt:P279)* wd:Q147538.
                                          ?softDrink wdt:P571 ?inception.

@@ -3644,7 +3644,7 @@ namespace WikidataGame.Backend.Helpers
                                                                                }
                                          BIND(Year(?inception) as ?year)
                                     }
-                                    group by ?inception
+                                    group by ?year
                                     ORDER BY (MD5(CONCAT(STR(?year), STR(NOW()))))                
                             } as %allSoftDrinks
 

@@ -12,7 +12,7 @@ namespace WikidataGame.Backend.Migrations
                 keyColumn: "Id",
                 keyValue: new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                 column: "ConcurrencyStamp",
-                value: "a04e009d-0b01-480e-b575-d15311ac6aa0");
+                value: "49593cca-a998-491c-98fe-4b0951fa3647");
 
             migrationBuilder.UpdateData(
                 table: "Questions",
@@ -36,7 +36,7 @@ namespace WikidataGame.Backend.Migrations
                                                                                }
                                          BIND(Year(?inception) as ?year)
                                     }
-                                    group by ?inception
+                                    group by ?year
                                     ORDER BY (MD5(CONCAT(STR(?year), STR(NOW()))))                
                             } as %allSoftDrinks
 

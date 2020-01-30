@@ -9,7 +9,7 @@ using WikidataGame.Backend.Helpers;
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200130230304_FixSoftdrinkYearGrouping")]
+    [Migration("20200130230649_FixSoftdrinkYearGrouping")]
     partial class FixSoftdrinkYearGrouping
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -3847,7 +3847,7 @@ namespace WikidataGame.Backend.Migrations
                                                                                }
                                          BIND(Year(?inception) as ?year)
                                     }
-                                    group by ?inception
+                                    group by ?year
                                     ORDER BY (MD5(CONCAT(STR(?year), STR(NOW()))))                
                             } as %allSoftDrinks
 
@@ -4532,7 +4532,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "a04e009d-0b01-480e-b575-d15311ac6aa0",
+                            ConcurrencyStamp = "49593cca-a998-491c-98fe-4b0951fa3647",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,

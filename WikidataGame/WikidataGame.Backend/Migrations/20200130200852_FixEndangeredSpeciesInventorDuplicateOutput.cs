@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WikidataGame.Backend.Migrations
 {
-    public partial class FixEndangeredSpeciesOutput : Migration
+    public partial class FixEndangeredSpeciesInventorDuplicateOutput : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,7 +12,7 @@ namespace WikidataGame.Backend.Migrations
                 keyColumn: "Id",
                 keyValue: new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                 column: "ConcurrencyStamp",
-                value: "c78fd9fd-2559-4d61-9288-2427b67bc6d2");
+                value: "9d406ede-473a-4577-abf0-acfcf505f649");
 
             migrationBuilder.UpdateData(
                 table: "Questions",
@@ -659,6 +659,70 @@ namespace WikidataGame.Backend.Migrations
                            BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
                          } ORDER BY DESC(?question)
                             ", "Which one of these species is {0}?" });
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("b95607f9-8cd6-48e8-bc99-c9c305e812be"),
+                column: "SparqlQuery",
+                value: @"
+                               SELECT DISTINCT ?question ?answer 
+                                WITH{
+                                 SELECT DISTINCT ?inventorLabel (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?itemLabel); SEPARATOR=',')) AS ?itemLabel)
+                                  WHERE 
+                                    { 
+                                      ?inventor wdt:P31 wd:Q5; wdt:P106 wd:Q205375.
+                                      ?item wdt:P61 ?inventor.
+                                      SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                        ?item rdfs:label ?itemLabel.
+                                        ?inventor rdfs:label ?inventorLabel
+                                      }
+                                      filter(lang(?inventorLabel) = 'en').
+                                      filter(lang(?itemLabel) = 'en').
+                                    }
+                                  group by ?inventorLabel
+                                 } as %allInventors
+
+                                WITH{
+                                 SELECT (group_concat(distinct sample(?inventorLabel); separator=', ') as ?inventors) ?itemLabel
+                                  WHERE 
+                                    { 
+                                     INCLUDE %allInventors
+                                    }
+                                   group by ?itemLabel
+                                } as %groupedInventors
+
+                               WITH{
+                                 SELECT ?inventors ?itemLabel
+                                  WHERE 
+                                    { 
+                                     INCLUDE %groupedInventors
+                                    }
+                                   ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
+                                   LIMIT 1
+                                } as %selectedInventor
+
+                                WITH{
+                                 SELECT Distinct ?inventors
+                                  WHERE 
+                                    { 
+                                     INCLUDE %groupedInventors.
+                                     FILTER NOT EXISTS {INCLUDE %selectedInventor}
+                                    }
+                                   ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
+                                   LIMIT 3
+                                } as %decoyInventors
+
+                                WHERE{
+                                  {INCLUDE %selectedInventor}
+                                  UNION
+                                  {INCLUDE %decoyInventors}
+                                  BIND(?inventors as ?answer)
+                                  Bind(?itemLabel as ?question)
+                                }
+
+                                Order by DESC(?question)
+                                ");
 
             migrationBuilder.UpdateData(
                 table: "Questions",
@@ -1420,6 +1484,62 @@ namespace WikidataGame.Backend.Migrations
                               } 
                              } ORDER BY DESC(?question)
                             ", "Which species is {0}?" });
+
+            migrationBuilder.UpdateData(
+                table: "Questions",
+                keyColumn: "Id",
+                keyValue: new Guid("b95607f9-8cd6-48e8-bc99-c9c305e812be"),
+                column: "SparqlQuery",
+                value: @"
+                                SELECT DISTINCT ?question ?answer 
+                                WITH{
+                                 SELECT DISTINCT ?inventorLabel (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?itemLabel); SEPARATOR=',')) AS ?itemLabel)
+                                  WHERE 
+                                    { 
+                                      ?inventor wdt:P31 wd:Q5; wdt:P106 wd:Q205375.
+                                      ?item wdt:P61 ?inventor.
+                                      SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'.
+                                        ?item rdfs:label ?itemLabel.
+                                        ?inventor rdfs:label ?inventorLabel
+                                      }
+                                      filter(lang(?inventorLabel) = 'en').
+                                      filter(lang(?itemLabel) = 'en').
+                                    }
+                                  group by ?inventorLabel
+                                  ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
+                                 } as %allInventors
+
+                                WITH{
+                                 SELECT ?inventorLabel ?itemLabel
+                                  WHERE 
+                                    { 
+                                     INCLUDE %allInventors
+                                    }
+                                   ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
+                                   LIMIT 1
+                                } as %selectedInventor
+
+                                WITH{
+                                 SELECT Distinct ?inventorLabel
+                                  WHERE 
+                                    { 
+                                     INCLUDE %allInventors.
+                                     FILTER NOT EXISTS {INCLUDE %selectedInventor}
+                                    }
+                                   ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
+                                   LIMIT 3
+                                } as %decoyInventors
+
+                                WHERE{
+                                  {INCLUDE %selectedInventor}
+                                  UNION
+                                  {INCLUDE %decoyInventors}
+                                  BIND(?inventorLabel as ?answer)
+                                  Bind(?itemLabel as ?question)
+                                }
+
+                                Order by DESC(?question)
+                                ");
 
             migrationBuilder.UpdateData(
                 table: "Questions",

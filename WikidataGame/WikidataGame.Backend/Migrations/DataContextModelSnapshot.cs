@@ -3496,7 +3496,7 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("acc3d752-2880-4882-ba16-e3deb3ee9cee"),
                             MiniGameType = 2,
                             SparqlQuery = @"
-                                SELECT DISTINCT ?question ?answer 
+                               SELECT DISTINCT ?question ?answer 
                                 WITH{
                                  SELECT DISTINCT ?inventorLabel (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?itemLabel); SEPARATOR=',')) AS ?itemLabel)
                                   WHERE 
@@ -3511,24 +3511,32 @@ namespace WikidataGame.Backend.Migrations
                                       filter(lang(?itemLabel) = 'en').
                                     }
                                   group by ?inventorLabel
-                                  ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
                                  } as %allInventors
 
                                 WITH{
-                                 SELECT ?inventorLabel ?itemLabel
+                                 SELECT (group_concat(distinct sample(?inventorLabel); separator=', ') as ?inventors) ?itemLabel
                                   WHERE 
                                     { 
                                      INCLUDE %allInventors
+                                    }
+                                   group by ?itemLabel
+                                } as %groupedInventors
+
+                               WITH{
+                                 SELECT ?inventors ?itemLabel
+                                  WHERE 
+                                    { 
+                                     INCLUDE %groupedInventors
                                     }
                                    ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
                                    LIMIT 1
                                 } as %selectedInventor
 
                                 WITH{
-                                 SELECT Distinct ?inventorLabel
+                                 SELECT Distinct ?inventors
                                   WHERE 
                                     { 
-                                     INCLUDE %allInventors.
+                                     INCLUDE %groupedInventors.
                                      FILTER NOT EXISTS {INCLUDE %selectedInventor}
                                     }
                                    ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
@@ -3539,7 +3547,7 @@ namespace WikidataGame.Backend.Migrations
                                   {INCLUDE %selectedInventor}
                                   UNION
                                   {INCLUDE %decoyInventors}
-                                  BIND(?inventorLabel as ?answer)
+                                  BIND(?inventors as ?answer)
                                   Bind(?itemLabel as ?question)
                                 }
 
@@ -4522,7 +4530,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c78fd9fd-2559-4d61-9288-2427b67bc6d2",
+                            ConcurrencyStamp = "9d406ede-473a-4577-abf0-acfcf505f649",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,

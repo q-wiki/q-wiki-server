@@ -1269,7 +1269,7 @@ namespace WikidataGame.Backend.Helpers
                                 include %allMammal. 
                                 FILTER NOT EXISTS {Include %monthsInDays}
                                 FILTER(?gestationUnit = wd:Q23387) 
-                                BIND((?gestation*14) as ?gestationTime)
+                                BIND((?gestation*7) as ?gestationTime)
                               }
                             } as %weeksInDays
 
@@ -1391,7 +1391,7 @@ namespace WikidataGame.Backend.Helpers
                                 include %allMammal. 
                                 FILTER NOT EXISTS {Include %monthsInDays}
                                 FILTER(?gestationUnit = wd:Q23387) 
-                                BIND((?gestation*14) as ?gestationTime)
+                                BIND((?gestation*7) as ?gestationTime)
                               }
                             } as %weeksInDays
 
@@ -1528,7 +1528,7 @@ namespace WikidataGame.Backend.Helpers
                                 include %allMammal. 
                                 FILTER NOT EXISTS {Include %monthsInDays}
                                 FILTER(?gestationUnit = wd:Q23387) 
-                                BIND((?gestation*14) as ?gestationTime)
+                                BIND((?gestation*7) as ?gestationTime)
                               }
                             } as %weeksInDays
 
@@ -1664,7 +1664,7 @@ namespace WikidataGame.Backend.Helpers
                                 include %allMammal. 
                                 FILTER NOT EXISTS {Include %monthsInDays}
                                 FILTER(?gestationUnit = wd:Q23387) 
-                                BIND((?gestation*14) as ?gestationTime)
+                                BIND((?gestation*7) as ?gestationTime)
                               }
                             } as %weeksInDays
 

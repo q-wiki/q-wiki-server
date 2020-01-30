@@ -9,8 +9,8 @@ using WikidataGame.Backend.Helpers;
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200130200852_FixEndangeredSpeciesInventorDuplicateOutput")]
-    partial class FixEndangeredSpeciesInventorDuplicateOutput
+    [Migration("20200130210244_FixGestationPeriodCalculation")]
+    partial class FixGestationPeriodCalculation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -1479,7 +1479,7 @@ namespace WikidataGame.Backend.Migrations
                                 include %allMammal. 
                                 FILTER NOT EXISTS {Include %monthsInDays}
                                 FILTER(?gestationUnit = wd:Q23387) 
-                                BIND((?gestation*14) as ?gestationTime)
+                                BIND((?gestation*7) as ?gestationTime)
                               }
                             } as %weeksInDays
 
@@ -1601,7 +1601,7 @@ namespace WikidataGame.Backend.Migrations
                                 include %allMammal. 
                                 FILTER NOT EXISTS {Include %monthsInDays}
                                 FILTER(?gestationUnit = wd:Q23387) 
-                                BIND((?gestation*14) as ?gestationTime)
+                                BIND((?gestation*7) as ?gestationTime)
                               }
                             } as %weeksInDays
 
@@ -1738,7 +1738,7 @@ namespace WikidataGame.Backend.Migrations
                                 include %allMammal. 
                                 FILTER NOT EXISTS {Include %monthsInDays}
                                 FILTER(?gestationUnit = wd:Q23387) 
-                                BIND((?gestation*14) as ?gestationTime)
+                                BIND((?gestation*7) as ?gestationTime)
                               }
                             } as %weeksInDays
 
@@ -1874,7 +1874,7 @@ namespace WikidataGame.Backend.Migrations
                                 include %allMammal. 
                                 FILTER NOT EXISTS {Include %monthsInDays}
                                 FILTER(?gestationUnit = wd:Q23387) 
-                                BIND((?gestation*14) as ?gestationTime)
+                                BIND((?gestation*7) as ?gestationTime)
                               }
                             } as %weeksInDays
 
@@ -4532,7 +4532,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "9d406ede-473a-4577-abf0-acfcf505f649",
+                            ConcurrencyStamp = "a4c1f492-d0f9-4ce3-8141-fef9ddfd0b36",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,

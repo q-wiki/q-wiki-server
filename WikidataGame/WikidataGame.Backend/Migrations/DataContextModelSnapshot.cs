@@ -1477,7 +1477,7 @@ namespace WikidataGame.Backend.Migrations
                                 include %allMammal. 
                                 FILTER NOT EXISTS {Include %monthsInDays}
                                 FILTER(?gestationUnit = wd:Q23387) 
-                                BIND((?gestation*14) as ?gestationTime)
+                                BIND((?gestation*7) as ?gestationTime)
                               }
                             } as %weeksInDays
 
@@ -1599,7 +1599,7 @@ namespace WikidataGame.Backend.Migrations
                                 include %allMammal. 
                                 FILTER NOT EXISTS {Include %monthsInDays}
                                 FILTER(?gestationUnit = wd:Q23387) 
-                                BIND((?gestation*14) as ?gestationTime)
+                                BIND((?gestation*7) as ?gestationTime)
                               }
                             } as %weeksInDays
 
@@ -1736,7 +1736,7 @@ namespace WikidataGame.Backend.Migrations
                                 include %allMammal. 
                                 FILTER NOT EXISTS {Include %monthsInDays}
                                 FILTER(?gestationUnit = wd:Q23387) 
-                                BIND((?gestation*14) as ?gestationTime)
+                                BIND((?gestation*7) as ?gestationTime)
                               }
                             } as %weeksInDays
 
@@ -1872,7 +1872,7 @@ namespace WikidataGame.Backend.Migrations
                                 include %allMammal. 
                                 FILTER NOT EXISTS {Include %monthsInDays}
                                 FILTER(?gestationUnit = wd:Q23387) 
-                                BIND((?gestation*14) as ?gestationTime)
+                                BIND((?gestation*7) as ?gestationTime)
                               }
                             } as %weeksInDays
 
@@ -4339,7 +4339,7 @@ namespace WikidataGame.Backend.Migrations
                             ORDER BY ?playerCount
                             ",
                             Status = 2,
-                            TaskDescription = "Sort these sports by maximum amount ofparticipating players (ascending)."
+                            TaskDescription = "Sort these sports by maximum amount of participating players (ascending)."
                         },
                         new
                         {
@@ -4530,7 +4530,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "9d406ede-473a-4577-abf0-acfcf505f649",
+                            ConcurrencyStamp = "bf3f3567-ea72-487c-adcc-c9761eb3bc6c",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,

@@ -9,8 +9,8 @@ using WikidataGame.Backend.Helpers;
 namespace WikidataGame.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200129225001_FixQueriesSortArtistTaskDescriptionFixesCompundDuplicateMediterranian")]
-    partial class FixQueriesSortArtistTaskDescriptionFixesCompundDuplicateMediterranian
+    [Migration("20200130200852_FixEndangeredSpeciesInventorDuplicateOutput")]
+    partial class FixEndangeredSpeciesInventorDuplicateOutput
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -2151,19 +2151,20 @@ namespace WikidataGame.Backend.Migrations
                               LIMIT 1
                             } as %selectedSpecies
 
-                            WHERE {
-                              {INCLUDE %selectedSpecies} 
-                               UNION 
-                              {INCLUDE %noproblem}
-                              SERVICE wikibase:label { 
-                                bd:serviceParam wikibase:language 'en'.
-                                ?item  rdfs:label ?itemLabel.
-                                ?status rdfs:label ?question.
-                              } 
-                             } ORDER BY DESC(?question)
+                         WHERE {
+                          {INCLUDE %selectedSpecies} 
+                           UNION 
+                          {INCLUDE %noproblem}
+                          SERVICE wikibase:label { 
+                            bd:serviceParam wikibase:language 'en'.
+                            ?item  rdfs:label ?itemLabel.
+                            ?status rdfs:label ?statusLabel.
+                          } 
+                           BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
+                         } ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Which species is {0}?"
+                            TaskDescription = "Which one of these species is {0}?"
                         },
                         new
                         {
@@ -2251,12 +2252,13 @@ namespace WikidataGame.Backend.Migrations
                               SERVICE wikibase:label { 
                                 bd:serviceParam wikibase:language 'en'.
                                 ?item  rdfs:label ?itemLabel.
-                                ?status rdfs:label ?question.
+                                ?status rdfs:label ?statusLabel.
                               } 
+                               BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
                              } ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Which species is {0}?"
+                            TaskDescription = "Which one of these species is {0}?"
                         },
                         new
                         {
@@ -2344,12 +2346,13 @@ namespace WikidataGame.Backend.Migrations
                               SERVICE wikibase:label { 
                                 bd:serviceParam wikibase:language 'en'.
                                 ?item  rdfs:label ?itemLabel.
-                                ?status rdfs:label ?question.
+                                ?status rdfs:label ?statusLabel.
                               } 
+                               BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
                              } ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Which species is {0}?"
+                            TaskDescription = "Which one of these species is {0}?"
                         },
                         new
                         {
@@ -2430,19 +2433,20 @@ namespace WikidataGame.Backend.Migrations
                               LIMIT 1
                             } as %selectedSpecies
 
-                            WHERE {
+                          WHERE {
                               {INCLUDE %selectedSpecies} 
                                UNION 
                               {INCLUDE %noproblem}
                               SERVICE wikibase:label { 
                                 bd:serviceParam wikibase:language 'en'.
                                 ?item  rdfs:label ?itemLabel.
-                                ?status rdfs:label ?question.
+                                ?status rdfs:label ?statusLabel.
                               } 
+                               BIND(REPLACE(str(?statusLabel), 'species', '') AS ?question)
                              } ORDER BY DESC(?question)
                             ",
                             Status = 2,
-                            TaskDescription = "Which species is {0}?"
+                            TaskDescription = "Which one of these species is {0}?"
                         },
                         new
                         {
@@ -3494,7 +3498,7 @@ namespace WikidataGame.Backend.Migrations
                             GroupId = new Guid("acc3d752-2880-4882-ba16-e3deb3ee9cee"),
                             MiniGameType = 2,
                             SparqlQuery = @"
-                                SELECT DISTINCT ?question ?answer 
+                               SELECT DISTINCT ?question ?answer 
                                 WITH{
                                  SELECT DISTINCT ?inventorLabel (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?itemLabel); SEPARATOR=',')) AS ?itemLabel)
                                   WHERE 
@@ -3509,24 +3513,32 @@ namespace WikidataGame.Backend.Migrations
                                       filter(lang(?itemLabel) = 'en').
                                     }
                                   group by ?inventorLabel
-                                  ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
                                  } as %allInventors
 
                                 WITH{
-                                 SELECT ?inventorLabel ?itemLabel
+                                 SELECT (group_concat(distinct sample(?inventorLabel); separator=', ') as ?inventors) ?itemLabel
                                   WHERE 
                                     { 
                                      INCLUDE %allInventors
+                                    }
+                                   group by ?itemLabel
+                                } as %groupedInventors
+
+                               WITH{
+                                 SELECT ?inventors ?itemLabel
+                                  WHERE 
+                                    { 
+                                     INCLUDE %groupedInventors
                                     }
                                    ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
                                    LIMIT 1
                                 } as %selectedInventor
 
                                 WITH{
-                                 SELECT Distinct ?inventorLabel
+                                 SELECT Distinct ?inventors
                                   WHERE 
                                     { 
-                                     INCLUDE %allInventors.
+                                     INCLUDE %groupedInventors.
                                      FILTER NOT EXISTS {INCLUDE %selectedInventor}
                                     }
                                    ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
@@ -3537,7 +3549,7 @@ namespace WikidataGame.Backend.Migrations
                                   {INCLUDE %selectedInventor}
                                   UNION
                                   {INCLUDE %decoyInventors}
-                                  BIND(?inventorLabel as ?answer)
+                                  BIND(?inventors as ?answer)
                                   Bind(?itemLabel as ?question)
                                 }
 
@@ -4520,7 +4532,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "7463a0d0-4a07-437c-a304-101cfd474318",
+                            ConcurrencyStamp = "9d406ede-473a-4577-abf0-acfcf505f649",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,

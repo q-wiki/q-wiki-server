@@ -3295,7 +3295,7 @@ namespace WikidataGame.Backend.Helpers
                       Status = QuestionStatus.Approved,
                       TaskDescription = "Who invented {0}?",
                       SparqlQuery = @"
-                                SELECT DISTINCT ?question ?answer 
+                               SELECT DISTINCT ?question ?answer 
                                 WITH{
                                  SELECT DISTINCT ?inventorLabel (SAMPLE(GROUP_CONCAT(DISTINCT SAMPLE(?itemLabel); SEPARATOR=',')) AS ?itemLabel)
                                   WHERE 
@@ -3310,24 +3310,32 @@ namespace WikidataGame.Backend.Helpers
                                       filter(lang(?itemLabel) = 'en').
                                     }
                                   group by ?inventorLabel
-                                  ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
                                  } as %allInventors
 
                                 WITH{
-                                 SELECT ?inventorLabel ?itemLabel
+                                 SELECT (group_concat(distinct sample(?inventorLabel); separator=', ') as ?inventors) ?itemLabel
                                   WHERE 
                                     { 
                                      INCLUDE %allInventors
+                                    }
+                                   group by ?itemLabel
+                                } as %groupedInventors
+
+                               WITH{
+                                 SELECT ?inventors ?itemLabel
+                                  WHERE 
+                                    { 
+                                     INCLUDE %groupedInventors
                                     }
                                    ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
                                    LIMIT 1
                                 } as %selectedInventor
 
                                 WITH{
-                                 SELECT Distinct ?inventorLabel
+                                 SELECT Distinct ?inventors
                                   WHERE 
                                     { 
-                                     INCLUDE %allInventors.
+                                     INCLUDE %groupedInventors.
                                      FILTER NOT EXISTS {INCLUDE %selectedInventor}
                                     }
                                    ORDER BY (MD5(CONCAT(STR(?inventorLabel), STR(NOW())))) 
@@ -3338,7 +3346,7 @@ namespace WikidataGame.Backend.Helpers
                                   {INCLUDE %selectedInventor}
                                   UNION
                                   {INCLUDE %decoyInventors}
-                                  BIND(?inventorLabel as ?answer)
+                                  BIND(?inventors as ?answer)
                                   Bind(?itemLabel as ?question)
                                 }
 

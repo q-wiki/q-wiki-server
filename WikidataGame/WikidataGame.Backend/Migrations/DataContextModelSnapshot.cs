@@ -3832,7 +3832,7 @@ namespace WikidataGame.Backend.Migrations
                             #Structure is important to get only one drink of a inception year and avoid duplicates
                             SELECT DISTINCT ?question  ?answer ?year
                             WITH{
-                                    SELECT (Sample(GROUP_CONCAT(DISTINCT sample(?softDrink); SEPARATOR=', ')) AS ?softDrink) (Sample(GROUP_CONCAT( DISTINCT sample(?softDrinkLabel); SEPARATOR=', ')) AS ?softDrinkLabel) (year(?inception) as ?year) 
+                                    SELECT (Sample(GROUP_CONCAT(DISTINCT sample(?softDrink); SEPARATOR=', ')) AS ?softDrink) (Sample(GROUP_CONCAT( DISTINCT sample(?softDrinkLabel); SEPARATOR=', ')) AS ?softDrinkLabel) ?year
                                     WHERE {
                                          ?softDrink (wd:wd31|wdt:P279)* wd:Q147538.
                                          ?softDrink wdt:P571 ?inception.
@@ -3845,7 +3845,7 @@ namespace WikidataGame.Backend.Migrations
                                                                                }
                                          BIND(Year(?inception) as ?year)
                                     }
-                                    group by ?inception
+                                    group by ?year
                                     ORDER BY (MD5(CONCAT(STR(?year), STR(NOW()))))                
                             } as %allSoftDrinks
 
@@ -4530,7 +4530,7 @@ namespace WikidataGame.Backend.Migrations
                         {
                             Id = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "bf3f3567-ea72-487c-adcc-c9761eb3bc6c",
+                            ConcurrencyStamp = "49593cca-a998-491c-98fe-4b0951fa3647",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,
